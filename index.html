@@ -3,42 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FFF Arch Maker - Pro V5 Construction Dark</title>
+    <title>FFF Arch Maker - Pro V6</title>
     <style>
-        /* Global Construction Dark Theme */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1e1c1a; color: #f4f4f2; margin: 0; padding: 0; overflow-x: hidden; }
+        /* Global Theme */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1a1817; color: #f4f4f2; margin: 0; padding: 0; overflow-x: hidden; }
         
         /* Minimalist Top Bar */
         .top-bar { background-color: #12100f; border-bottom: 1px solid #333; padding: 3px 10px; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 100; height: 15px;}
         .top-bar h1 { color: #888; font-size: 13px; margin: 0; letter-spacing: 0.5px; text-transform: uppercase;}
 
-        /* Viewport Logic (Viewport First, Construction Optimized) */
+        /* Viewport Logic */
         .viewport-container { position: relative; width: 100%; height: calc(60vh); max-height: 550px; background: #0a1d3b; border-bottom: 1px solid #333; overflow: hidden; }
         canvas { display: block; width: 100%; height: 100%; }
 
-        /* Floating Opaque Overlay Inputs (White fields, Non-transparent) */
-        .floating-input { position: absolute; display: flex; flex-direction: column; align-items: flex-start; z-index: 20; background: #fff; border: 1px solid #444; border-radius: 6px; padding: 5px; opacity: 1;}
-        .floating-input label { font-size: 10px; font-weight: bold; color: #666; text-transform: uppercase; margin-bottom: 1px;}
-        .floating-input input { width: 60px; background: #fff; border: none; color: #000; font-weight: bold; border-radius: 2px; padding: 3px; font-size: 15px; text-align: center; font-family: monospace;}
-        .floating-input input:focus { outline: none; border: 1px solid #58a6ff; }
+        /* Floating Opaque Overlay Inputs (Centered Text) */
+        .floating-input { position: absolute; display: flex; flex-direction: column; align-items: center; z-index: 20; background: #ffffff; border: 1px solid #444; border-radius: 6px; padding: 5px; opacity: 1; min-width: 65px; box-shadow: 0px 4px 6px rgba(0,0,0,0.3);}
+        .floating-input label { width: 100%; text-align: center; font-size: 10px; font-weight: bold; color: #555; text-transform: uppercase; margin-bottom: 2px;}
+        .floating-input input { width: 60px; background: #f2f2f2; border: 1px solid #ccc; color: #000; font-weight: bold; border-radius: 3px; padding: 3px; font-size: 15px; text-align: center; font-family: monospace;}
+        .floating-input input:focus { outline: none; border: 1px solid #58a6ff; background: #fff;}
         
         /* Minimalist Corner Positioning */
-        .input-height { top: 10px; left: 10px; }
-        .input-diameter { top: 10px; right: 10px; }
-        .input-span { bottom: 10px; left: 10px; } 
-        .input-depth { bottom: 10px; right: 10px; }
+        .input-height { top: 12px; left: 12px; }
+        .input-diameter { top: 12px; right: 12px; }
+        .input-span { bottom: 12px; left: 12px; } 
+        .input-depth { bottom: 12px; right: 12px; }
 
-        /* Minimalist Results Section (Scroll down) */
-        .results-container { padding: 10px; max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        /* Minimalist Results Section */
+        .results-container { padding: 12px; max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         @media (max-width: 600px) { .results-container { grid-template-columns: 1fr; } }
         
-        .result-panel { padding: 8px; border-bottom: 1px solid #333; display: flex; flex-direction: column; gap: 4px; background-color: #1e1c1a;}
-        .section-title { font-size: 10px; text-transform: uppercase; color: #58a6ff; font-weight: bold; padding-bottom: 1px; margin: 0; border-bottom: 1px solid #333;}
-        .result-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #aaa; margin: 0;}
+        .result-panel { padding: 10px; border-bottom: 1px solid #333; display: flex; flex-direction: column; gap: 5px; background-color: #1a1817;}
+        .section-title { font-size: 11px; text-transform: uppercase; color: #58a6ff; font-weight: bold; padding-bottom: 2px; margin: 0; border-bottom: 1px solid #333;}
+        .result-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #bbb; margin: 0;}
         .value { font-size: 15px; font-weight: bold; color: #fff; font-family: monospace;}
         .value-highlight { color: #58a6ff; font-size: 17px; font-weight: bold; font-family: monospace;}
         
-        .note { font-size: 10px; color: #555; text-align: center; margin: 10px 10px 20px 15px;}
+        .note { font-size: 10px; color: #666; text-align: center; margin: 10px 15px 25px 15px;}
     </style>
 </head>
 <body>
@@ -92,7 +92,7 @@
         </div>
     </div>
 
-    <p class="note">The continuous dark brown line is the ground. Red cross is origin (0,0). White grid with hierarchy (0.5m thinner) zanika płynnie w całym oknie. Viewport V5 Construction Dark optimized.</p>
+    <p class="note">The continuous brown line is the ground. Red cross is origin (0,0). White grid respects visual hierarchy.</p>
 
     <script>
         function formatInput(element, decimals) {
@@ -125,7 +125,7 @@
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            const margin = 70; // 
+            const margin = 75; // Bezpieczny margines od krawędzi
             const drawWidth = canvas.width - margin * 2;
             const drawHeight = canvas.height - margin * 2;
             
@@ -138,84 +138,86 @@
             const groundY = offsetY - (depth * scale);
 
             // --- Geodezyjna wizualizacja tła ---
-            // Niebo (Gradient nad gruntem, ciemny green-blue)
+            // Niebo (Jasniejszy gradient nad gruntem, blue do green)
             let skyGradient = ctx.createLinearGradient(0, 0, 0, groundY);
-            skyGradient.addColorStop(0, '#0a1d3b'); 
-            skyGradient.addColorStop(1, '#0a3120'); 
+            skyGradient.addColorStop(0, '#152b45'); 
+            skyGradient.addColorStop(1, '#1b4332'); 
             ctx.fillStyle = skyGradient;
             ctx.fillRect(0, 0, canvas.width, groundY);
             
-            // Grunt (Ciemny brązowo-szary pod ziemią)
-            ctx.fillStyle = '#261e14'; 
+            // Grunt (Jaśniejszy szaro-brązowy)
+            ctx.fillStyle = '#3a2e24'; 
             ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
 
-            // --- Inżynieryjna Siatka (Mocno ciemno szare, Hierarchy) ---
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            // --- Biała Siatka (Naprawiona i Zróżnicowana) ---
             ctx.font = '11px monospace'; 
-            ctx.textAlign = 'center';
-            ctx.beginPath();
             
-            // Linie pionowe (X, Hierarchy, Fills entire window)
+            // Linie pionowe (X)
             for(let x = - (Math.ceil(span/2)+2); x <= (Math.ceil(span/2)+2); x += 0.5) { 
+                ctx.beginPath();
                 let scaledX = x * scale;
-                // Hierarchy based on 0.5 steps
                 if (Number.isInteger(x)) {
-                    ctx.strokeStyle = 'rgba(30, 30, 30, 1)'; // Pełne metry dark grey
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; // Grubsze pełne metry
                     ctx.lineWidth = 1;
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                    ctx.textAlign = 'center';
                     if (x !== 0) {
-                        ctx.fillText(x + 'm', offsetX + scaledX, groundY + 13);
-                        ctx.fillText('-' + x + 'm', offsetX - scaledX, groundY + 13);
+                        ctx.fillText(x + 'm', offsetX + scaledX, groundY + 14);
                     }
                 } else {
-                    ctx.strokeStyle = 'rgba(10, 10, 10, 1)'; // 0.5m half thick, very dark
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)'; // Cieniutkie pół-metry
                     ctx.lineWidth = 0.5;
                 }
-                ctx.moveTo(offsetX + scaledX, 0); ctx.lineTo(offsetX + scaledX, canvas.height);
-                ctx.moveTo(offsetX - scaledX, 0); ctx.lineTo(offsetX - scaledX, canvas.height);
+                ctx.moveTo(offsetX + scaledX, 0); 
+                ctx.lineTo(offsetX + scaledX, canvas.height);
+                ctx.stroke();
             }
-            // Linie poziome (Y, Hierarchy, Fills entire window)
+
+            // Linie poziome (Y)
             ctx.textAlign = 'left';
             ctx.textBaseline = 'middle';
             for(let y = - (Math.floor(depth)+2); y <= (Math.ceil(height)+2); y += 0.5) { 
+                ctx.beginPath();
                 let scaledY = y * scale;
                 if (Number.isInteger(y)) {
-                    ctx.strokeStyle = 'rgba(30, 30, 30, 1)'; // Pełne metry dark grey
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; // Grubsze pełne metry
                     ctx.lineWidth = 1;
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
                     if (y !== 0) {
-                        ctx.fillText(y + 'm', offsetX + scaledX + 5, offsetY - scaledY);
+                        ctx.fillText(y + 'm', offsetX + 5, offsetY - scaledY);
                     }
                 } else {
-                    ctx.strokeStyle = 'rgba(10, 10, 10, 1)'; // 0.5m half thick, very dark
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)'; // Cieniutkie pół-metry
                     ctx.lineWidth = 0.5;
                 }
-                ctx.moveTo(0, offsetY - scaledY); ctx.lineTo(canvas.width, offsetY - scaledY);
+                ctx.moveTo(0, offsetY - scaledY); 
+                ctx.lineTo(canvas.width, offsetY - scaledY);
+                ctx.stroke();
             }
-            ctx.stroke();
 
-            // --- Czerwony Krzyżyk (Początek Układu) ---
-            ctx.strokeStyle = '#ff3333';
-            ctx.lineWidth = 1.5;
+            // --- Ciągła Brązowa Linia Gruntu ---
             ctx.beginPath();
-            ctx.moveTo(offsetX - 7, groundY); ctx.lineTo(offsetX + 7, groundY);
-            ctx.moveTo(offsetX, groundY - 7); ctx.lineTo(offsetX, groundY + 7);
-            ctx.stroke();
-
-            // --- Ciągła Ciemnobrązowa Linia Gruntu ---
-            ctx.strokeStyle = '#3d2b1a';
+            ctx.strokeStyle = '#5e412f'; // Wyraźny brąz
             ctx.lineWidth = 2;
-            ctx.beginPath();
             ctx.moveTo(0, groundY);
             ctx.lineTo(canvas.width, groundY);
             ctx.stroke();
 
+            // --- Czerwony Krzyżyk (Początek Układu) ---
+            ctx.beginPath();
+            ctx.strokeStyle = '#ff4444';
+            ctx.lineWidth = 2;
+            ctx.moveTo(offsetX - 8, groundY); ctx.lineTo(offsetX + 8, groundY);
+            ctx.moveTo(offsetX, groundY - 8); ctx.lineTo(offsetX, groundY + 8);
+            ctx.stroke();
+
             // --- Fizyczna Grubość Rękawa ---
+            ctx.beginPath();
             ctx.lineWidth = (diameter / 100) * scale;
-            ctx.strokeStyle = '#ddd'; 
+            ctx.strokeStyle = '#e0e0e0'; // Jasnoszary łuk, bardzo widoczny
             ctx.lineCap = 'butt';
             ctx.lineJoin = 'round';
 
-            // --- Prawdziwa Krzywa Łańcuchowa (zawsze w bezpiecznej strefie V5) ---
-            ctx.beginPath();
             const numSteps = 150;
             for (let i = 0; i <= numSteps; i++) {
                 let t = i / numSteps;
