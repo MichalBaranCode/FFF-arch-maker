@@ -1,69 +1,99 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FFF Arch Maker - Pro V2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FFF Arch Maker - Pro V3</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0d1117; color: #c9d1d9; padding: 20px; max-width: 800px; margin: 0 auto; }
-        h2 { color: #58a6ff; text-align: center; border-bottom: 1px solid #30363d; padding-bottom: 10px; margin-bottom: 20px;}
-        .grid-container { display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; }
-        @media (max-width: 650px) { .grid-container { grid-template-columns: 1fr; } }
-        label { display: block; margin-top: 10px; font-weight: bold; color: #8b949e; font-size: 13px;}
-        input { width: 100%; box-sizing: border-box; padding: 10px; margin-top: 5px; background: #21262d; border: 1px solid #30363d; color: #c9d1d9; border-radius: 6px; font-size: 16px; font-family: monospace;}
-        input:focus { outline: none; border-color: #58a6ff; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0d1117; color: #c9d1d9; margin: 0; padding: 0; overflow-x: hidden; }
         
-        .result-panel { padding: 15px; background: #161b22; border: 1px solid #30363d; border-left: 4px solid #58a6ff; border-radius: 6px; display: flex; flex-direction: column; gap: 12px;}
+        /* Top Navigation Bar */
+        .top-bar { background-color: #161b22; border-bottom: 1px solid #30363d; padding: 10px 20px; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 100; height: 30px;}
+        .top-bar h1 { color: #58a6ff; font-size: 18px; margin: 0; letter-spacing: 1px; text-transform: uppercase;}
+
+        /* Canvas Wrapper (Viewport First) */
+        .viewport-container { position: relative; width: 100%; height: calc(100vh - 50px); max-height: 700px; background: #010409; border-bottom: 1px solid #30363d;}
+        canvas { display: block; width: 100%; height: 100%; object-fit: contain; }
+
+        /* Floating UI Inputs */
+        .floating-input { position: absolute; background: rgba(22, 27, 34, 0.85); border: 1px solid #30363d; border-radius: 8px; padding: 8px; backdrop-filter: blur(4px); display: flex; flex-direction: column; align-items: center; min-width: 80px; z-index: 10;}
+        .floating-input label { font-size: 11px; font-weight: bold; color: #8b949e; text-transform: uppercase; margin-bottom: 4px; text-align: center;}
+        .floating-input input { width: 70px; background: #0d1117; border: 1px solid #484f58; color: #58a6ff; font-weight: bold; border-radius: 4px; padding: 6px; font-size: 16px; text-align: center; font-family: monospace;}
+        .floating-input input:focus { outline: none; border-color: #58a6ff; }
+        
+        /* Positioning the Floating Inputs */
+        .input-height { top: 15px; left: 15px; }
+        .input-diameter { top: 15px; right: 15px; }
+        .input-span { bottom: 15px; left: 50%; transform: translateX(-50%); }
+        .input-depth { bottom: 15px; right: 15px; }
+
+        /* Results Section (Scroll down) */
+        .results-container { padding: 20px; max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 600px) { .results-container { grid-template-columns: 1fr; } }
+        
+        .result-panel { padding: 15px; background: #161b22; border: 1px solid #30363d; border-radius: 6px; display: flex; flex-direction: column; gap: 10px;}
         .section-title { font-size: 12px; text-transform: uppercase; color: #58a6ff; font-weight: bold; border-bottom: 1px solid #30363d; padding-bottom: 4px; margin: 0;}
         .result-row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #8b949e; margin: 2px 0;}
         .value { font-size: 16px; font-weight: bold; color: #ffffff; font-family: monospace;}
         .value-highlight { color: #58a6ff; font-size: 18px; font-weight: bold; font-family: monospace;}
         
-        canvas { display: block; width: 100%; background: #010409; border: 1px solid #30363d; border-radius: 6px; margin-top: 20px; }
-        .note { font-size: 11px; color: #484f58; text-align: center; margin-top: 10px;}
+        .note { font-size: 11px; color: #484f58; text-align: center; margin: 20px 20px 40px 20px;}
     </style>
 </head>
 <body>
-    <h2>FFF Arch Maker</h2>
 
-    <div class="grid-container">
-        <div>
-            <label>Całkowita rozpiętość łuku (L) [m]:</label>
-            <input type="number" id="span" value="2.00" step="0.01" oninput="calculate()" onblur="formatInput(this, 2)">
+    <div class="top-bar">
+        <h1>FFF Arch Maker</h1>
+    </div>
 
-            <label>Całkowita wysokość łuku (h) [m]:</label>
+    <div class="viewport-container">
+        <canvas id="archCanvas" width="800" height="800"></canvas>
+        
+        <div class="floating-input input-height">
+            <label>Height (m)</label>
             <input type="number" id="height" value="1.50" step="0.01" oninput="calculate()" onblur="formatInput(this, 2)">
+        </div>
 
-            <label>Głębokość fundamentu w gruncie [m]:</label>
-            <input type="number" id="depth" value="0.30" step="0.01" oninput="calculate()" onblur="formatInput(this, 2)">
-
-            <label>Średnica rękawa [cm]:</label>
+        <div class="floating-input input-diameter">
+            <label>Tube Ø (cm)</label>
             <input type="number" id="diameter" value="10.0" step="0.1" oninput="calculate()" onblur="formatInput(this, 1)">
         </div>
 
-        <div class="result-panel">
-            <p class="section-title">Parametry nad gruntem</p>
-            <div class="result-row">Rozpiętość wizualna:<span class="value" id="spanAbove">0.00 m</span></div>
-            <div class="result-row">Wysokość wizualna:<span class="value" id="heightAbove">0.00 m</span></div>
-            <div class="result-row">Długość rękawa (widoczna):<span class="value" id="lengthAbove">0.00 m</span></div>
-            
-            <p class="section-title" style="margin-top: 5px;">Parametry w gruncie</p>
-            <div class="result-row">Odcinek kiszki w jednym otworze:<span class="value" id="lengthUnder">0.00 m</span></div>
-            <div class="result-row">Całkowita długość rękawa (L+P):<span class="value-highlight" id="lengthTotal">0.00 m</span></div>
+        <div class="floating-input input-span">
+            <label>Span (m)</label>
+            <input type="number" id="span" value="2.00" step="0.01" oninput="calculate()" onblur="formatInput(this, 2)">
+        </div>
 
-            <p class="section-title" style="margin-top: 5px;">Materiały (Całość)</p>
-            <div class="result-row">Objętość zaprawy:<span class="value" id="volume">0.0 l</span></div>
-            <div class="result-row" style="color:#fff;">Mapefill PRO (Sucha masa):<span class="value-highlight" id="dryMass">0.0 kg</span></div>
-            <div class="result-row">Woda (14% - 15%):<span class="value" id="waterRange">0.0 - 0.0 l</span></div>
-            <div class="result-row">Masa gotowego łuku:<span class="value" id="totalMass">0.0 - 0.0 kg</span></div>
+        <div class="floating-input input-depth">
+            <label>Depth (m)</label>
+            <input type="number" id="depth" value="0.30" step="0.01" oninput="calculate()" onblur="formatInput(this, 2)">
         </div>
     </div>
 
-    <canvas id="archCanvas" width="800" height="450"></canvas>
-    <p class="note">Niebieska linia oznacza poziom gruntu. Część krzywej poniżej znajduje się w odwiertach fundamentowych.</p>
+    <div class="results-container">
+        <div class="result-panel">
+            <p class="section-title">Above Ground Parameters</p>
+            <div class="result-row">Visual Span:<span class="value" id="spanAbove">0.00 m</span></div>
+            <div class="result-row">Visual Height:<span class="value" id="heightAbove">0.00 m</span></div>
+            <div class="result-row">Visible Tube Length:<span class="value" id="lengthAbove">0.00 m</span></div>
+            
+            <p class="section-title" style="margin-top: 15px;">Underground Parameters</p>
+            <div class="result-row">Tube Length per Hole:<span class="value" id="lengthUnder">0.00 m</span></div>
+            <div class="result-row">Total Tube Length (L+R):<span class="value-highlight" id="lengthTotal">0.00 m</span></div>
+        </div>
+
+        <div class="result-panel">
+            <p class="section-title">Materials (Total)</p>
+            <div class="result-row">Mortar Volume:<span class="value" id="volume">0.0 l</span></div>
+            <div class="result-row" style="color:#fff;">Mapefill PRO (Dry Mass):<span class="value-highlight" id="dryMass">0.0 kg</span></div>
+            <div class="result-row">Water (14% - 15%):<span class="value" id="waterRange">0.0 - 0.0 l</span></div>
+            <div class="result-row">Total Arch Mass:<span class="value" id="totalMass">0.0 - 0.0 kg</span></div>
+        </div>
+    </div>
+
+    <p class="note">The blue dashed line represents the ground level. The segment of the curve below it is located in the foundation drill holes.</p>
 
     <script>
-        // Funkcja wymuszająca odpowiedni format przy opuszczeniu pola
         function formatInput(element, decimals) {
             if(element.value !== "") {
                 element.value = parseFloat(element.value).toFixed(decimals);
@@ -71,7 +101,6 @@
             calculate();
         }
 
-        // Metoda bisekcji dla parametru 'a' krzywej łańcuchowej
         function findCatenaryParameterA(span, height) {
             let L_half = span / 2;
             let a_min = 0.001;
@@ -95,11 +124,10 @@
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            const margin = 40;
+            const margin = 80;
             const drawWidth = canvas.width - margin * 2;
             const drawHeight = canvas.height - margin * 2;
             
-            // Zachowanie proporcji X/Y = 1
             const scaleX = drawWidth / span;
             const scaleY = drawHeight / height;
             const scale = Math.min(scaleX, scaleY);
@@ -107,61 +135,57 @@
             const offsetX = canvas.width / 2;
             const offsetY = canvas.height - margin - (drawHeight - (height * scale)) / 2;
 
-            // Rysowanie metrycznej siatki odniesienia (co 0.5 metra)
+            // Metric Grid
             ctx.strokeStyle = '#21262d';
             ctx.lineWidth = 1;
             ctx.fillStyle = '#484f58';
-            ctx.font = '10px monospace';
+            ctx.font = '12px monospace';
             ctx.textAlign = 'center';
             ctx.beginPath();
             
-            // Linie pionowe (X)
             for(let x = 0; x <= span/2 + 0.5; x += 0.5) {
                 let scaledX = x * scale;
                 ctx.moveTo(offsetX + scaledX, 0); ctx.lineTo(offsetX + scaledX, canvas.height);
                 ctx.moveTo(offsetX - scaledX, 0); ctx.lineTo(offsetX - scaledX, canvas.height);
-                // Etykiety X (tylko pełne metry)
                 if (Number.isInteger(x) && x !== 0) {
-                    ctx.fillText(x + 'm', offsetX + scaledX + 10, offsetY - 5);
-                    ctx.fillText('-' + x + 'm', offsetX - scaledX - 12, offsetY - 5);
+                    ctx.fillText(x + 'm', offsetX + scaledX + 15, offsetY - 10);
+                    ctx.fillText('-' + x + 'm', offsetX - scaledX - 18, offsetY - 10);
                 }
             }
-            // Linie poziome (Y)
             ctx.textAlign = 'left';
             ctx.textBaseline = 'bottom';
             for(let y = 0; y <= height + 0.5; y += 0.5) {
                 let scaledY = y * scale;
                 ctx.moveTo(0, offsetY - scaledY); ctx.lineTo(canvas.width, offsetY - scaledY);
-                // Etykiety Y
                 if (Number.isInteger(y) && y !== 0) {
-                    ctx.fillText(y + 'm', offsetX + 5, offsetY - scaledY - 2);
+                    ctx.fillText(y + 'm', offsetX + 8, offsetY - scaledY - 4);
                 }
             }
             ctx.stroke();
 
-            // Płaszczyzna gruntu (uwzględniająca głębokość fundamentu)
+            // Ground Level
             const groundY = offsetY - (depth * scale);
             ctx.strokeStyle = '#58a6ff';
             ctx.lineWidth = 2;
-            ctx.setLineDash([5, 5]); // przerywana linia dla ziemi
+            ctx.setLineDash([8, 8]);
             ctx.beginPath();
             ctx.moveTo(0, groundY);
             ctx.lineTo(canvas.width, groundY);
             ctx.stroke();
-            ctx.setLineDash([]); // reset
+            ctx.setLineDash([]);
 
-            // Rysowanie fizycznej grubości rękawa
+            // Physical Tube Thickness
             ctx.lineWidth = (diameter / 100) * scale;
             ctx.strokeStyle = '#8b949e'; 
             ctx.lineCap = 'butt';
             ctx.lineJoin = 'round';
 
-            // Precyzyjne generowanie krzywej łańcuchowej (naprawiony błąd "podnoszącej się nogi")
+            // Catenary Curve
             ctx.beginPath();
             const numSteps = 150;
             for (let i = 0; i <= numSteps; i++) {
                 let t = i / numSteps;
-                let x = -span / 2 + (t * span); // Twarde wyliczenie punktu na osi X
+                let x = -span / 2 + (t * span); 
                 let y = height - (a * (Math.cosh(x / a) - 1));
                 
                 let canvasX = offsetX + (x * scale);
@@ -174,39 +198,30 @@
         }
 
         function calculate() {
-            // Pobranie i walidacja danych wejściowych
             const span = Math.max(0.01, parseFloat(document.getElementById('span').value) || 0);
             const height = Math.max(0.01, parseFloat(document.getElementById('height').value) || 0);
             let depth = parseFloat(document.getElementById('depth').value) || 0;
             const diameter = Math.max(0.1, parseFloat(document.getElementById('diameter').value) || 0);
 
-            // Zabezpieczenie: łuk nie może być całkowicie pod ziemią dla matematyki wyświetlania
             if (depth >= height) depth = height - 0.001;
             if (depth < 0) depth = 0;
 
-            // 1. Obliczenia dla CAŁKOWITEGO łuku (wraz z fundamentem)
             const a = findCatenaryParameterA(span, height);
             const totalLength = 2 * a * Math.sinh((span / 2) / a);
             
-            // 2. Obliczenia dla geometrii NAD GRUNTEM
             const heightAbove = height - depth;
-            // Szukanie x, dla którego y(x) = depth (licząc od dołu), czyli gdzie krzywa przecina grunt
-            // Równanie z osią na dole: depth = height - a * (cosh(x/a) - 1)
             const cosh_val = (height - depth) / a + 1;
             const x_ground = a * Math.acosh(cosh_val);
             const spanAbove = 2 * x_ground;
             const lengthAbove = 2 * a * Math.sinh(x_ground / a);
 
-            // 3. Obliczenia dla fundamentu (w gruncie)
             const lengthUnderTotal = totalLength - lengthAbove;
             const lengthUnderPerLeg = lengthUnderTotal / 2;
 
-            // 4. Objętość i materiały (dla całości rękawa)
             const radiusMeters = (diameter / 2) / 100;
             const volumeCubicMeters = Math.PI * Math.pow(radiusMeters, 2) * totalLength;
             const volumeLiters = volumeCubicMeters * 1000;
             
-            // Mapefill PRO
             const dryMass = volumeLiters * 1.95;
             const waterMin = dryMass * 0.14;
             const waterMax = dryMass * 0.15;
@@ -214,7 +229,6 @@
             const totalMassMin = dryMass + waterMin;
             const totalMassMax = dryMass + waterMax;
 
-            // Aktualizacja interfejsu
             document.getElementById('spanAbove').innerText = spanAbove.toFixed(2) + " m";
             document.getElementById('heightAbove').innerText = heightAbove.toFixed(2) + " m";
             document.getElementById('lengthAbove').innerText = lengthAbove.toFixed(2) + " m";
@@ -227,11 +241,24 @@
             document.getElementById('waterRange').innerText = waterMin.toFixed(1) + " - " + waterMax.toFixed(1) + " l";
             document.getElementById('totalMass').innerText = totalMassMin.toFixed(1) + " - " + totalMassMax.toFixed(1) + " kg";
 
-            // Renderowanie na canvasie
             drawArch(span, height, depth, diameter, a);
         }
         
-        window.onload = calculate; 
+        window.onload = function() {
+            // Resize canvas to be square initially to prevent distortion before calculating
+            const canvas = document.getElementById('archCanvas');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientWidth;
+            calculate();
+        };
+
+        // Redraw on window resize to maintain visual fidelity
+        window.addEventListener('resize', function() {
+            const canvas = document.getElementById('archCanvas');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            calculate();
+        });
     </script>
 </body>
 </html>
