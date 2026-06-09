@@ -3,20 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FFF Arch Maker - Pro</title>
+    <title>FFF Arch Maker - Pro V2</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0d1117; color: #c9d1d9; padding: 20px; max-width: 700px; margin: 0 auto; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0d1117; color: #c9d1d9; padding: 20px; max-width: 800px; margin: 0 auto; }
         h2 { color: #58a6ff; text-align: center; border-bottom: 1px solid #30363d; padding-bottom: 10px; margin-bottom: 20px;}
         .grid-container { display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; }
-        @media (max-width: 600px) { .grid-container { grid-template-columns: 1fr; } }
-        label { display: block; margin-top: 10px; font-weight: bold; color: #8b949e; font-size: 14px;}
-        input { width: 100%; box-sizing: border-box; padding: 10px; margin-top: 5px; background: #21262d; border: 1px solid #30363d; color: #c9d1d9; border-radius: 6px; font-size: 16px; }
+        @media (max-width: 650px) { .grid-container { grid-template-columns: 1fr; } }
+        label { display: block; margin-top: 10px; font-weight: bold; color: #8b949e; font-size: 13px;}
+        input { width: 100%; box-sizing: border-box; padding: 10px; margin-top: 5px; background: #21262d; border: 1px solid #30363d; color: #c9d1d9; border-radius: 6px; font-size: 16px; font-family: monospace;}
         input:focus { outline: none; border-color: #58a6ff; }
-        .result { padding: 15px; background: #161b22; border: 1px solid #30363d; border-left: 4px solid #58a6ff; border-radius: 6px; display: flex; flex-direction: column; justify-content: center;}
-        .result p { margin: 8px 0; font-size: 14px; color: #8b949e; display: flex; justify-content: space-between; align-items: center;}
-        .value { font-size: 16px; font-weight: bold; color: #ffffff;}
-        .highlight { color: #58a6ff; font-size: 22px; display: block; text-align: right;}
-        canvas { display: block; width: 100%; background: #12161c; border: 1px solid #30363d; border-radius: 6px; margin-top: 20px; }
+        
+        .result-panel { padding: 15px; background: #161b22; border: 1px solid #30363d; border-left: 4px solid #58a6ff; border-radius: 6px; display: flex; flex-direction: column; gap: 12px;}
+        .section-title { font-size: 12px; text-transform: uppercase; color: #58a6ff; font-weight: bold; border-bottom: 1px solid #30363d; padding-bottom: 4px; margin: 0;}
+        .result-row { display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #8b949e; margin: 2px 0;}
+        .value { font-size: 16px; font-weight: bold; color: #ffffff; font-family: monospace;}
+        .value-highlight { color: #58a6ff; font-size: 18px; font-weight: bold; font-family: monospace;}
+        
+        canvas { display: block; width: 100%; background: #010409; border: 1px solid #30363d; border-radius: 6px; margin-top: 20px; }
         .note { font-size: 11px; color: #484f58; text-align: center; margin-top: 10px;}
     </style>
 </head>
@@ -25,38 +28,58 @@
 
     <div class="grid-container">
         <div>
-            <label>Rozpiętość łuku L (m):</label>
-            <input type="number" id="span" value="2.00" step="0.01" oninput="calculate()">
+            <label>Całkowita rozpiętość łuku (L) [m]:</label>
+            <input type="number" id="span" value="2.00" step="0.01" oninput="calculate()" onblur="formatInput(this, 2)">
 
-            <label>Wysokość łuku h (m):</label>
-            <input type="number" id="height" value="1.50" step="0.01" oninput="calculate()">
+            <label>Całkowita wysokość łuku (h) [m]:</label>
+            <input type="number" id="height" value="1.50" step="0.01" oninput="calculate()" onblur="formatInput(this, 2)">
 
-            <label>Średnica rękawa (cm):</label>
-            <input type="number" id="diameter" value="10.0" step="0.1" oninput="calculate()">
+            <label>Głębokość fundamentu w gruncie [m]:</label>
+            <input type="number" id="depth" value="0.30" step="0.01" oninput="calculate()" onblur="formatInput(this, 2)">
+
+            <label>Średnica rękawa [cm]:</label>
+            <input type="number" id="diameter" value="10.0" step="0.1" oninput="calculate()" onblur="formatInput(this, 1)">
         </div>
 
-        <div class="result">
-            <p>Długość rękawa: <span class="value" id="length">0.00 m</span></p>
-            <p>Objętość zaprawy: <span class="value" id="volume">0.00 l</span></p>
-            <hr style="width: 100%; border: 0; border-top: 1px solid #30363d; margin: 10px 0;">
-            <p style="color:#fff; font-weight:bold;">Mapefill PRO (Sucha masa): <span class="value highlight" id="dryMass">0.0 kg</span></p>
-            <p>Woda (14% - 15%): <span class="value" id="waterRange">0.0 - 0.0 l</span></p>
-            <p>Masa gotowego łuku: <span class="value" id="totalMass">0.0 - 0.0 kg</span></p>
+        <div class="result-panel">
+            <p class="section-title">Parametry nad gruntem</p>
+            <div class="result-row">Rozpiętość wizualna:<span class="value" id="spanAbove">0.00 m</span></div>
+            <div class="result-row">Wysokość wizualna:<span class="value" id="heightAbove">0.00 m</span></div>
+            <div class="result-row">Długość rękawa (widoczna):<span class="value" id="lengthAbove">0.00 m</span></div>
+            
+            <p class="section-title" style="margin-top: 5px;">Parametry w gruncie</p>
+            <div class="result-row">Odcinek kiszki w jednym otworze:<span class="value" id="lengthUnder">0.00 m</span></div>
+            <div class="result-row">Całkowita długość rękawa (L+P):<span class="value-highlight" id="lengthTotal">0.00 m</span></div>
+
+            <p class="section-title" style="margin-top: 5px;">Materiały (Całość)</p>
+            <div class="result-row">Objętość zaprawy:<span class="value" id="volume">0.0 l</span></div>
+            <div class="result-row" style="color:#fff;">Mapefill PRO (Sucha masa):<span class="value-highlight" id="dryMass">0.0 kg</span></div>
+            <div class="result-row">Woda (14% - 15%):<span class="value" id="waterRange">0.0 - 0.0 l</span></div>
+            <div class="result-row">Masa gotowego łuku:<span class="value" id="totalMass">0.0 - 0.0 kg</span></div>
         </div>
     </div>
 
-    <canvas id="archCanvas" width="600" height="350"></canvas>
-    <p class="note">Wizualizacja zachowuje idealne proporcje siatki (1:1). Kształt odzwierciedla prawdziwą matematyczną krzywą łańcuchową i fizyczną grubość rękawa w przestrzeni.</p>
+    <canvas id="archCanvas" width="800" height="450"></canvas>
+    <p class="note">Niebieska linia oznacza poziom gruntu. Część krzywej poniżej znajduje się w odwiertach fundamentowych.</p>
 
     <script>
+        // Funkcja wymuszająca odpowiedni format przy opuszczeniu pola
+        function formatInput(element, decimals) {
+            if(element.value !== "") {
+                element.value = parseFloat(element.value).toFixed(decimals);
+            }
+            calculate();
+        }
+
+        // Metoda bisekcji dla parametru 'a' krzywej łańcuchowej
         function findCatenaryParameterA(span, height) {
             let L_half = span / 2;
-            let a_min = 0.01;
+            let a_min = 0.001;
             let a_max = 100.0;
             let a = (a_min + a_max) / 2;
-            let tolerance = 0.0001;
+            let tolerance = 0.00001;
             
-            for (let i = 0; i < 100; i++) {
+            for (let i = 0; i < 150; i++) {
                 let calc_h = a * (Math.cosh(L_half / a) - 1);
                 let diff = calc_h - height;
                 if (Math.abs(diff) < tolerance) break;
@@ -67,7 +90,7 @@
             return a;
         }
 
-        function drawArch(span, height, diameter, a) {
+        function drawArch(span, height, depth, diameter, a) {
             const canvas = document.getElementById('archCanvas');
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -87,61 +110,103 @@
             // Rysowanie metrycznej siatki odniesienia (co 0.5 metra)
             ctx.strokeStyle = '#21262d';
             ctx.lineWidth = 1;
+            ctx.fillStyle = '#484f58';
+            ctx.font = '10px monospace';
+            ctx.textAlign = 'center';
             ctx.beginPath();
+            
+            // Linie pionowe (X)
             for(let x = 0; x <= span/2 + 0.5; x += 0.5) {
                 let scaledX = x * scale;
                 ctx.moveTo(offsetX + scaledX, 0); ctx.lineTo(offsetX + scaledX, canvas.height);
                 ctx.moveTo(offsetX - scaledX, 0); ctx.lineTo(offsetX - scaledX, canvas.height);
+                // Etykiety X (tylko pełne metry)
+                if (Number.isInteger(x) && x !== 0) {
+                    ctx.fillText(x + 'm', offsetX + scaledX + 10, offsetY - 5);
+                    ctx.fillText('-' + x + 'm', offsetX - scaledX - 12, offsetY - 5);
+                }
             }
+            // Linie poziome (Y)
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'bottom';
             for(let y = 0; y <= height + 0.5; y += 0.5) {
                 let scaledY = y * scale;
                 ctx.moveTo(0, offsetY - scaledY); ctx.lineTo(canvas.width, offsetY - scaledY);
+                // Etykiety Y
+                if (Number.isInteger(y) && y !== 0) {
+                    ctx.fillText(y + 'm', offsetX + 5, offsetY - scaledY - 2);
+                }
             }
             ctx.stroke();
 
-            // Płaszczyzna gruntu
+            // Płaszczyzna gruntu (uwzględniająca głębokość fundamentu)
+            const groundY = offsetY - (depth * scale);
             ctx.strokeStyle = '#58a6ff';
             ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]); // przerywana linia dla ziemi
             ctx.beginPath();
-            ctx.moveTo(0, offsetY);
-            ctx.lineTo(canvas.width, offsetY);
+            ctx.moveTo(0, groundY);
+            ctx.lineTo(canvas.width, groundY);
             ctx.stroke();
+            ctx.setLineDash([]); // reset
 
-            // Prawdziwa grubosc fizyczna łuku (skalowanie średnicy w metrach na piksele)
+            // Rysowanie fizycznej grubości rękawa
             ctx.lineWidth = (diameter / 100) * scale;
             ctx.strokeStyle = '#8b949e'; 
             ctx.lineCap = 'butt';
             ctx.lineJoin = 'round';
 
-            // Generowanie ciagłej krzywej łańcuchowej
+            // Precyzyjne generowanie krzywej łańcuchowej (naprawiony błąd "podnoszącej się nogi")
             ctx.beginPath();
-            const step = span / 150; 
-            for (let x = -span / 2; x <= span / 2; x += step) {
-                // Odwrotna krzywa łańcuchowa dla struktury stojącej
+            const numSteps = 150;
+            for (let i = 0; i <= numSteps; i++) {
+                let t = i / numSteps;
+                let x = -span / 2 + (t * span); // Twarde wyliczenie punktu na osi X
                 let y = height - (a * (Math.cosh(x / a) - 1));
                 
                 let canvasX = offsetX + (x * scale);
                 let canvasY = offsetY - (y * scale);
                 
-                if (x === -span / 2) ctx.moveTo(canvasX, canvasY);
+                if (i === 0) ctx.moveTo(canvasX, canvasY);
                 else ctx.lineTo(canvasX, canvasY);
             }
             ctx.stroke();
         }
 
         function calculate() {
-            const span = parseFloat(document.getElementById('span').value) || 0.001;
-            const height = parseFloat(document.getElementById('height').value) || 0.001;
-            const diameter = parseFloat(document.getElementById('diameter').value) || 0;
+            // Pobranie i walidacja danych wejściowych
+            const span = Math.max(0.01, parseFloat(document.getElementById('span').value) || 0);
+            const height = Math.max(0.01, parseFloat(document.getElementById('height').value) || 0);
+            let depth = parseFloat(document.getElementById('depth').value) || 0;
+            const diameter = Math.max(0.1, parseFloat(document.getElementById('diameter').value) || 0);
 
+            // Zabezpieczenie: łuk nie może być całkowicie pod ziemią dla matematyki wyświetlania
+            if (depth >= height) depth = height - 0.001;
+            if (depth < 0) depth = 0;
+
+            // 1. Obliczenia dla CAŁKOWITEGO łuku (wraz z fundamentem)
             const a = findCatenaryParameterA(span, height);
-            const length = 2 * a * Math.sinh((span / 2) / a);
+            const totalLength = 2 * a * Math.sinh((span / 2) / a);
             
+            // 2. Obliczenia dla geometrii NAD GRUNTEM
+            const heightAbove = height - depth;
+            // Szukanie x, dla którego y(x) = depth (licząc od dołu), czyli gdzie krzywa przecina grunt
+            // Równanie z osią na dole: depth = height - a * (cosh(x/a) - 1)
+            const cosh_val = (height - depth) / a + 1;
+            const x_ground = a * Math.acosh(cosh_val);
+            const spanAbove = 2 * x_ground;
+            const lengthAbove = 2 * a * Math.sinh(x_ground / a);
+
+            // 3. Obliczenia dla fundamentu (w gruncie)
+            const lengthUnderTotal = totalLength - lengthAbove;
+            const lengthUnderPerLeg = lengthUnderTotal / 2;
+
+            // 4. Objętość i materiały (dla całości rękawa)
             const radiusMeters = (diameter / 2) / 100;
-            const volumeCubicMeters = Math.PI * Math.pow(radiusMeters, 2) * length;
+            const volumeCubicMeters = Math.PI * Math.pow(radiusMeters, 2) * totalLength;
             const volumeLiters = volumeCubicMeters * 1000;
             
-            // Matematyka na twardych danych z Mapei
+            // Mapefill PRO
             const dryMass = volumeLiters * 1.95;
             const waterMin = dryMass * 0.14;
             const waterMax = dryMass * 0.15;
@@ -149,13 +214,21 @@
             const totalMassMin = dryMass + waterMin;
             const totalMassMax = dryMass + waterMax;
 
-            document.getElementById('length').innerText = length.toFixed(2) + " m";
+            // Aktualizacja interfejsu
+            document.getElementById('spanAbove').innerText = spanAbove.toFixed(2) + " m";
+            document.getElementById('heightAbove').innerText = heightAbove.toFixed(2) + " m";
+            document.getElementById('lengthAbove').innerText = lengthAbove.toFixed(2) + " m";
+            
+            document.getElementById('lengthUnder').innerText = lengthUnderPerLeg.toFixed(2) + " m";
+            document.getElementById('lengthTotal').innerText = totalLength.toFixed(2) + " m";
+
             document.getElementById('volume').innerText = volumeLiters.toFixed(1) + " l";
             document.getElementById('dryMass').innerText = dryMass.toFixed(1) + " kg";
             document.getElementById('waterRange').innerText = waterMin.toFixed(1) + " - " + waterMax.toFixed(1) + " l";
             document.getElementById('totalMass').innerText = totalMassMin.toFixed(1) + " - " + totalMassMax.toFixed(1) + " kg";
 
-            drawArch(span, height, diameter, a);
+            // Renderowanie na canvasie
+            drawArch(span, height, depth, diameter, a);
         }
         
         window.onload = calculate; 
