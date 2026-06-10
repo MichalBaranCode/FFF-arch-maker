@@ -3,47 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FFF Arch Maker - Pro V11 Construction Dark</title>
+    <title>FFF Arch Maker - Pro V12 Daylight</title>
     <style>
         /* Global Theme */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #151413; color: #f4f4f2; margin: 0; padding: 0; overflow-x: hidden; touch-action: manipulation; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #111; color: #f4f4f2; margin: 0; padding: 0; overflow-x: hidden; touch-action: manipulation; }
         
         /* Top Bar */
-        .top-bar { background-color: #0c0a09; border-bottom: 1px solid #2a2a2a; padding: 4px 10px; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 100; height: 16px;}
+        .top-bar { background-color: #0c0a09; border-bottom: 1px solid #222; padding: 4px 10px; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 100; height: 16px;}
         .top-bar h1 { color: #888; font-size: 11px; margin: 0; letter-spacing: 0.5px; text-transform: uppercase;}
         .version-badge { color: #58a6ff; font-weight: bold; margin-left: 5px; }
 
         /* Viewport */
-        .viewport-container { position: relative; width: 100%; height: calc(60vh); max-height: 550px; background: #08121f; border-bottom: 1px solid #2a2a2a; overflow: hidden; }
+        .viewport-container { position: relative; width: 100%; height: calc(60vh); max-height: 550px; background: #111; overflow: hidden; }
         canvas { display: block; width: 100%; height: 100%; }
 
-        /* HUD Boxes - Zoned Layout */
-        .hud-box { position: absolute; background: #ffffff; border: 1px solid #333; border-radius: 6px; padding: 0; overflow: hidden; box-shadow: 0px 4px 10px rgba(0,0,0,0.4); z-index: 20; width: 66px; display: flex; flex-direction: column; align-items: center;}
-        .hud-box-header { width: 100%; background: #e6e6e6; border-bottom: 1px solid #ccc; padding: 3px 0; display: flex; justify-content: center; align-items: center;}
-        .hud-box label { font-size: 9px; font-weight: bold; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin: 0;}
-        .hud-box input[type="number"] { width: 100%; border: none; text-align: center; font-size: 16px; font-weight: bold; color: #000; background: transparent; outline: none; font-family: monospace; padding: 5px 0;}
+        /* HUD Boxes - Modern Zoned Layout with subtle shadows */
+        .hud-box { position: absolute; background: #ffffff; border-radius: 4px; padding: 0; overflow: hidden; box-shadow: 0px 6px 15px rgba(0,0,0,0.25); z-index: 20; width: 68px; display: flex; flex-direction: column; align-items: center; border: 1px solid rgba(0,0,0,0.1);}
+        .hud-box-header { width: 100%; background: #f0f0f0; border-bottom: 1px solid #d4d4d4; padding: 4px 0; display: flex; justify-content: center; align-items: center;}
+        .hud-box label { font-size: 9px; font-weight: bold; color: #555; text-transform: uppercase; letter-spacing: 0.2px; margin: 0;}
+        .hud-box input[type="number"] { width: 100%; border: none; text-align: center; font-size: 15px; font-weight: bold; color: #111; background: #fff; outline: none; font-family: monospace; padding: 5px 0;}
         
         /* Box Positioning */
-        #box-height { top: 12px; left: 12px; }
-        #box-diameter { top: 12px; right: 12px; }
-        #box-span { bottom: 12px; left: 12px; } 
-        #box-depth { bottom: 12px; right: 12px; }
+        #box-height { top: 15px; left: 15px; }
+        #box-diameter { top: 15px; right: 15px; }
+        #box-span { bottom: 15px; left: 15px; } 
+        #box-depth { bottom: 15px; right: 15px; }
 
-        /* HUD Sliders - Hardware Look & Scroll Lock */
-        .hud-slider { position: absolute; z-index: 15; appearance: none; background: transparent; outline: none; touch-action: none; }
-        .hud-slider::-webkit-slider-runnable-track { width: 100%; height: 6px; background: rgba(0,0,0,0.6); border: 1px solid #444; border-radius: 3px; }
-        .hud-slider::-webkit-slider-thumb { appearance: none; width: 22px; height: 22px; background: radial-gradient(circle at 50% 20%, #f4f4f4, #777); border: 1px solid #444; border-radius: 50%; margin-top: -9px; cursor: pointer; box-shadow: 0 3px 5px rgba(0,0,0,0.6);}
+        /* HUD Sliders - Minimalist Hardware Look */
+        .hud-slider { position: absolute; z-index: 15; appearance: none; background: transparent; outline: none; touch-action: none; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.2)); }
+        .hud-slider::-webkit-slider-runnable-track { width: 100%; height: 3px; background: #444; border-radius: 2px; }
+        .hud-slider::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; background: radial-gradient(circle at 50% 10%, #fff, #888 80%, #444); border-radius: 50%; margin-top: -6.5px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.3);}
         
         /* Slider Positioning */
-        #sliderHeight { width: 150px; height: 22px; top: 145px; left: 15px; transform: translate(-50%, -50%) rotate(-90deg); }
-        #sliderSpan { width: 140px; height: 22px; bottom: 25px; left: 90px; }
+        #sliderHeight { width: 130px; height: 16px; top: 145px; left: 15px; transform: translate(-50%, -50%) rotate(-90deg); }
+        #sliderSpan { width: 130px; height: 16px; bottom: 25px; left: 95px; }
 
         /* Results */
         .results-container { padding: 10px; max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         @media (max-width: 600px) { .results-container { grid-template-columns: 1fr; } }
         
-        .result-panel { padding: 8px; border-bottom: 1px solid #2a2a2a; display: flex; flex-direction: column; gap: 4px; background-color: #151413;}
-        .section-title { font-size: 10px; text-transform: uppercase; color: #58a6ff; font-weight: bold; padding-bottom: 1px; margin: 0; border-bottom: 1px solid #2a2a2a;}
+        .result-panel { padding: 8px; border-bottom: 1px solid #222; display: flex; flex-direction: column; gap: 4px; background-color: #151413;}
+        .section-title { font-size: 10px; text-transform: uppercase; color: #58a6ff; font-weight: bold; padding-bottom: 1px; margin: 0; border-bottom: 1px solid #222;}
         .result-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #aaa; margin: 0;}
         .value { font-size: 15px; font-weight: bold; color: #fff; font-family: monospace;}
         .value-highlight { color: #58a6ff; font-size: 17px; font-weight: bold; font-family: monospace;}
@@ -54,7 +54,7 @@
 <body>
 
     <div class="top-bar">
-        <h1>FFF Arch Maker <span class="version-badge">V11</span></h1>
+        <h1>FFF Arch Maker <span class="version-badge">V12</span></h1>
     </div>
 
     <div class="viewport-container">
@@ -105,7 +105,7 @@
         </div>
     </div>
 
-    <p class="note">V11 Construction Dark. DPI scaling fixed. Slider scroll locked. Smooth 3D Central Shading applied.</p>
+    <p class="note">V12 Daylight Pro. Realistic Top-Lit 3D Shading. Arch-shaped Halo. Anti-glare Vignette.</p>
 
     <script>
         // Sync Logic
@@ -141,10 +141,9 @@
             return a;
         }
 
-        // Helper to draw catenary path
-        function drawCatenaryStroke(ctx, catenaryPoints, lineWidth, color) {
+        function drawCatenaryStroke(ctx, catenaryPoints, lineWidth, strokeStyle) {
             ctx.beginPath();
-            ctx.strokeStyle = color;
+            ctx.strokeStyle = strokeStyle;
             ctx.lineWidth = lineWidth;
             for (let i = 0; i < catenaryPoints.length; i++) {
                 let p = catenaryPoints[i];
@@ -158,7 +157,6 @@
             const canvas = document.getElementById('archCanvas');
             const ctx = canvas.getContext('2d');
             
-            // DPI Fix: Using CSS width/height for calculations, not raw pixel count
             const dpr = window.devicePixelRatio || 1;
             const cssWidth = canvas.width / dpr;
             const cssHeight = canvas.height / dpr;
@@ -166,7 +164,7 @@
             if (cssWidth === 0 || cssHeight === 0) return;
             
             ctx.save();
-            ctx.scale(dpr, dpr); // All drawing is now scaled perfectly for Retina displays
+            ctx.scale(dpr, dpr); 
             ctx.clearRect(0, 0, cssWidth, cssHeight);
 
             const margin = 80; 
@@ -181,46 +179,52 @@
             const offsetY = cssHeight - margin - (drawHeight - (height * scale)) / 2;
             const groundY = offsetY - (depth * scale);
 
-            // --- Tło Vignette V3 (Zieleń-Błękit i jasny brąz) ---
-            let skyRadius = cssWidth * 0.7;
-            let skyGradient = ctx.createRadialGradient(offsetX, groundY, 0, offsetX, groundY, skyRadius);
-            skyGradient.addColorStop(0, '#2d5a4c'); // Jasny, turkusowy środek
-            skyGradient.addColorStop(0.5, '#1c314a'); // Granat
-            skyGradient.addColorStop(1, '#070f1a'); // Mrok
+            // --- 1. Muted Daylight Background (Green to Blue) ---
+            let skyGradient = ctx.createLinearGradient(0, 0, 0, groundY);
+            skyGradient.addColorStop(0, '#2b4d66'); // Zgaszony błękit (góra)
+            skyGradient.addColorStop(1, '#2c4230'); // Zgaszona zieleń (nad ziemią)
             ctx.fillStyle = skyGradient;
             ctx.fillRect(0, 0, cssWidth, groundY);
             
-            let groundRadius = cssWidth * 0.7;
-            let groundGradient = ctx.createRadialGradient(offsetX, groundY, 0, offsetX, groundY, groundRadius);
-            groundGradient.addColorStop(0, '#4a3826'); // Ciepły, jasny brąz w centrum
-            groundGradient.addColorStop(1, '#14110e'); // Mroczny brąz na krawędziach
+            let groundGradient = ctx.createLinearGradient(0, groundY, 0, cssHeight);
+            groundGradient.addColorStop(0, '#3d2e24'); // Ciepły brąz ziemi
+            groundGradient.addColorStop(1, '#1c130e'); 
             ctx.fillStyle = groundGradient; 
             ctx.fillRect(0, groundY, cssWidth, cssHeight - groundY);
 
-            // Punkty krzywej dla siatki i renderowania
+            // Catenary Math for Path
             const numSteps = 150;
             const catenaryPoints = [];
+            let archTopY = offsetY; // find the peak for lighting calculation
             for (let i = 0; i <= numSteps; i++) {
                 let t = i / numSteps;
                 let x = -span / 2 + (t * span); 
                 let y = height - (a * (Math.cosh(x / a) - 1));
-                catenaryPoints.push({ x: offsetX + x * scale, y: offsetY - y * scale });
+                let canvasY = offsetY - y * scale;
+                catenaryPoints.push({ x: offsetX + x * scale, y: canvasY });
+                if (canvasY < archTopY) archTopY = canvasY;
             }
 
-            // --- Siatka (Fading) ---
+            // --- 2. Arch Halo (Glow exactly following the arch shape) ---
+            ctx.save();
+            ctx.shadowColor = 'rgba(255, 255, 255, 0.4)';
+            ctx.shadowBlur = 80;
+            drawCatenaryStroke(ctx, catenaryPoints, 20, 'rgba(255,255,255,0)'); // Transparent stroke, visible shadow
+            ctx.restore();
+
+            // --- 3. Grid (Fading) ---
             ctx.font = '10px monospace'; 
             ctx.textAlign = 'center';
-            
             for(let x = - (Math.ceil(span/2)+2); x <= (Math.ceil(span/2)+2); x += 0.5) { 
                 ctx.beginPath();
                 let scaledX = x * scale;
                 if (Number.isInteger(x)) {
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
                     ctx.lineWidth = 1;
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
                     if (x !== 0) ctx.fillText(x + 'm', offsetX + scaledX, groundY + 12);
                 } else {
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.07)';
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
                     ctx.lineWidth = 0.5;
                 }
                 
@@ -241,12 +245,12 @@
                 ctx.beginPath();
                 let scaledY = y * scale;
                 if (Number.isInteger(y)) {
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
                     ctx.lineWidth = 1;
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
                     if (y !== 0) ctx.fillText(y + 'm', offsetX + 8, offsetY - scaledY);
                 } else {
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.07)';
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
                     ctx.lineWidth = 0.5;
                 }
                 
@@ -261,39 +265,64 @@
                 ctx.globalAlpha = 1.0; 
             }
 
-            // --- Linia Gruntu (Zawsze pod krzyżykiem i łukiem) ---
-            ctx.strokeStyle = '#5c4028';
+            // --- 4. Anti-Glare Vignette (Zewnętrzny cień ekranu) ---
+            let vigGradient = ctx.createRadialGradient(cssWidth/2, cssHeight/2, cssHeight*0.4, cssWidth/2, cssHeight/2, cssWidth);
+            vigGradient.addColorStop(0, 'rgba(0,0,0,0)');
+            vigGradient.addColorStop(1, 'rgba(0,0,0,0.6)');
+            ctx.fillStyle = vigGradient;
+            ctx.fillRect(0, 0, cssWidth, cssHeight);
+
+            // --- 5. Linia Gruntu ---
+            ctx.strokeStyle = '#2b1a10';
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(0, groundY);
             ctx.lineTo(cssWidth, groundY);
             ctx.stroke();
 
-            // --- Smooth 3D Arch Shading (Wielowarstwowe światło z góry) ---
+            // --- 6. Top-Lit 3D Arch Shading (Render Effect) ---
             let baseWidth = Math.max(0.1, (diameter / 100) * scale);
             ctx.lineCap = 'butt';
             ctx.lineJoin = 'round';
 
-            // Zewnętrzny ciemny cień
-            drawCatenaryStroke(ctx, catenaryPoints, baseWidth, '#111');
-            // Średni ciemnoszary (formuje krawędzie)
-            drawCatenaryStroke(ctx, catenaryPoints, baseWidth * 0.8, '#444');
-            // Jasny szary materiał wewnątrz
-            drawCatenaryStroke(ctx, catenaryPoints, baseWidth * 0.6, '#888');
-            // Rozbielenie bliżej środka
-            drawCatenaryStroke(ctx, catenaryPoints, baseWidth * 0.35, '#ccc');
-            // Ostry biały highlight na samym środku
-            drawCatenaryStroke(ctx, catenaryPoints, baseWidth * 0.15, '#fff');
+            // Top Light Gradient (White at Peak, Dark Grey at Ground)
+            let lightGradient = ctx.createLinearGradient(0, archTopY, 0, groundY + (depth * scale));
+            lightGradient.addColorStop(0, '#f8f8f8'); // Jasny szczyt
+            lightGradient.addColorStop(0.8, '#555555'); // Ciemne nogi przy gruncie
+            lightGradient.addColorStop(1, '#222222'); // Ciemny fundament
 
-            // --- Czerwony Krzyżyk (Zawsze na samym wierzchu) ---
-            ctx.strokeStyle = '#ff2a2a';
+            // Highlight Gradient (Pure White at Peak, Transparent down)
+            let highGradient = ctx.createLinearGradient(0, archTopY, 0, groundY);
+            highGradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)'); 
+            highGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.1)');
+            highGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+            // Warstwa 1: Baza / Kontur (Czarny)
+            drawCatenaryStroke(ctx, catenaryPoints, baseWidth, '#000');
+            
+            // Warstwa 2: Bryła główna symulująca kierunek światła z góry
+            drawCatenaryStroke(ctx, catenaryPoints, baseWidth * 0.75, lightGradient);
+
+            // Warstwa 3: Ostre podświetlenie (offset dla wrażenia cylindra oświetlonego z góry-przodu)
+            ctx.beginPath();
+            ctx.strokeStyle = highGradient;
+            ctx.lineWidth = baseWidth * 0.2;
+            for (let i = 0; i < catenaryPoints.length; i++) {
+                let p = catenaryPoints[i];
+                if (i === 0) ctx.moveTo(p.x, p.y - baseWidth*0.15); // Przesunięcie w górę
+                else ctx.lineTo(p.x, p.y - baseWidth*0.15);
+            }
+            ctx.stroke();
+
+            // --- 7. Czerwony Krzyżyk (Zawsze NA WIERZCHU) ---
+            ctx.strokeStyle = '#ff1a1a';
             ctx.lineWidth = 1.5; 
             ctx.beginPath();
             ctx.moveTo(offsetX - 5, groundY); ctx.lineTo(offsetX + 5, groundY); 
             ctx.moveTo(offsetX, groundY - 5); ctx.lineTo(offsetX, groundY + 5);
             ctx.stroke();
 
-            ctx.restore(); // Koniec działania DPI scaling
+            ctx.restore(); 
         }
 
         function calculate() {
