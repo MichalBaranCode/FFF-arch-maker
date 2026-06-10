@@ -3,55 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fabricable Fabric Formwork - V16 Ultra-Pro Daylight</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;800;900&display=swap" rel="stylesheet">
+    <title>Fabricable Fabric Formwork - V17</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;0,800;1,300&display=swap" rel="stylesheet">
     <style>
-        /* Global Theme & Anti-Bounce */
-        body { font-family: 'Montserrat', sans-serif; background-color: #1a1a1a; color: #f4f4f2; margin: 0; padding: 0; overflow-x: hidden; touch-action: manipulation; overscroll-behavior-y: none; }
+        /* Twardy reset i blokada skakania ekranu */
+        body { font-family: 'Montserrat', sans-serif; background-color: #161616; color: #f4f4f2; margin: 0; padding: 0; overflow-x: hidden; touch-action: manipulation; overscroll-behavior-y: none; }
         
-        /* Top Bar - Affinity Mockup Match (Font Weights & Colors) */
-        .top-bar { background-color: #0c0a09; border-bottom: 2px solid #222; padding: 4px 15px; display: flex; align-items: baseline; justify-content: center; position: sticky; top: 0; z-index: 100;}
-        .title-main { color: #f0f0f0; font-size: 16px; font-weight: 800; margin-right: 8px;}
-        .title-sub { color: #f0f0f0; font-size: 14px; font-weight: 300; margin-right: 15px; opacity: 0.8;}
-        .version-badge { color: #e74c3c; font-size: 15px; font-family: 'Courier New', Courier, monospace; font-weight: bold; letter-spacing: 2px; }
+        /* Belka - Dokładne odwzorowanie Affinity */
+        .top-bar { background-color: #1a1a1a; border-bottom: 2px solid #111; padding: 6px 15px; display: flex; align-items: baseline; justify-content: center; position: sticky; top: 0; z-index: 100;}
+        .title-main { color: #f0f0f0; font-size: 16px; font-weight: 800; margin-right: 6px;}
+        .title-sub { color: #d0d0d0; font-size: 14px; font-weight: 300; font-style: italic; margin-right: 12px; }
+        .version-badge { color: #e74c3c; font-size: 14px; font-family: monospace; font-weight: bold; letter-spacing: 1px; }
 
-        /* Viewport Logic */
+        /* Obszar roboczy */
         .viewport-container { position: relative; width: 100%; height: calc(65vh); min-height: 450px; background: #222; overflow: hidden; border-bottom: 1px solid #333; }
         canvas { display: block; width: 100%; height: 100%; }
 
-        /* HUD Boxes - In Corners (Restored & Bold, Matching Affinity Mockup Density) */
-        .hud-box { position: absolute; background: #ffffff; border-radius: 6px; padding: 0; overflow: hidden; box-shadow: 0px 6px 15px rgba(0,0,0,0.2); z-index: 20; width: 75px; display: flex; flex-direction: column; align-items: center; border: 1px solid rgba(0,0,0,0.1);}
-        .hud-box-header { width: 100%; background: #f2f2f2; border-bottom: 1px solid #ddd; padding: 4px 0; display: flex; justify-content: center; align-items: center;}
-        .hud-box label { font-size: 9px; font-weight: bold; color: #555; text-transform: uppercase; letter-spacing: 0.2px; margin: 0;}
-        .hud-box input[type="number"] { width: 100%; border: none; text-align: center; font-size: 16px; font-weight: 800; color: #111; background: #fff; outline: none; font-family: 'Montserrat', sans-serif; padding: 5px 0;}
+        /* Okienka parametrów (Narożniki) */
+        .hud-box { position: absolute; background: #ffffff; border-radius: 4px; padding: 0; overflow: hidden; box-shadow: 0px 8px 20px rgba(0,0,0,0.3); z-index: 20; width: 75px; display: flex; flex-direction: column; align-items: center; border: 1px solid rgba(0,0,0,0.15);}
+        .hud-box-header { width: 100%; background: #e8e8e8; border-bottom: 1px solid #d0d0d0; padding: 4px 0; display: flex; justify-content: center; align-items: center;}
+        .hud-box label { font-size: 9px; font-weight: 800; color: #444; text-transform: uppercase; letter-spacing: 0px; margin: 0;}
+        .hud-box input[type="number"] { width: 100%; border: none; text-align: center; font-size: 17px; font-weight: 800; color: #000; background: #fff; outline: none; font-family: 'Montserrat', sans-serif; padding: 6px 0;}
         
-        /* Corner Positioning */
+        /* Pozycjonowanie okienek */
         #box-height { top: 15px; left: 15px; }
         #box-diameter { top: 15px; right: 15px; }
         #box-span { bottom: 15px; left: 15px; } 
         #box-depth { bottom: 15px; right: 15px; }
 
-        /* HUD Sliders - Modern Borderless, Subtile Tracks */
-        .hud-slider { position: absolute; z-index: 15; appearance: none; background: transparent; outline: none; touch-action: none; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.2)); }
-        /* Tapered track simulation using linear gradients */
-        .hud-slider::-webkit-slider-runnable-track { width: 100%; height: 2px; background: linear-gradient(90deg, rgba(153,153,153,0) 0%, rgba(153,153,153,1) 30%, rgba(153,153,153,1) 70%, rgba(153,153,153,0) 100%); border-radius: 1px; }
-        .hud-slider::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; background: radial-gradient(circle at 50% 10%, #fff, #999 70%, #555); border-radius: 50%; margin-top: -7px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.4); border: none;}
+        /* Suwaki - Pocienione linie, metalowe guziki */
+        .hud-slider { position: absolute; z-index: 15; appearance: none; background: transparent; outline: none; touch-action: none; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.3)); }
         
-        /* Specific Slider Positioning (Horizontal Span, Vertical Height) */
-        #sliderHeight { width: 140px; top: 135px; left: 15px; transform: translate(-50%, -50%) rotate(-90deg); transform-origin: top left;}
-        #sliderSpan { width: 130px; bottom: 26px; left: 105px; }
+        /* Delikatna, zanikająca linia suwaka */
+        .hud-slider::-webkit-slider-runnable-track { width: 100%; height: 2px; background: linear-gradient(90deg, rgba(100,100,100,0) 0%, rgba(100,100,100,1) 20%, rgba(100,100,100,1) 80%, rgba(100,100,100,0) 100%); border-radius: 1px; border: none; }
+        /* Guzik bez obwódki */
+        .hud-slider::-webkit-slider-thumb { appearance: none; width: 18px; height: 18px; background: radial-gradient(circle at 50% 10%, #fff, #999 70%, #444); border-radius: 50%; margin-top: -8px; cursor: pointer; border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.5);}
+        
+        /* Pozycjonowanie suwaków */
+        /* Pionowy suwak pod wysokością */
+        #sliderHeight { width: 160px; top: 170px; left: 14px; transform: translate(-50%, -50%) rotate(-90deg); transform-origin: top left;}
+        /* Poziomy suwak obok rozpiętości */
+        #sliderSpan { width: 140px; bottom: 27px; left: 105px; }
 
-        /* Results Section */
+        /* Sekcja wyników */
         .results-container { padding: 15px 10px; max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         @media (max-width: 500px) { .results-container { grid-template-columns: 1fr; } }
         
-        .result-panel { padding: 10px; border-bottom: 1px solid #2a2a2a; display: flex; flex-direction: column; gap: 4px; background-color: #1a1a1a;}
-        .section-title { font-size: 10px; text-transform: uppercase; color: #58a6ff; font-weight: bold; padding-bottom: 1px; margin: 0; border-bottom: 1px solid #2a2a2a;}
+        .result-panel { padding: 12px; border-bottom: 1px solid #2a2a2a; border-radius: 4px; display: flex; flex-direction: column; gap: 6px; background-color: #1a1a1a; box-shadow: inset 0 0 10px rgba(0,0,0,0.2);}
+        .section-title { font-size: 10px; text-transform: uppercase; color: #58a6ff; font-weight: 800; padding-bottom: 4px; margin: 0 0 2px 0; border-bottom: 1px solid #333;}
         .result-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #bbb; margin: 0;}
-        .value { font-size: 15px; font-weight: bold; color: #fff; font-family: monospace;}
-        .value-highlight { color: #58a6ff; font-size: 17px; font-weight: bold; font-family: monospace;}
+        .value { font-size: 15px; font-weight: 700; color: #fff; font-family: monospace;}
+        .value-highlight { color: #58a6ff; font-size: 18px; font-weight: 800; font-family: monospace;}
         
-        .note { font-size: 10px; color: #555; text-align: center; margin: 10px 10px 30px 15px;}
+        .note { font-size: 10px; color: #555; text-align: center; margin: 0 10px 30px 10px;}
     </style>
 </head>
 <body>
@@ -59,29 +63,29 @@
     <div class="top-bar">
         <span class="title-main">Fabricable Fabric Formwork</span>
         <span class="title-sub">Arch Maker</span>
-        <span class="version-badge">V16</span>
+        <span class="version-badge">V17</span>
     </div>
 
     <div class="viewport-container" id="viewport">
         <canvas id="archCanvas"></canvas>
         
         <div class="hud-box" id="box-height">
-            <div class="hud-box-header"><label>Height (m)</label></div>
+            <div class="hud-box-header"><label>Wysokość</label></div>
             <input type="number" id="height" value="1.50" step="0.01" oninput="syncInput('height')">
         </div>
         
         <div class="hud-box" id="box-diameter">
-            <div class="hud-box-header"><label>Tube Ø (cm)</label></div>
+            <div class="hud-box-header"><label>Rura Ø cm</label></div>
             <input type="number" id="diameter" value="10.0" step="0.1" oninput="calculate()">
         </div>
 
         <div class="hud-box" id="box-span">
-            <div class="hud-box-header"><label>Span (m)</label></div>
+            <div class="hud-box-header"><label>Rozstaw</label></div>
             <input type="number" id="span" value="2.00" step="0.01" oninput="syncInput('span')">
         </div>
 
         <div class="hud-box" id="box-depth">
-            <div class="hud-box-header"><label>Depth (m)</label></div>
+            <div class="hud-box-header"><label>Grunt</label></div>
             <input type="number" id="depth" value="0.30" step="0.01" oninput="calculate()">
         </div>
 
@@ -91,310 +95,47 @@
 
     <div class="results-container">
         <div class="result-panel">
-            <p class="section-title">Above Ground Parameters</p>
-            <div class="result-row">Visual Span:<span class="value" id="spanAbove">0.00 m</span></div>
-            <div class="result-row">Visual Height:<span class="value" id="heightAbove">0.00 m</span></div>
-            <div class="result-row">Visible Tube Length:<span class="value" id="lengthAbove">0.00 m</span></div>
+            <p class="section-title">Geometria Nad Gruntem</p>
+            <div class="result-row">Widoczny Rozstaw:<span class="value" id="spanAbove">0.00 m</span></div>
+            <div class="result-row">Widoczna Wysokość:<span class="value" id="heightAbove">0.00 m</span></div>
+            <div class="result-row">Długość Kiszki:<span class="value" id="lengthAbove">0.00 m</span></div>
             
-            <p class="section-title" style="margin-top: 5px;">Underground Parameters</p>
-            <div class="result-row">Tube Length per Hole:<span class="value" id="lengthUnder">0.00 m</span></div>
-            <div class="result-row">Total Tube Length (L+R):<span class="value-highlight" id="lengthTotal">0.00 m</span></div>
+            <p class="section-title" style="margin-top: 10px;">Fundament</p>
+            <div class="result-row">Odcinek w 1 Otworze:<span class="value" id="lengthUnder">0.00 m</span></div>
+            <div class="result-row">Całkowita Długość:<span class="value-highlight" id="lengthTotal">0.00 m</span></div>
         </div>
 
         <div class="result-panel">
-            <p class="section-title">Materials (Total)</p>
-            <div class="result-row">Mortar Volume:<span class="value" id="volume">0.0 l</span></div>
-            <div class="result-row" style="color:#fff; font-weight:bold;">Mapefill PRO (Dry Mass):<span class="value-highlight" id="dryMass">0.0 kg</span></div>
-            <div class="result-row">Water (14% - 15%):<span class="value" id="waterRange">0.0 - 0.0 l</span></div>
-            <div class="result-row">Total Arch Mass:<span class="value" id="totalMass">0.0 - 0.0 kg</span></div>
+            <p class="section-title">Technologia Mapefill</p>
+            <div class="result-row">Objętość Zaprawy:<span class="value" id="volume">0.0 l</span></div>
+            <div class="result-row" style="color:#fff; font-weight:bold; margin-top: 4px;">Sucha Masa PRO:<span class="value-highlight" id="dryMass">0.0 kg</span></div>
+            <div class="result-row">Wymagana Woda:<span class="value" id="waterRange">0.0 - 0.0 l</span></div>
+            <div class="result-row" style="margin-top: 8px; border-top: 1px dashed #444; padding-top: 8px;">Masa Gotowego Łuku:<span class="value" id="totalMass" style="color:#fff;">0.0 kg</span></div>
         </div>
     </div>
 
-    <p class="note">V16 Ultra-Pro Daylight. Exact layout restored. Meticulous Montserrat font match. Natural landscape gradient with ground texture. Buttery smooth symmetric shading with flat butt-caps. Vertical height slider. Elegant subtle tracks.</p>
+    <p class="note">Silnik V17. Zabezpieczenia przeciw crashom. Pionowy suwak dodany. Zgaszone tło z ziarnem gleby. Płynny, gradientowy światłocień symulujący oświetlenie górne z płaskimi zakończeniami rury.</p>
 
     <script>
-        // Sync Logic
+        // Bezpieczna synchronizacja
         function syncSlider(id) {
             const slider = document.getElementById('slider' + id.charAt(0).toUpperCase() + id.slice(1));
             const input = document.getElementById(id);
-            input.value = parseFloat(slider.value).toFixed(2);
-            calculate();
+            if(slider && input) {
+                input.value = parseFloat(slider.value).toFixed(2);
+                calculate();
+            }
         }
 
         function syncInput(id) {
             const input = document.getElementById(id);
             const slider = document.getElementById('slider' + id.charAt(0).toUpperCase() + id.slice(1));
-            const val = parseFloat(input.value) || 0;
-            if(slider) slider.value = Math.max(slider.min, Math.min(slider.max, val));
-            calculate();
+            if(slider && input) {
+                const val = parseFloat(input.value) || 0;
+                slider.value = Math.max(slider.min, Math.min(slider.max, val));
+                calculate();
+            }
         }
 
-        // Anti-Bounce for mobile sliders
-        const sliders = document.querySelectorAll('.hud-slider');
-        sliders.forEach(s => {
-            s.addEventListener('touchmove', function(e) {
-                e.stopPropagation(); 
-            }, { passive: false });
-        });
-
-        function findCatenaryParameterA(span, height) {
-            let L_half = span / 2;
-            let a_min = 0.001;
-            let a_max = 100.0;
-            let a = (a_min + a_max) / 2;
-            let tolerance = 0.00001;
-            for (let i = 0; i < 150; i++) {
-                let calc_h = a * (Math.cosh(L_half / a) - 1);
-                let diff = calc_h - height;
-                if (Math.abs(diff) < tolerance) break;
-                if (diff > 0) a_min = a;
-                else a_max = a;
-                a = (a_min + a_max) / 2;
-            }
-            return a;
-        }
-
-        // Helper: Draw single smooth stroke
-        function drawCatenaryStroke(ctx, catenaryPoints, lineWidth, color) {
-            ctx.beginPath();
-            ctx.strokeStyle = color;
-            ctx.lineWidth = lineWidth;
-            for (let i = 0; i < catenaryPoints.length; i++) {
-                let p = catenaryPoints[i];
-                if (i === 0) ctx.moveTo(p.x, p.y);
-                else ctx.lineTo(p.x, p.y);
-            }
-            ctx.stroke();
-        }
-
-        function drawArch(span, height, depth, diameter, a) {
-            const canvas = document.getElementById('archCanvas');
-            const ctx = canvas.getContext('2d');
-            
-            const dpr = window.devicePixelRatio || 1;
-            const cssWidth = canvas.width / dpr;
-            const cssHeight = canvas.height / dpr;
-
-            if (cssWidth === 0 || cssHeight === 0) return;
-            
-            ctx.save();
-            ctx.scale(dpr, dpr); 
-            ctx.clearRect(0, 0, cssWidth, cssHeight);
-
-            const margin = 80; 
-            const drawWidth = Math.max(1, cssWidth - margin * 2);
-            const drawHeight = Math.max(1, cssHeight - margin * 2.5);
-            
-            const scaleX = drawWidth / span;
-            const scaleY = drawHeight / height;
-            const scale = Math.max(0.1, Math.min(scaleX, scaleY));
-
-            const offsetX = cssWidth / 2;
-            const offsetY = cssHeight - margin - (drawHeight - (height * scale)) / 2;
-            const groundY = offsetY - (depth * scale);
-
-            // --- 1. Natural Landscape Background ---
-            let bgGradient = ctx.createLinearGradient(0, 0, 0, cssHeight);
-            bgGradient.addColorStop(0, '#5a7d9a'); // Błękit nieba
-            bgGradient.addColorStop(Math.min(1, groundY / cssHeight), '#6b7d60'); // Zieleń trawy
-            bgGradient.addColorStop(1, '#3a4734'); // Ciemna ziemia
-            ctx.fillStyle = bgGradient;
-            ctx.fillRect(0, 0, cssWidth, cssHeight);
-
-            // --- 2. Ground Texture (Grain/Noise) ---
-            ctx.save();
-            ctx.globalAlpha = 0.15; // Subtle texture
-            for (let i = 0; i < 5000; i++) { // thousands of tiny noise dots
-                let x = Math.random() * cssWidth;
-                let y = groundY + Math.random() * (cssHeight - groundY);
-                // random earth tones
-                let color = ['#6b4f3b', '#5a4a34', '#3a2e24'][Math.floor(Math.random()*3)];
-                ctx.fillStyle = color;
-                ctx.beginPath();
-                ctx.arc(x, y, 0.5, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            ctx.globalAlpha = 1.0;
-            ctx.restore();
-
-            // --- 3. Daylight Vignette (Anti-glare, Center remains bright) ---
-            let vigGradient = ctx.createRadialGradient(cssWidth/2, cssHeight/2, cssHeight*0.2, cssWidth/2, cssHeight/2, cssWidth*0.8);
-            vigGradient.addColorStop(0, 'rgba(0,0,0,0)'); // Czyste, jasne centrum
-            vigGradient.addColorStop(1, 'rgba(20,20,20,0.6)'); // Przyciemnione, szare brzegi
-            ctx.fillStyle = vigGradient;
-            ctx.fillRect(0, 0, cssWidth, cssHeight);
-
-            // Generate Arch Points
-            const numSteps = 150;
-            const catenaryPoints = [];
-            let archTopY = offsetY; 
-            for (let i = 0; i <= numSteps; i++) {
-                let t = i / numSteps;
-                let x = -span / 2 + (t * span); 
-                let y = height - (a * (Math.cosh(x / a) - 1));
-                let canvasY = offsetY - y * scale;
-                catenaryPoints.push({ x: offsetX + x * scale, y: canvasY });
-                if (canvasY < archTopY) archTopY = canvasY;
-            }
-
-            // --- 4. Grid (Fading) ---
-            ctx.font = '10px monospace'; 
-            ctx.textAlign = 'center';
-            for(let x = - (Math.ceil(span/2)+2); x <= (Math.ceil(span/2)+2); x += 0.5) { 
-                ctx.beginPath();
-                let scaledX = x * scale;
-                if (Number.isInteger(x)) {
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
-                    ctx.lineWidth = 1;
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-                    if (x !== 0) ctx.fillText(x + 'm', offsetX + scaledX, groundY + 12);
-                } else {
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-                    ctx.lineWidth = 0.5;
-                }
-                
-                let minDst = 1000;
-                let lineCanvasX = offsetX + scaledX;
-                for(let p of catenaryPoints) minDst = Math.min(minDst, Math.abs(p.x - lineCanvasX));
-                let gridAlpha = 1 - (minDst / Math.max(10, (span * scale / 2 + margin/2)));
-                ctx.globalAlpha = Math.max(0, Math.min(1, gridAlpha)); 
-
-                ctx.moveTo(offsetX + scaledX, 0); ctx.lineTo(offsetX + scaledX, cssHeight);
-                ctx.stroke();
-                ctx.globalAlpha = 1.0; 
-            }
-
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'middle';
-            for(let y = - (Math.floor(depth)+2); y <= (Math.ceil(height)+2); y += 0.5) { 
-                ctx.beginPath();
-                let scaledY = y * scale;
-                if (Number.isInteger(y)) {
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
-                    ctx.lineWidth = 1;
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-                    if (y !== 0) ctx.fillText(y + 'm', offsetX + 8, offsetY - scaledY);
-                } else {
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-                    ctx.lineWidth = 0.5;
-                }
-                
-                let minDst = 1000;
-                let lineCanvasY = offsetY - scaledY;
-                for(let p of catenaryPoints) minDst = Math.min(minDst, Math.abs(p.y - lineCanvasY));
-                let gridAlpha = 1 - (minDst / Math.max(10, (height * scale / 2 + margin/2)));
-                ctx.globalAlpha = Math.max(0, Math.min(1, gridAlpha)); 
-
-                ctx.moveTo(0, offsetY - scaledY); ctx.lineTo(cssWidth, offsetY - scaledY);
-                ctx.stroke();
-                ctx.globalAlpha = 1.0; 
-            }
-
-            // --- 5. Linia Gruntu ---
-            ctx.strokeStyle = '#4a3322';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(0, groundY);
-            ctx.lineTo(cssWidth, groundY);
-            ctx.stroke();
-
-            // --- 6. Smooth 3D Tube Shading (Wielowarstwowy, płynny blend, PŁASKIE końce) ---
-            let baseWidth = Math.max(0.1, (diameter / 100) * scale);
-            
-            // BEZWZGLĘDNIE płaskie krawędzie (żadnych zaokrągleń)
-            ctx.lineCap = 'butt';
-            ctx.lineJoin = 'round';
-
-            // Konstrukcja płynnego światłocienia poprzez gęste nałożenie na siebie 8 warstw
-            
-            // L1: Najszersza, najciemniejsza baza
-            drawCatenaryStroke(ctx, catenaryPoints, baseWidth, '#333333');
-            
-            // L2: Płynne przejście w szarość
-            drawCatenaryStroke(ctx, catenaryPoints, baseWidth * 0.9, '#4d4d4d');
-            
-            // L3: Rdzeń rury
-            drawCatenaryStroke(ctx, catenaryPoints, baseWidth * 0.75, '#666666');
-            
-            // L4: Łapanie światła
-            drawCatenaryStroke(ctx, catenaryPoints, baseWidth * 0.6, '#888888');
-            
-            // L5: Strefa bardzo jasna
-            drawCatenaryStroke(ctx, catenaryPoints, baseWidth * 0.45, '#aaaaaa');
-            
-            // L6: Miękki odblask
-            drawCatenaryStroke(ctx, catenaryPoints, baseWidth * 0.3, '#cccccc');
-            
-            // L7: Ostre światło słońca blisko górnej krawędzi
-            drawCatenaryStroke(ctx, catenaryPoints, baseWidth * 0.15, '#eaeaea');
-            
-            // L8: Czysta biel na samym szczycie krawędzi
-            drawCatenaryStroke(ctx, catenaryPoints, baseWidth * 0.05, '#ffffff');
-
-
-            // --- 7. Ciemnożółty Krzyżyk (Zawsze NA WIERZCHU) ---
-            ctx.strokeStyle = '#ccaa00'; // Ciemny, inżynieryjny żółty
-            ctx.lineWidth = 1.5; 
-            ctx.beginPath();
-            ctx.moveTo(offsetX - 5, groundY); ctx.lineTo(offsetX + 5, groundY); 
-            ctx.moveTo(offsetX, groundY - 5); ctx.lineTo(offsetX, groundY + 5);
-            ctx.stroke();
-
-            ctx.restore(); 
-        }
-
-        function calculate() {
-            const span = Math.max(0.01, parseFloat(document.getElementById('span').value) || 0);
-            const height = Math.max(0.01, parseFloat(document.getElementById('height').value) || 0);
-            const diameter = Math.max(0.1, parseFloat(document.getElementById('diameter').value) || 0);
-            let depth = parseFloat(document.getElementById('depth').value) || 0;
-
-            if (depth >= height) depth = height - 0.001;
-            if (depth < 0) depth = 0;
-
-            const a = findCatenaryParameterA(span, height);
-            const totalLength = 2 * a * Math.sinh((span / 2) / a);
-            
-            const spanAbove = 2 * a * Math.acosh((height - depth) / a + 1);
-            const lengthAbove = 2 * a * Math.sinh((spanAbove / 2) / a);
-
-            const lengthUnderTotal = totalLength - lengthAbove;
-            const lengthUnderPerLeg = lengthUnderTotal / 2;
-
-            const radiusMeters = (diameter / 2) / 100;
-            const volumeLiters = (Math.PI * Math.pow(radiusMeters, 2) * totalLength) * 1000;
-            
-            const dryMass = volumeLiters * 1.95;
-            const waterMin = dryMass * 0.14;
-            const waterMax = dryMass * 0.15;
-
-            document.getElementById('spanAbove').innerText = spanAbove.toFixed(2) + " m";
-            document.getElementById('heightAbove').innerText = heightAbove.toFixed(2) + " m";
-            document.getElementById('lengthAbove').innerText = lengthAbove.toFixed(2) + " m";
-            document.getElementById('lengthUnder').innerText = lengthUnderPerLeg.toFixed(2) + " m";
-            document.getElementById('lengthTotal').innerText = totalLength.toFixed(2) + " m";
-
-            document.getElementById('volume').innerText = volumeLiters.toFixed(1) + " l";
-            document.getElementById('dryMass').innerText = dryMass.toFixed(1) + " kg";
-            document.getElementById('waterRange').innerText = waterMin.toFixed(1) + " - " + waterMax.toFixed(1) + " l";
-            document.getElementById('totalMass').innerText = (dryMass + waterMax).toFixed(1) + " kg";
-
-            drawArch(span, height, depth, diameter, a);
-        }
-        
-        function resizeCanvas() {
-            const canvas = document.getElementById('archCanvas');
-            const dpr = window.devicePixelRatio || 1;
-            const rect = canvas.parentElement.getBoundingClientRect();
-            
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            
-            calculate();
-        }
-
-        window.onload = resizeCanvas;
-        window.addEventListener('resize', resizeCanvas);
-    </script>
-</body>
-</html>
+        // Twarda blokada przewijania przy dotyku suwaka
+        const sliders = document.querySelectorAll('.hud-slider
