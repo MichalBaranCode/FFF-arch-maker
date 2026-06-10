@@ -3,86 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FFF Arch Maker - Pro V8 Construction Dark HUD</title>
+    <title>FFF Arch Maker - Pro V10 Construction Dark</title>
     <style>
         /* Global Construction Dark Theme */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1a1817; color: #f4f4f2; margin: 0; padding: 0; overflow-x: hidden; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #151413; color: #f4f4f2; margin: 0; padding: 0; overflow-x: hidden; }
         
         /* Minimalist Top Bar */
-        .top-bar { background-color: #12100f; border-bottom: 1px solid #333; padding: 3px 10px; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 100; height: 15px;}
-        .top-bar h1 { color: #888; font-size: 13px; margin: 0; letter-spacing: 0.5px; text-transform: uppercase;}
+        .top-bar { background-color: #0c0a09; border-bottom: 1px solid #2a2a2a; padding: 4px 10px; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 100; height: 16px;}
+        .top-bar h1 { color: #888; font-size: 11px; margin: 0; letter-spacing: 0.5px; text-transform: uppercase;}
+        .version-badge { color: #58a6ff; font-weight: bold; margin-left: 5px; }
 
-        /* Viewport Logic (Viewport First, Construction Optimized) */
-        .viewport-container { position: relative; width: 100%; height: calc(60vh); max-height: 550px; background: #0a1d3b; border-bottom: 1px solid #333; overflow: hidden; }
+        /* Viewport Logic */
+        .viewport-container { position: relative; width: 100%; height: calc(60vh); max-height: 550px; background: #08121f; border-bottom: 1px solid #2a2a2a; overflow: hidden; }
         canvas { display: block; width: 100%; height: 100%; }
 
-        /* Floating Opaque Overlay Inputs (Centered Text, NADSTAWKA Title) */
-        .floating-input { position: absolute; display: flex; flex-direction: column; align-items: center; z-index: 20; background: #ffffff; border: 1px solid #444; border-radius: 6px; padding: 3px; opacity: 1; min-width: 60px; box-shadow: 0px 4px 6px rgba(0,0,0,0.3); }
-        .floating-input label { width: 100%; text-align: center; font-size: 10px; font-weight: bold; color: #555; text-transform: uppercase; margin-bottom: 1px;}
-        .floating-input input[type="number"] { width: 55px; background: #ffffff; border: none; color: #000; font-weight: bold; border-radius: 2px; padding: 3px; font-size: 15px; text-align: center; font-family: monospace;}
-        .floating-input input:focus { outline: none; border: 1px solid #58a6ff; }
+        /* HUD Boxes - Clean, Minimalist, White Overlays */
+        .hud-box { position: absolute; background: #ffffff; border: 1px solid #333; border-radius: 6px; padding: 5px; box-shadow: 0px 4px 10px rgba(0,0,0,0.4); z-index: 20; width: 60px; display: flex; flex-direction: column; align-items: center;}
+        .hud-box label { width: 100%; text-align: center; font-size: 9px; font-weight: bold; color: #666; text-transform: uppercase; margin-bottom: 3px; letter-spacing: 0.5px;}
+        .hud-box .divider { width: 85%; height: 1px; background: #ddd; margin-bottom: 3px; }
+        .hud-box input[type="number"] { width: 100%; border: none; text-align: center; font-size: 16px; font-weight: bold; color: #000; background: transparent; outline: none; font-family: monospace; padding: 0;}
         
-        /* HUD Sliders Styling (Vertical Height, Horizontal Span) */
-        .hud-slider { appearance: none; background: rgba(30, 30, 30, 1); border: 1px solid #444; border-radius: 4px; outline: none; }
-        .hud-slider::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; background: #58a6ff; border-radius: 50%; cursor: pointer; border: 2px solid #fff;}
+        /* Corner Positioning for HUD Boxes */
+        #box-height { top: 12px; left: 12px; }
+        #box-diameter { top: 12px; right: 12px; }
+        #box-span { bottom: 12px; left: 12px; } 
+        #box-depth { bottom: 12px; right: 12px; }
+
+        /* HUD Sliders - Decoupled from boxes */
+        .hud-slider { position: absolute; z-index: 15; appearance: none; background: transparent; outline: none; }
+        .hud-slider::-webkit-slider-runnable-track { width: 100%; height: 6px; background: rgba(0,0,0,0.6); border: 1px solid #444; border-radius: 3px; }
+        .hud-slider::-webkit-slider-thumb { appearance: none; width: 20px; height: 20px; background: #58a6ff; border: 2px solid #fff; border-radius: 50%; margin-top: -8px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.5);}
         
-        /* Height Slider (Vertical) */
-        .input-height { top: 12px; left: 12px; }
-        #sliderHeight { position: absolute; top: 70px; left: -10px; width: 120px; height: 10px; transform: rotate(-90deg); z-index: 20;}
+        /* Specific Sliders Positioning */
+        #sliderHeight { width: 140px; height: 20px; top: 140px; left: 10px; transform: translate(-50%, -50%) rotate(-90deg); }
+        #sliderSpan { width: 140px; height: 20px; bottom: 25px; left: 90px; }
 
-        /* Diameter Input (Overlay) */
-        .input-diameter { top: 12px; right: 12px; }
-
-        /* Span Input & Slider (Horizontal Bottom Left) */
-        .input-span { bottom: 12px; left: 12px; } 
-        #sliderSpan { position: absolute; bottom: 70px; left: 12px; width: 120px; height: 10px; z-index: 20;}
-
-        /* Depth Input (Overlay) */
-        .input-depth { bottom: 12px; right: 12px; }
-
-        /* Minimalist Results Section (Scroll down) */
+        /* Minimalist Results Section */
         .results-container { padding: 10px; max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         @media (max-width: 600px) { .results-container { grid-template-columns: 1fr; } }
         
-        .result-panel { padding: 8px; border-bottom: 1px solid #333; display: flex; flex-direction: column; gap: 4px; background-color: #1a1817;}
-        .section-title { font-size: 10px; text-transform: uppercase; color: #58a6ff; font-weight: bold; padding-bottom: 1px; margin: 0; border-bottom: 1px solid #333;}
+        .result-panel { padding: 8px; border-bottom: 1px solid #2a2a2a; display: flex; flex-direction: column; gap: 4px; background-color: #151413;}
+        .section-title { font-size: 10px; text-transform: uppercase; color: #58a6ff; font-weight: bold; padding-bottom: 1px; margin: 0; border-bottom: 1px solid #2a2a2a;}
         .result-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #aaa; margin: 0;}
         .value { font-size: 15px; font-weight: bold; color: #fff; font-family: monospace;}
         .value-highlight { color: #58a6ff; font-size: 17px; font-weight: bold; font-family: monospace;}
         
-        .note { font-size: 10px; color: #555; text-align: center; margin: 10px 10px 20px 15px;}
+        .note { font-size: 10px; color: #444; text-align: center; margin: 10px 10px 20px 15px;}
     </style>
 </head>
 <body>
 
     <div class="top-bar">
-        <h1>FFF Arch Maker</h1>
+        <h1>FFF Arch Maker <span class="version-badge">V10</span></h1>
     </div>
 
     <div class="viewport-container">
         <canvas id="archCanvas"></canvas>
         
-        <div class="floating-input input-height">
-            <label>Height (m)</label>
-            <input type="number" id="height" value="1.50" step="0.01" oninput="calculate()" onblur="formatInput(this, 2)">
+        <div class="hud-box" id="box-height">
+            <label>Height (m)</label><div class="divider"></div>
+            <input type="number" id="height" value="1.50" step="0.01" oninput="syncInput('height')">
         </div>
-        <input type="range" id="sliderHeight" class="hud-slider" min="0.5" max="5.0" step="0.1" value="1.5" oninput="calculate()">
+        
+        <div class="hud-box" id="box-diameter">
+            <label>Tube Ø (cm)</label><div class="divider"></div>
+            <input type="number" id="diameter" value="10.0" step="0.1" oninput="calculate()">
+        </div>
 
-        <div class="floating-input input-diameter">
-            <label>Tube Ø (cm)</label>
-            <input type="number" id="diameter" value="10.0" step="0.1" oninput="calculate()" onblur="formatInput(this, 1)">
+        <div class="hud-box" id="box-span">
+            <label>Span (m)</label><div class="divider"></div>
+            <input type="number" id="span" value="2.00" step="0.01" oninput="syncInput('span')">
         </div>
 
-        <div class="floating-input input-span">
-            <label>Span (m)</label>
-            <input type="number" id="span" value="2.00" step="0.01" oninput="calculate()" onblur="formatInput(this, 2)">
+        <div class="hud-box" id="box-depth">
+            <label>Depth (m)</label><div class="divider"></div>
+            <input type="number" id="depth" value="0.30" step="0.01" oninput="calculate()">
         </div>
-        <input type="range" id="sliderSpan" class="hud-slider" min="1.0" max="5.0" step="0.1" value="2.0" oninput="calculate()">
 
-        <div class="floating-input input-depth">
-            <label>Depth (m)</label>
-            <input type="number" id="depth" value="0.30" step="0.01" oninput="calculate()" onblur="formatInput(this, 2)">
-        </div>
+        <input type="range" id="sliderHeight" class="hud-slider" min="0.5" max="5.0" step="0.1" value="1.5" oninput="syncSlider('height')">
+        <input type="range" id="sliderSpan" class="hud-slider" min="1.0" max="5.0" step="0.1" value="2.0" oninput="syncSlider('span')">
     </div>
 
     <div class="results-container">
@@ -106,13 +105,22 @@
         </div>
     </div>
 
-    <p class="note">Vignette V2 night optimized. HUD sliders for Height/Span with 0.1m step, white inputs allow precise paste. Arch shaded for 3D appearance.</p>
+    <p class="note">V10 Decoupled HUD. Math clamped for mobile safety. 3D Arch Shading applied.</p>
 
     <script>
-        function formatInput(element, decimals) {
-            if(element.value !== "") {
-                element.value = parseFloat(element.value).toFixed(decimals);
-            }
+        // Sync Logic
+        function syncSlider(id) {
+            const slider = document.getElementById('slider' + id.charAt(0).toUpperCase() + id.slice(1));
+            const input = document.getElementById(id);
+            input.value = parseFloat(slider.value).toFixed(2);
+            calculate();
+        }
+
+        function syncInput(id) {
+            const input = document.getElementById(id);
+            const slider = document.getElementById('slider' + id.charAt(0).toUpperCase() + id.slice(1));
+            const val = parseFloat(input.value) || 0;
+            slider.value = Math.max(slider.min, Math.min(slider.max, val));
             calculate();
         }
 
@@ -122,7 +130,6 @@
             let a_max = 100.0;
             let a = (a_min + a_max) / 2;
             let tolerance = 0.00001;
-            
             for (let i = 0; i < 150; i++) {
                 let calc_h = a * (Math.cosh(L_half / a) - 1);
                 let diff = calc_h - height;
@@ -137,201 +144,162 @@
         function drawArch(span, height, depth, diameter, a) {
             const canvas = document.getElementById('archCanvas');
             const ctx = canvas.getContext('2d');
+            
+            // Bezpieczne wymiary
+            if (canvas.width === 0 || canvas.height === 0) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            const margin = 70; // 
-            const drawWidth = canvas.width - margin * 2;
-            const drawHeight = canvas.height - margin * 2;
+            const margin = 80; 
+            const drawWidth = Math.max(1, canvas.width - margin * 2);
+            const drawHeight = Math.max(1, canvas.height - margin * 2);
             
             const scaleX = drawWidth / span;
             const scaleY = drawHeight / height;
-            const scale = Math.min(scaleX, scaleY);
+            const scale = Math.max(0.1, Math.min(scaleX, scaleY));
 
             const offsetX = canvas.width / 2;
             const offsetY = canvas.height - margin - (drawHeight - (height * scale)) / 2;
             const groundY = offsetY - (depth * scale);
 
-            // --- Geodezyjna wizualizacja tła z winietą (Radial Gradients) ---
-            // Niebo (Gradient nad gruntem, jaśniejszy green-blue)
+            // Tło - Ciemne, zgaszone, ergonomiczne
             let skyRadius = canvas.width * 0.7;
             let skyGradient = ctx.createRadialGradient(offsetX, groundY, 0, offsetX, groundY, skyRadius);
-            skyGradient.addColorStop(0, '#2b4d75'); // Jasny, rozświetlony błękit w centrum
-            skyGradient.addColorStop(1, '#0c2415'); // Bardzo ciemny granat/zielony na brzegach (winieta)
+            skyGradient.addColorStop(0, '#1c314a'); 
+            skyGradient.addColorStop(1, '#070f1a'); 
             ctx.fillStyle = skyGradient;
             ctx.fillRect(0, 0, canvas.width, groundY);
             
-            // Grunt (Ciemny brązowo-szary pod ziemią, jaśniejszy center)
             let groundRadius = canvas.width * 0.7;
             let groundGradient = ctx.createRadialGradient(offsetX, groundY, 0, offsetX, groundY, groundRadius);
-            groundGradient.addColorStop(0, '#594a38'); // Jaśniejszy szaro-brązowy w centrum
-            groundGradient.addColorStop(1, '#1e1c1a'); // Bardzo ciemna ziemia na brzegach
+            groundGradient.addColorStop(0, '#382b21'); 
+            groundGradient.addColorStop(1, '#14110e'); 
             ctx.fillStyle = groundGradient; 
             ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
 
-            // --- Inżynieryjna Siatka (Mocno ciemno szare, Hierarchy, Fading by distance) ---
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-            ctx.font = '11px monospace'; 
-            ctx.textAlign = 'center';
-            
-            // Linie pionowe (X, Hierarchy, Fills entire window)
-            const numStepsCatenary = 150;
+            // Generowanie punktów łuku dla grid fadingu
+            const numSteps = 150;
             const catenaryPoints = [];
-            for (let i = 0; i <= numStepsCatenary; i++) {
-                let t = i / numStepsCatenary;
+            for (let i = 0; i <= numSteps; i++) {
+                let t = i / numSteps;
                 let x = -span / 2 + (t * span); 
                 let y = height - (a * (Math.cosh(x / a) - 1));
                 catenaryPoints.push({ x: offsetX + x * scale, y: offsetY - y * scale });
             }
 
+            // Siatka - Bezpieczny Fading
+            ctx.font = '10px monospace'; 
+            ctx.textAlign = 'center';
+            
             for(let x = - (Math.ceil(span/2)+2); x <= (Math.ceil(span/2)+2); x += 0.5) { 
                 ctx.beginPath();
                 let scaledX = x * scale;
-                // Hierarchy based on 0.5 steps
                 if (Number.isInteger(x)) {
-                    ctx.strokeStyle = 'rgba(30, 30, 30, 1)'; // Pełne metry dark grey
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
                     ctx.lineWidth = 1;
-                    if (x !== 0) {
-                        ctx.fillText(x + 'm', offsetX + scaledX, groundY + 13);
-                        ctx.fillText('-' + x + 'm', offsetX - scaledX, groundY + 13);
-                    }
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                    if (x !== 0) ctx.fillText(x + 'm', offsetX + scaledX, groundY + 12);
                 } else {
-                    ctx.strokeStyle = 'rgba(10, 10, 10, 1)'; // 0.5m half thick, very dark
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.07)';
                     ctx.lineWidth = 0.5;
                 }
                 
-                // Płynne zanikanie (fading) siatki w oddaleniu od łuku
-                // Obliczanie minimalnego dystansu linii do krzywej łańcuchowej
                 let minDst = 1000;
                 let lineCanvasX = offsetX + scaledX;
-                for(let p of catenaryPoints) {
-                    minDst = Math.min(minDst, Math.abs(p.x - lineCanvasX));
-                }
-                let gridAlpha = Math.max(0, 1 - (minDst / (span * scale / 2 + margin/2)));
-                ctx.globalAlpha = gridAlpha; // Apply fading
+                for(let p of catenaryPoints) minDst = Math.min(minDst, Math.abs(p.x - lineCanvasX));
+                
+                let gridAlpha = 1 - (minDst / Math.max(10, (span * scale / 2 + margin/2)));
+                ctx.globalAlpha = Math.max(0, Math.min(1, gridAlpha)); 
 
                 ctx.moveTo(offsetX + scaledX, 0); ctx.lineTo(offsetX + scaledX, canvas.height);
-                ctx.moveTo(offsetX - scaledX, 0); ctx.lineTo(offsetX - scaledX, canvas.height);
                 ctx.stroke();
-                ctx.globalAlpha = 1.0; // reset
+                ctx.globalAlpha = 1.0; 
             }
-            // Linie poziome (Y, Hierarchy, Fills entire window, Fading by distance)
+
             ctx.textAlign = 'left';
             ctx.textBaseline = 'middle';
             for(let y = - (Math.floor(depth)+2); y <= (Math.ceil(height)+2); y += 0.5) { 
                 ctx.beginPath();
                 let scaledY = y * scale;
                 if (Number.isInteger(y)) {
-                    ctx.strokeStyle = 'rgba(30, 30, 30, 1)'; // Pełne metry dark grey
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
                     ctx.lineWidth = 1;
-                    if (y !== 0) {
-                        ctx.fillText(y + 'm', offsetX + scaledX + 5, offsetY - scaledY);
-                    }
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                    if (y !== 0) ctx.fillText(y + 'm', offsetX + 8, offsetY - scaledY);
                 } else {
-                    ctx.strokeStyle = 'rgba(10, 10, 10, 1)'; // 0.5m half thick, very dark
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.07)';
                     ctx.lineWidth = 0.5;
                 }
                 
-                // Płynne zanikanie (fading) siatki w oddaleniu od łuku
-                // Obliczanie minimalnego dystansu linii do krzywej łańcuchowej
                 let minDst = 1000;
                 let lineCanvasY = offsetY - scaledY;
-                for(let p of catenaryPoints) {
-                    minDst = Math.min(minDst, Math.abs(p.y - lineCanvasY));
-                }
-                let gridAlpha = Math.max(0, 1 - (minDst / (height * scale / 2 + margin/2)));
-                ctx.globalAlpha = gridAlpha; // Apply fading
+                for(let p of catenaryPoints) minDst = Math.min(minDst, Math.abs(p.y - lineCanvasY));
+                
+                let gridAlpha = 1 - (minDst / Math.max(10, (height * scale / 2 + margin/2)));
+                ctx.globalAlpha = Math.max(0, Math.min(1, gridAlpha)); 
 
                 ctx.moveTo(0, offsetY - scaledY); ctx.lineTo(canvas.width, offsetY - scaledY);
                 ctx.stroke();
-                ctx.globalAlpha = 1.0; // reset
+                ctx.globalAlpha = 1.0; 
             }
 
-            // --- Czerwony Krzyżyk (Początek Układu, Thinner V8) ---
+            // Czerwony Krzyżyk
             ctx.strokeStyle = '#ff3333';
-            ctx.lineWidth = 1; // Thinner
+            ctx.lineWidth = 1; 
             ctx.beginPath();
-            ctx.moveTo(offsetX - 5, groundY); ctx.lineTo(offsetX + 5, groundY); // smaller
-            ctx.moveTo(offsetX, groundY - 5); ctx.lineTo(offsetX, groundY + 5);
+            ctx.moveTo(offsetX - 4, groundY); ctx.lineTo(offsetX + 4, groundY); 
+            ctx.moveTo(offsetX, groundY - 4); ctx.lineTo(offsetX, groundY + 4);
             ctx.stroke();
 
-            // --- Ciągła Ciemnobrązowa Linia Gruntu ---
-            ctx.strokeStyle = '#3d2b1a';
+            // Linia Gruntu
+            ctx.strokeStyle = '#2b1e16';
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(0, groundY);
             ctx.lineTo(canvas.width, groundY);
             ctx.stroke();
 
-            // --- Fizyczna Grubość Rękawa (with Shading V8) ---
-            ctx.lineWidth = (diameter / 100) * scale;
+            // 3D Arch Shading (Cień bazowy + Jasny Rdzeń + Zewnętrzny Ostrzejszy Highlight)
+            let baseWidth = Math.max(0.1, (diameter / 100) * scale);
             ctx.lineCap = 'butt';
             ctx.lineJoin = 'round';
 
-            // --- Prawdziwa Krzywa Łańcuchowa with 3D Shading (inner shadow/highlight) ---
+            // 1. Ciemny cień / Baza
             ctx.beginPath();
-            // Draw full thick light curve first as highlight
-            ctx.strokeStyle = '#e2e2e2'; 
-            ctx.beginPath();
-            for (let i = 0; i <= numStepsCatenary; i++) {
+            ctx.strokeStyle = '#222'; 
+            ctx.lineWidth = baseWidth;
+            for (let i = 0; i <= numSteps; i++) {
                 let p = catenaryPoints[i];
-                if (i === 0) ctx.moveTo(p.x, p.y);
-                else ctx.lineTo(p.x, p.y);
+                if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
             }
             ctx.stroke();
 
-            // Draw inner shadow gradient across each segment to simulate 3D tube with top light
-            // This is complex in 2D canvas, a simple linear gradient across segment is faster.
-            for (let i = 0; i < numStepsCatenary; i++) {
-                ctx.beginPath();
-                let p1 = catenaryPoints[i];
-                let p2 = catenaryPoints[i+1];
-                let lineGradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
-                lineGradient.addColorStop(0, '#555'); // Inner shadow start
-                lineGradient.addColorStop(0.5, 'rgba(0,0,0,0)'); // Transparent highlight central line
-                lineGradient.addColorStop(1, '#555'); // Inner shadow end
-                
-                ctx.lineWidth = (diameter / 100) * scale; // Inner stroke diameter
-                ctx.strokeStyle = lineGradient;
-                ctx.moveTo(p1.x, p1.y);
-                ctx.lineTo(p2.x, p2.y);
-                ctx.stroke();
+            // 2. Jasny szary materiał wewnątrz
+            ctx.beginPath();
+            ctx.strokeStyle = '#a0a0a0'; 
+            ctx.lineWidth = baseWidth * 0.75; 
+            for (let i = 0; i <= numSteps; i++) {
+                let p = catenaryPoints[i];
+                if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
             }
+            ctx.stroke();
+
+            // 3. Ostre białe światło padające od góry
+            ctx.beginPath();
+            ctx.strokeStyle = '#ffffff'; 
+            ctx.lineWidth = baseWidth * 0.25; 
+            for (let i = 0; i <= numSteps; i++) {
+                let p = catenaryPoints[i];
+                if (i === 0) ctx.moveTo(p.x - baseWidth*0.2, p.y - baseWidth*0.2); 
+                else ctx.lineTo(p.x - baseWidth*0.2, p.y - baseWidth*0.2);
+            }
+            ctx.stroke();
         }
 
         function calculate() {
-            // Read Inputs & Sliders
-            let spanInput = parseFloat(document.getElementById('span').value) || 2.0;
-            let spanSlider = parseFloat(document.getElementById('sliderSpan').value) || 2.0;
-            
-            let heightInput = parseFloat(document.getElementById('height').value) || 1.5;
-            let heightSlider = parseFloat(document.getElementById('sliderHeight').value) || 1.5;
-            
-            // Sync logic: Slider has priority for step, input for precise pasted value.
-            // When slider changes, it triggers, but we use the input box if user just pasted something.
-            // If they are not equal, the last changed one takes priority. 
-            // In 2D loop it is complex. Let's make it simpler: Slider step is for slider, direct input allows precision.
+            const span = Math.max(0.01, parseFloat(document.getElementById('span').value) || 0);
+            const height = Math.max(0.01, parseFloat(document.getElementById('height').value) || 0);
             const diameter = Math.max(0.1, parseFloat(document.getElementById('diameter').value) || 0);
             let depth = parseFloat(document.getElementById('depth').value) || 0;
-
-            // Handle Span (Sync Input and Slider)
-            // If user moved slider, update input box, step 0.1
-            if (document.getElementById('sliderSpan').focused) {
-                document.getElementById('span').value = spanSlider.toFixed(2);
-            }
-            // If user pasted precise value, update slider
-            else {
-                document.getElementById('sliderSpan').value = spanInput.toFixed(2);
-            }
-            const span = Math.max(0.01, parseFloat(document.getElementById('span').value) || 0);
-
-            // Handle Height (Sync Input and Slider)
-            if (document.getElementById('sliderHeight').focused) {
-                document.getElementById('height').value = heightSlider.toFixed(2);
-            }
-            else {
-                document.getElementById('sliderHeight').value = heightInput.toFixed(2);
-            }
-            const height = Math.max(0.01, parseFloat(document.getElementById('height').value) || 0);
 
             if (depth >= height) depth = height - 0.001;
             if (depth < 0) depth = 0;
@@ -352,7 +320,6 @@
             const volumeCubicMeters = Math.PI * Math.pow(radiusMeters, 2) * totalLength;
             const volumeLiters = volumeCubicMeters * 1000;
             
-            // Twarde dane Mapefill
             const dryMass = volumeLiters * 1.95;
             const waterMin = dryMass * 0.14;
             const waterMax = dryMass * 0.15;
@@ -372,4 +339,18 @@
             document.getElementById('waterRange').innerText = waterMin.toFixed(1) + " - " + waterMax.toFixed(1) + " l";
             document.getElementById('totalMass').innerText = totalMassMin.toFixed(1) + " - " + totalMassMax.toFixed(1) + " kg";
 
-            drawArch(
+            drawArch(span, height, depth, diameter, a);
+        }
+        
+        function resizeCanvas() {
+            const canvas = document.getElementById('archCanvas');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            calculate();
+        }
+
+        window.onload = resizeCanvas;
+        window.addEventListener('resize', resizeCanvas);
+    </script>
+</body>
+</html>
