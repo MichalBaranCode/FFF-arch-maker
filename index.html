@@ -138,4 +138,256 @@
         }
 
         // Twarda blokada przewijania przy dotyku suwaka
-        const sliders = document.querySelectorAll('.hud-slider
+        const sliders = document.querySelectorAll('.hud-slider');
+        sliders.forEach(s => {
+            s.addEventListener('touchmove', function(e) { e.stopPropagation(); }, { passive: false });
+        });
+
+        function findCatenaryParameterA(span, height) {
+            let L_half = span / 2;
+            let a_min = 0.001;
+            let a_max = 100.0;
+            let a = (a_min + a_max) / 2;
+            let tolerance = 0.0001;
+            for (let i = 0; i < 100; i++) {
+                let calc_h = a * (Math.cosh(L_half / a) - 1);
+                let diff = calc_h - height;
+                if (Math.abs(diff) < tolerance) break;
+                if (diff > 0) a_min = a;
+                else a_max = a;
+                a = (a_min + a_max) / 2;
+            }
+            return a;
+        }
+
+        // Bezpieczna funkcja rysująca pojedynczą ścieżkę
+        function drawCatenaryStroke(ctx, catenaryPoints, lineWidth, strokeStyle) {
+            if(catenaryPoints.length === 0) return;
+            ctx.beginPath();
+            ctx.strokeStyle = strokeStyle;
+            ctx.lineWidth = lineWidth;
+            for (let i = 0; i < catenaryPoints.length; i++) {
+                let p = catenaryPoints[i];
+                if (i === 0) ctx.moveTo(p.x, p.y);
+                else ctx.lineTo(p.x, p.y);
+            }
+            ctx.stroke();
+        }
+
+        function drawArch(span, height, depth, diameter, a) {
+            const canvas = document.getElementById('archCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Zabezpieczenie przed błędem dzielenia przez zero
+            if (!canvas.parentElement) return;
+            const rect = canvas.parentElement.getBoundingClientRect();
+            if (rect.width <= 0 || rect.height <= 0) return;
+
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            
+            const cssWidth = canvas.width / dpr;
+            const cssHeight = canvas.height / dpr;
+            
+            ctx.scale(dpr, dpr); 
+            ctx.clearRect(0, 0, cssWidth, cssHeight);
+
+            const margin = 80; 
+            const drawWidth = Math.max(1, cssWidth - margin * 2);
+            const drawHeight = Math.max(1, cssHeight - margin * 2.5);
+            
+            const scaleX = drawWidth / span;
+            const scaleY = drawHeight / height;
+            const scale = Math.max(0.1, Math.min(scaleX, scaleY));
+
+            const offsetX = cssWidth / 2;
+            const offsetY = cssHeight - margin - (drawHeight - (height * scale)) / 2;
+            const groundY = Math.min(cssHeight, Math.max(0, offsetY - (depth * scale))); // Bezpieczny groundY
+
+            // --- 1. Tło: Krajobraz + Gleba ---
+            let bgGradient = ctx.createLinearGradient(0, 0, 0, cssHeight);
+            bgGradient.addColorStop(0, '#5a7d9a'); // Błękit
+            bgGradient.addColorStop(Math.min(1, Math.max(0, groundY / cssHeight)), '#6b7d60'); // Zieleń
+            bgGradient.addColorStop(1, '#2c221a'); // Ziemia
+            ctx.fillStyle = bgGradient;
+            ctx.fillRect(0, 0, cssWidth, cssHeight);
+
+            // Szum gleby (bardzo lekki, zoptymalizowany)
+            if (cssHeight - groundY > 0) {
+                ctx.save();
+                ctx.globalAlpha = 0.2;
+                ctx.fillStyle = '#111';
+                for(let i=0; i<1500; i++) {
+                    let rx = Math.random() * cssWidth;
+                    let ry = groundY + Math.random() * (cssHeight - groundY);
+                    ctx.fillRect(rx, ry, 1.5, 1.5);
+                }
+                ctx.restore();
+            }
+
+            // --- 2. Lekka Winieta (skupiająca wzrok) ---
+            let vigGradient = ctx.createRadialGradient(cssWidth/2, cssHeight/2, cssHeight*0.2, cssWidth/2, cssHeight/2, cssWidth*0.8);
+            vigGradient.addColorStop(0, 'rgba(0,0,0,0)'); 
+            vigGradient.addColorStop(1, 'rgba(10,10,10,0.5)'); 
+            ctx.fillStyle = vigGradient;
+            ctx.fillRect(0, 0, cssWidth, cssHeight);
+
+            // Generowanie punktów łuku
+            const numSteps = 150;
+            const catenaryPoints = [];
+            let archTopY = offsetY;
+            for (let i = 0; i <= numSteps; i++) {
+                let t = i / numSteps;
+                let x = -span / 2 + (t * span); 
+                let y = height - (a * (Math.cosh(x / a) - 1));
+                let cY = offsetY - y * scale;
+                catenaryPoints.push({ x: offsetX + x * scale, y: cY });
+                if(cY < archTopY) archTopY = cY;
+            }
+
+            // --- 3. Siatka (Zanikanie) ---
+            ctx.font = '10px monospace'; 
+            ctx.textAlign = 'center';
+            for(let x = - (Math.ceil(span/2)+2); x <= (Math.ceil(span/2)+2); x += 0.5) { 
+                ctx.beginPath();
+                let scaledX = x * scale;
+                if (Number.isInteger(x)) {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                    ctx.lineWidth = 1;
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                    if (x !== 0) ctx.fillText(x + 'm', offsetX + scaledX, groundY + 12);
+                } else {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+                    ctx.lineWidth = 0.5;
+                }
+                let minDst = 1000;
+                let lineCanvasX = offsetX + scaledX;
+                for(let p of catenaryPoints) minDst = Math.min(minDst, Math.abs(p.x - lineCanvasX));
+                ctx.globalAlpha = Math.max(0, Math.min(1, 1 - (minDst / (span * scale / 2 + margin/2)))); 
+                ctx.moveTo(offsetX + scaledX, 0); ctx.lineTo(offsetX + scaledX, cssHeight);
+                ctx.stroke();
+                ctx.globalAlpha = 1.0; 
+            }
+
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            for(let y = - (Math.floor(depth)+2); y <= (Math.ceil(height)+2); y += 0.5) { 
+                ctx.beginPath();
+                let scaledY = y * scale;
+                if (Number.isInteger(y)) {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                    ctx.lineWidth = 1;
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                    if (y !== 0) ctx.fillText(y + 'm', offsetX + 8, offsetY - scaledY);
+                } else {
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+                    ctx.lineWidth = 0.5;
+                }
+                let minDst = 1000;
+                let lineCanvasY = offsetY - scaledY;
+                for(let p of catenaryPoints) minDst = Math.min(minDst, Math.abs(p.y - lineCanvasY));
+                ctx.globalAlpha = Math.max(0, Math.min(1, 1 - (minDst / (height * scale / 2 + margin/2)))); 
+                ctx.moveTo(0, offsetY - scaledY); ctx.lineTo(cssWidth, offsetY - scaledY);
+                ctx.stroke();
+                ctx.globalAlpha = 1.0; 
+            }
+
+            // --- 4. Ciemnobrązowa Linia Gruntu ---
+            ctx.strokeStyle = '#3d2516';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, groundY);
+            ctx.lineTo(cssWidth, groundY);
+            ctx.stroke();
+
+            // --- 5. Twardy, Płynny Gradient Oświetlenia Łuku (Top-Down) ---
+            let baseWidth = Math.max(0.1, (diameter / 100) * scale);
+            
+            // BEZWZGLĘDNIE płaskie krawędzie
+            ctx.lineCap = 'butt';
+            ctx.lineJoin = 'miter';
+
+            // Pionowy gradient oświetlenia - Baza (Ciemno na dole, jasno na górze)
+            let archGradient = ctx.createLinearGradient(0, archTopY, 0, groundY + (depth * scale));
+            archGradient.addColorStop(0, '#ffffff'); // Czyste słońce na szczycie
+            archGradient.addColorStop(0.3, '#c0c0c0'); // Szarość w połowie
+            archGradient.addColorStop(0.8, '#444444'); // Ciemny cień na pionowych nogach
+            archGradient.addColorStop(1, '#222222'); // Najciemniej w fundamencie
+
+            // Warstwa 1: Główna, gładka bryła rury
+            drawCatenaryStroke(ctx, catenaryPoints, baseWidth, archGradient);
+
+            // Warstwa 2: Subtelny rdzeń/podświetlenie uwypuklające środek (symulacja cylindra)
+            let coreGradient = ctx.createLinearGradient(0, archTopY, 0, groundY);
+            coreGradient.addColorStop(0, 'rgba(255,255,255,0.8)');
+            coreGradient.addColorStop(0.6, 'rgba(255,255,255,0.1)');
+            coreGradient.addColorStop(1, 'rgba(255,255,255,0)');
+            drawCatenaryStroke(ctx, catenaryPoints, baseWidth * 0.4, coreGradient);
+
+            // --- 6. Ciemnożółty Krzyżyk (Zawsze NA WIERZCHU) ---
+            ctx.strokeStyle = '#ccaa00'; 
+            ctx.lineWidth = 1.5; 
+            ctx.beginPath();
+            ctx.moveTo(offsetX - 4, groundY); ctx.lineTo(offsetX + 4, groundY); 
+            ctx.moveTo(offsetX, groundY - 4); ctx.lineTo(offsetX, groundY + 4);
+            ctx.stroke();
+        }
+
+        function calculate() {
+            const spanBox = document.getElementById('span');
+            if(!spanBox) return; // Zabezpieczenie inicjalizacyjne
+
+            const span = Math.max(0.01, parseFloat(spanBox.value) || 0);
+            const height = Math.max(0.01, parseFloat(document.getElementById('height').value) || 0);
+            const diameter = Math.max(0.1, parseFloat(document.getElementById('diameter').value) || 0);
+            let depth = parseFloat(document.getElementById('depth').value) || 0;
+
+            if (depth >= height) depth = height - 0.001;
+            if (depth < 0) depth = 0;
+
+            const a = findCatenaryParameterA(span, height);
+            const totalLength = 2 * a * Math.sinh((span / 2) / a);
+            
+            const spanAbove = 2 * a * Math.acosh((height - depth) / a + 1);
+            const lengthAbove = 2 * a * Math.sinh((spanAbove / 2) / a);
+
+            const lengthUnderTotal = totalLength - lengthAbove;
+            const lengthUnderPerLeg = lengthUnderTotal / 2;
+
+            const radiusMeters = (diameter / 2) / 100;
+            const volumeLiters = (Math.PI * Math.pow(radiusMeters, 2) * totalLength) * 1000;
+            
+            const dryMass = volumeLiters * 1.95;
+            const waterMin = dryMass * 0.14;
+            const waterMax = dryMass * 0.15;
+
+            document.getElementById('spanAbove').innerText = spanAbove.toFixed(2) + " m";
+            document.getElementById('heightAbove').innerText = (height - depth).toFixed(2) + " m";
+            document.getElementById('lengthAbove').innerText = lengthAbove.toFixed(2) + " m";
+            document.getElementById('lengthUnder').innerText = lengthUnderPerLeg.toFixed(2) + " m";
+            document.getElementById('lengthTotal').innerText = totalLength.toFixed(2) + " m";
+
+            document.getElementById('volume').innerText = volumeLiters.toFixed(1) + " l";
+            document.getElementById('dryMass').innerText = dryMass.toFixed(1) + " kg";
+            document.getElementById('waterRange').innerText = waterMin.toFixed(1) + " - " + waterMax.toFixed(1) + " l";
+            document.getElementById('totalMass').innerText = (dryMass + waterMax).toFixed(1) + " kg";
+
+            // Wywołaj rysowanie
+            drawArch(span, height, depth, diameter, a);
+        }
+        
+        function initApp() {
+            calculate();
+            window.addEventListener('resize', calculate);
+        }
+
+        // Czekamy na pełne załadowanie DOM, żeby wymiary były pewne
+        if (document.readyState === 'complete') {
+            initApp();
+        } else {
+            window.addEventListener('load', initApp);
+        }
+    </script>
+</body>
+</html>
