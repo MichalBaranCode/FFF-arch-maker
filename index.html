@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
-FFF ARCH MAKER V19
-Base: V15 reset / corrected from the last known good version.
+FFF ARCH MAKER V20
+Base: V15 reset. V20 continues after V20 visual pass.
 Rule: this version number must match the visible badge in the app.
 -->
 <html lang="pl">
@@ -9,7 +9,7 @@ Rule: this version number must match the visible badge in the app.
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#242321">
-    <title>Fabricable Fabric Formwork — Arch Maker V19</title>
+    <title>Fabricable Fabric Formwork — Arch Maker V20</title>
     <style>
         :root {
             --ui-dark: #171817;
@@ -19,11 +19,11 @@ Rule: this version number must match the visible badge in the app.
             --ui-muted: rgba(242,240,234,0.58);
             --accent: #d54b3d;
             --blue: #55a7ff;
-            --soil-top: #9e9674;
-            --soil-mid: #7d6c4f;
-            --soil-bottom: #4f3b27;
-            --sky-top: #a9cfdf;
-            --sky-bottom: #bad1ad;
+            --soil-top: #a49c7d;
+            --soil-mid: #756148;
+            --soil-bottom: #432b1b;
+            --sky-top: #a6c5d0;
+            --sky-bottom: #b4c7a8;
         }
 
         * { box-sizing: border-box; }
@@ -66,19 +66,21 @@ Rule: this version number must match the visible badge in the app.
 
         .title-main {
             color: #f4f1eb;
+            font-family: "Avenir Next", Avenir, "Gill Sans", "Trebuchet MS", Inter, ui-sans-serif, system-ui, sans-serif;
             font-size: 13px;
             line-height: 1;
-            font-weight: 640;
-            letter-spacing: -0.02em;
+            font-weight: 520;
+            letter-spacing: -0.01em;
         }
 
         .title-sub {
-            color: rgba(244,241,235,0.68);
-            font-family: Georgia, "Times New Roman", serif;
+            color: rgba(244,241,235,0.62);
+            font-family: "Avenir Next", Avenir, "Gill Sans", "Trebuchet MS", Inter, ui-sans-serif, system-ui, sans-serif;
             font-size: 12px;
             font-style: italic;
             line-height: 1;
-            letter-spacing: 0.015em;
+            font-weight: 350;
+            letter-spacing: 0.01em;
             margin-left: 1px;
         }
 
@@ -114,22 +116,22 @@ Rule: this version number must match the visible badge in the app.
         .hud-box {
             position: absolute;
             z-index: 30;
-            width: 68px;
-            border-radius: 8px;
+            width: 62px;
+            border-radius: 7px;
             overflow: hidden;
             background: rgba(255,255,255,0.88);
             border: 1px solid rgba(255,255,255,0.55);
-            box-shadow: 0 10px 26px rgba(20,18,14,0.18), 0 1px 0 rgba(255,255,255,0.55) inset;
+            box-shadow: 0 7px 18px rgba(20,18,14,0.16), 0 1px 0 rgba(255,255,255,0.52) inset;
             backdrop-filter: blur(10px) saturate(1.05);
             -webkit-backdrop-filter: blur(10px) saturate(1.05);
         }
 
         .hud-box-header {
-            min-height: 21px;
+            min-height: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 3px 4px 2px 4px;
+            padding: 2px 3px 1px 3px;
             background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(235,235,231,0.72));
             border-bottom: 1px solid rgba(0,0,0,0.075);
         }
@@ -137,7 +139,7 @@ Rule: this version number must match the visible badge in the app.
         .hud-box label {
             margin: 0;
             color: rgba(31,31,28,0.64);
-            font-size: 7.4px;
+            font-size: 6.8px;
             font-weight: 800;
             line-height: 1.05;
             letter-spacing: 0.055em;
@@ -147,13 +149,13 @@ Rule: this version number must match the visible badge in the app.
 
         .hud-box input[type="number"] {
             width: 100%;
-            height: 31px;
+            height: 28px;
             border: 0;
             outline: 0;
             background: rgba(255,255,255,0.92);
             color: #141411;
             text-align: center;
-            font-size: 15px;
+            font-size: 14px;
             line-height: 1;
             font-weight: 780;
             font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
@@ -168,78 +170,138 @@ Rule: this version number must match the visible badge in the app.
             margin: 0;
         }
 
-        #box-height { top: 14px; left: 14px; }
-        #box-diameter { top: 14px; right: 14px; }
-        #box-span { bottom: 14px; left: 14px; }
-        #box-depth { bottom: 14px; right: 14px; }
+        #box-height { top: 12px; left: 12px; }
+        #box-diameter { top: 12px; right: 12px; }
+        #box-span { bottom: 12px; left: 12px; }
+        #box-depth { bottom: 12px; right: 12px; }
+
+
+        .slider-shell {
+            --pct: 50;
+            position: absolute;
+            z-index: 29;
+            width: 154px;
+            height: 28px;
+            margin: 0;
+            touch-action: none;
+            filter: drop-shadow(0 5px 8px rgba(0,0,0,0.20));
+        }
+
+        .slider-rail {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 10px;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .slider-rail::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 2px;
+            height: 6px;
+            border-radius: 999px;
+            background:
+                linear-gradient(90deg,
+                    rgba(24,28,27,0.56) 0%,
+                    rgba(70,76,72,0.54) calc(var(--pct) * 1% - 28%),
+                    rgba(226,234,224,0.92) calc(var(--pct) * 1%),
+                    rgba(70,76,72,0.54) calc(var(--pct) * 1% + 28%),
+                    rgba(24,28,27,0.56) 100%);
+            clip-path: polygon(0 45%, calc(var(--pct) * 1%) 24%, 100% 45%, 100% 55%, calc(var(--pct) * 1%) 76%, 0 55%);
+            box-shadow: 0 1px 0 rgba(255,255,255,0.16) inset, 0 -1px 0 rgba(0,0,0,0.22) inset;
+        }
+
+        .slider-focus {
+            position: absolute;
+            top: 0;
+            left: calc(var(--pct) * 1%);
+            width: 58px;
+            height: 10px;
+            transform: translateX(-50%);
+            border-radius: 999px;
+            background: radial-gradient(ellipse at center, rgba(255,255,246,0.50) 0%, rgba(255,255,246,0.22) 36%, rgba(255,255,246,0.00) 72%);
+            pointer-events: none;
+        }
+
+        .slider-knob {
+            position: absolute;
+            left: calc(var(--pct) * 1%);
+            top: 50%;
+            width: 16px;
+            height: 16px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.72);
+            background:
+                radial-gradient(circle at 36% 24%, #ffffff 0%, #ecebe4 22%, #b9b8af 46%, #77766f 72%, #3e3d39 100%);
+            box-shadow:
+                0 3px 8px rgba(0,0,0,0.36),
+                0 0 0 1px rgba(0,0,0,0.10),
+                0 1px 0 rgba(255,255,255,0.65) inset;
+            pointer-events: none;
+        }
 
         .hud-slider {
-            --pos: 50%;
-            --slider-bg: linear-gradient(90deg, rgba(28,31,30,0.52) 0%, rgba(94,97,92,0.55) 40%, rgba(238,243,235,0.90) 50%, rgba(94,97,92,0.55) 60%, rgba(28,31,30,0.52) 100%);
             position: absolute;
-            z-index: 24;
-            width: 154px;
-            height: 25px;
+            inset: 0;
+            z-index: 3;
+            width: 100%;
+            height: 100%;
             margin: 0;
             appearance: none;
             -webkit-appearance: none;
             background: transparent;
-            outline: none;
+            opacity: 0.001;
             cursor: pointer;
             touch-action: none;
-            filter: drop-shadow(0 5px 8px rgba(0,0,0,0.22));
         }
 
         .hud-slider::-webkit-slider-runnable-track {
             width: 100%;
-            height: 6px;
-            border-radius: 999px;
-            background: var(--slider-bg);
-            clip-path: polygon(0 42%, var(--pos) 24%, 100% 42%, 100% 58%, var(--pos) 76%, 0 58%);
-            box-shadow: 0 1px 0 rgba(255,255,255,0.18) inset, 0 -1px 0 rgba(0,0,0,0.20) inset;
+            height: 28px;
+            background: transparent;
         }
 
         .hud-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 15px;
-            height: 15px;
-            margin-top: -4.5px;
-            border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.55);
-            background: radial-gradient(circle at 42% 30%, #ffffff 0%, #d9d7d0 34%, #8b8981 72%, #4a4945 100%);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.36), 0 0 0 1px rgba(0,0,0,0.08);
+            width: 28px;
+            height: 28px;
+            background: transparent;
+            border: 0;
         }
 
         .hud-slider::-moz-range-track {
             width: 100%;
-            height: 6px;
-            border-radius: 999px;
-            background: var(--slider-bg);
-            clip-path: polygon(0 42%, var(--pos) 24%, 100% 42%, 100% 58%, var(--pos) 76%, 0 58%);
+            height: 28px;
+            background: transparent;
+            border: 0;
         }
 
         .hud-slider::-moz-range-thumb {
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.55);
-            background: radial-gradient(circle at 42% 30%, #ffffff 0%, #d9d7d0 34%, #8b8981 72%, #4a4945 100%);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.36), 0 0 0 1px rgba(0,0,0,0.08);
+            width: 28px;
+            height: 28px;
+            background: transparent;
+            border: 0;
         }
 
-        #sliderHeight {
-            width: 160px;
-            top: 203px;
-            left: 38px;
+        #sliderHeightShell {
+            width: 154px;
+            top: 190px;
+            left: 35px;
             transform: rotate(-90deg);
             transform-origin: left center;
         }
 
-        #sliderSpan {
-            width: 164px;
-            bottom: 24px;
-            left: 94px;
+        #sliderSpanShell {
+            width: 154px;
+            bottom: 18px;
+            left: 84px;
         }
 
         .results-shell {
@@ -282,7 +344,7 @@ Rule: this version number must match the visible badge in the app.
             align-items: baseline;
             justify-content: space-between;
             gap: 14px;
-            min-height: 21px;
+            min-height: 18px;
             margin: 0;
             color: rgba(242,240,234,0.70);
             font-size: 12px;
@@ -324,9 +386,9 @@ Rule: this version number must match the visible badge in the app.
             .title-sub { font-size: 11px; }
             .version-badge { font-size: 10px; }
 
-            #sliderSpan {
+            #sliderSpanShell {
                 width: 138px;
-                left: 90px;
+                left: 84px;
             }
 
             .results-container {
@@ -343,8 +405,8 @@ Rule: this version number must match the visible badge in the app.
             .hud-box { width: 64px; }
             .hud-box label { font-size: 6.9px; }
             .hud-box input[type="number"] { font-size: 14px; }
-            #sliderSpan { width: 118px; left: 84px; }
-            #sliderHeight { width: 145px; top: 190px; left: 35px; }
+            #sliderSpanShell { width: 118px; left: 78px; }
+            #sliderHeightShell { width: 145px; top: 184px; left: 33px; }
         }
     </style>
 </head>
@@ -352,7 +414,7 @@ Rule: this version number must match the visible badge in the app.
     <div class="top-bar">
         <span class="title-main">Fabricable Fabric Formwork</span>
         <span class="title-sub">Arch Maker</span>
-        <span class="version-badge">V19</span>
+        <span class="version-badge">V20</span>
     </div>
 
     <div class="viewport-container" id="viewport">
@@ -378,8 +440,21 @@ Rule: this version number must match the visible badge in the app.
             <input type="number" id="depth" value="0.30" step="0.01" inputmode="decimal" oninput="calculate()">
         </div>
 
-        <input type="range" id="sliderHeight" class="hud-slider" min="0.5" max="5.0" step="0.1" value="1.5" aria-label="Height slider" oninput="syncSlider('height')">
-        <input type="range" id="sliderSpan" class="hud-slider" min="1.0" max="5.0" step="0.1" value="2.0" aria-label="Span slider" oninput="syncSlider('span')">
+        <div class="slider-shell" id="sliderHeightShell">
+            <div class="slider-rail" aria-hidden="true">
+                <div class="slider-focus"></div>
+                <div class="slider-knob"></div>
+            </div>
+            <input type="range" id="sliderHeight" class="hud-slider" min="0.5" max="5.0" step="0.1" value="1.5" aria-label="Height slider" oninput="syncSlider('height')">
+        </div>
+
+        <div class="slider-shell" id="sliderSpanShell">
+            <div class="slider-rail" aria-hidden="true">
+                <div class="slider-focus"></div>
+                <div class="slider-knob"></div>
+            </div>
+            <input type="range" id="sliderSpan" class="hud-slider" min="1.0" max="5.0" step="0.1" value="2.0" aria-label="Span slider" oninput="syncSlider('span')">
+        </div>
     </div>
 
     <div class="results-shell">
@@ -404,11 +479,11 @@ Rule: this version number must match the visible badge in the app.
             </div>
         </div>
 
-        <p class="note">V19 — reset from V15. Two sliders. Split sky/soil gradient. Refined HUD. Fixed visual height output.</p>
+        <p class="note">V20 — visual refinement. Custom visible slider knobs. Smaller HUD. Smoother top-lit tube shading.</p>
     </div>
 
     <script>
-        const VERSION = "V19";
+        const VERSION = "V20";
 
         function clamp(value, min, max) {
             return Math.max(min, Math.min(max, value));
@@ -428,19 +503,11 @@ Rule: this version number must match the visible badge in the app.
             const max = parseFloat(slider.max) || 100;
             const val = parseFloat(slider.value) || min;
             const percent = clamp(((val - min) / (max - min)) * 100, 0, 100);
-            const p1 = clamp(percent - 13, 0, 100);
-            const p2 = clamp(percent + 13, 0, 100);
+            const shell = slider.closest('.slider-shell');
 
-            slider.style.setProperty('--pos', percent + '%');
-            slider.style.setProperty(
-                '--slider-bg',
-                `linear-gradient(90deg,
-                    rgba(23,28,27,0.54) 0%,
-                    rgba(75,80,75,0.56) ${p1}%,
-                    rgba(235,243,232,0.94) ${percent}%,
-                    rgba(75,80,75,0.56) ${p2}%,
-                    rgba(23,28,27,0.54) 100%)`
-            );
+            if (shell) {
+                shell.style.setProperty('--pct', percent);
+            }
         }
 
         function syncSlider(id) {
@@ -538,39 +605,63 @@ Rule: this version number must match the visible badge in the app.
         }
 
         function drawTube(ctx, points, baseWidth) {
+            if (!points.length || baseWidth <= 0) return;
+
+            function lerp(a, b, t) {
+                return a + (b - a) * t;
+            }
+
+            function colorMix(c1, c2, t, alpha = 1) {
+                const r = Math.round(lerp(c1[0], c2[0], t));
+                const g = Math.round(lerp(c1[1], c2[1], t));
+                const b = Math.round(lerp(c1[2], c2[2], t));
+                return `rgba(${r},${g},${b},${alpha})`;
+            }
+
             ctx.save();
             ctx.lineCap = 'butt';
             ctx.lineJoin = 'round';
 
-            ctx.shadowColor = 'rgba(0,0,0,0.32)';
-            ctx.shadowBlur = Math.max(2, baseWidth * 0.22);
-            ctx.shadowOffsetX = Math.max(1, baseWidth * 0.06);
-            ctx.shadowOffsetY = Math.max(2, baseWidth * 0.10);
-            drawCatenaryStrokeOffset(ctx, points, baseWidth * 1.05, 'rgba(30,30,29,0.98)', 0);
+            // Soft physical shadow: below/right, not painted outline.
+            ctx.shadowColor = 'rgba(0,0,0,0.34)';
+            ctx.shadowBlur = Math.max(3, baseWidth * 0.20);
+            ctx.shadowOffsetX = Math.max(1.2, baseWidth * 0.055);
+            ctx.shadowOffsetY = Math.max(2.4, baseWidth * 0.13);
+            drawCatenaryStrokeOffset(ctx, points, baseWidth * 1.02, 'rgba(40,40,38,0.94)', 0);
 
             ctx.shadowColor = 'transparent';
             ctx.shadowBlur = 0;
             ctx.shadowOffsetX = 0;
             ctx.shadowOffsetY = 0;
 
-            const layers = [
-                [1.00, '#383936', 0.00],
-                [0.92, '#4b4c48', -0.03],
-                [0.82, '#62635e', -0.08],
-                [0.70, '#777973', -0.14],
-                [0.58, '#8d8f88', -0.20],
-                [0.45, '#a5a79f', -0.27],
-                [0.32, '#bfc1b7', -0.34],
-                [0.20, '#dadbd2', -0.41],
-                [0.10, '#f1f0e7', -0.48]
-            ];
+            // Smooth top-lit tube: many sub-pixel layers, no hard "paint stripes".
+            const bottom = [45, 46, 43];
+            const mid = [120, 122, 116];
+            const top = [238, 238, 229];
+            const layers = 42;
 
-            for (const [widthScale, color, offsetScale] of layers) {
+            for (let i = 0; i < layers; i++) {
+                const t = i / (layers - 1);
+                const eased = 1 - Math.pow(1 - t, 1.55);
+                const widthScale = lerp(1.00, 0.105, eased);
+                const offsetScale = lerp(0.00, -0.505, eased);
+
+                let color;
+                if (t < 0.58) {
+                    color = colorMix(bottom, mid, t / 0.58, 0.96);
+                } else {
+                    color = colorMix(mid, top, (t - 0.58) / 0.42, 0.94);
+                }
+
                 drawCatenaryStrokeOffset(ctx, points, baseWidth * widthScale, color, baseWidth * offsetScale);
             }
 
-            drawCatenaryStrokeOffset(ctx, points, Math.max(0.8, baseWidth * 0.018), 'rgba(255,255,255,0.62)', baseWidth * -0.515);
-            drawCatenaryStrokeOffset(ctx, points, Math.max(0.7, baseWidth * 0.020), 'rgba(0,0,0,0.22)', baseWidth * 0.50);
+            // Gentle upper glow and lower contact shadow. Thin and transparent, not cartoon lines.
+            drawCatenaryStrokeOffset(ctx, points, Math.max(0.9, baseWidth * 0.030), 'rgba(255,255,248,0.45)', baseWidth * -0.525);
+            drawCatenaryStrokeOffset(ctx, points, Math.max(1.0, baseWidth * 0.035), 'rgba(0,0,0,0.24)', baseWidth * 0.485);
+
+            // Very subtle central sheen, visible mainly on larger tubes.
+            drawCatenaryStrokeOffset(ctx, points, Math.max(0.8, baseWidth * 0.022), 'rgba(255,255,255,0.16)', baseWidth * -0.24);
 
             ctx.restore();
         }
@@ -625,7 +716,7 @@ Rule: this version number must match the visible badge in the app.
             ctx.fillStyle = vignette;
             ctx.fillRect(0, 0, cssWidth, cssHeight);
 
-            const numSteps = 220;
+            const numSteps = 340;
             const catenaryPoints = [];
             for (let i = 0; i <= numSteps; i++) {
                 const t = i / numSteps;
@@ -645,7 +736,7 @@ Rule: this version number must match the visible badge in the app.
                 const canvasX = offsetX + x * scale;
                 const isMajor = Number.isInteger(x);
                 const distanceToCenter = Math.abs(canvasX - offsetX) / Math.max(1, cssWidth / 2);
-                const alpha = (isMajor ? 0.15 : 0.07) * (1 - distanceToCenter * 0.35);
+                const alpha = (isMajor ? 0.105 : 0.045) * (1 - distanceToCenter * 0.35);
                 ctx.strokeStyle = `rgba(255,255,255,${Math.max(0.025, alpha)})`;
                 ctx.lineWidth = isMajor ? 0.8 : 0.45;
                 ctx.beginPath();
@@ -654,7 +745,7 @@ Rule: this version number must match the visible badge in the app.
                 ctx.stroke();
 
                 if (isMajor && x !== 0) {
-                    ctx.fillStyle = 'rgba(255,255,255,0.42)';
+                    ctx.fillStyle = 'rgba(255,255,255,0.34)';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     ctx.fillText(`${x}m`, canvasX, groundY + 11);
@@ -666,7 +757,7 @@ Rule: this version number must match the visible badge in the app.
             for (let y = yStart; y <= yEnd; y += 0.5) {
                 const canvasY = offsetY - y * scale;
                 const isMajor = Number.isInteger(y);
-                const alpha = isMajor ? 0.15 : 0.07;
+                const alpha = isMajor ? 0.105 : 0.045;
                 ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
                 ctx.lineWidth = isMajor ? 0.8 : 0.45;
                 ctx.beginPath();
@@ -675,7 +766,7 @@ Rule: this version number must match the visible badge in the app.
                 ctx.stroke();
 
                 if (isMajor && y !== 0) {
-                    ctx.fillStyle = 'rgba(255,255,255,0.42)';
+                    ctx.fillStyle = 'rgba(255,255,255,0.34)';
                     ctx.textAlign = 'left';
                     ctx.textBaseline = 'middle';
                     ctx.fillText(`${y}m`, offsetX + 9, canvasY);
@@ -685,7 +776,7 @@ Rule: this version number must match the visible badge in the app.
 
             // Ground plane.
             ctx.strokeStyle = 'rgba(54,38,23,0.92)';
-            ctx.lineWidth = 1.35;
+            ctx.lineWidth = 1.15;
             ctx.beginPath();
             ctx.moveTo(0, groundY);
             ctx.lineTo(cssWidth, groundY);
