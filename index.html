@@ -3,42 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FFF Arch Maker - Pro V10 Construction Dark</title>
+    <title>FFF Arch Maker - Pro V11 Construction Dark</title>
     <style>
-        /* Global Construction Dark Theme */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #151413; color: #f4f4f2; margin: 0; padding: 0; overflow-x: hidden; }
+        /* Global Theme */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #151413; color: #f4f4f2; margin: 0; padding: 0; overflow-x: hidden; touch-action: manipulation; }
         
-        /* Minimalist Top Bar */
+        /* Top Bar */
         .top-bar { background-color: #0c0a09; border-bottom: 1px solid #2a2a2a; padding: 4px 10px; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 100; height: 16px;}
         .top-bar h1 { color: #888; font-size: 11px; margin: 0; letter-spacing: 0.5px; text-transform: uppercase;}
         .version-badge { color: #58a6ff; font-weight: bold; margin-left: 5px; }
 
-        /* Viewport Logic */
+        /* Viewport */
         .viewport-container { position: relative; width: 100%; height: calc(60vh); max-height: 550px; background: #08121f; border-bottom: 1px solid #2a2a2a; overflow: hidden; }
         canvas { display: block; width: 100%; height: 100%; }
 
-        /* HUD Boxes - Clean, Minimalist, White Overlays */
-        .hud-box { position: absolute; background: #ffffff; border: 1px solid #333; border-radius: 6px; padding: 5px; box-shadow: 0px 4px 10px rgba(0,0,0,0.4); z-index: 20; width: 60px; display: flex; flex-direction: column; align-items: center;}
-        .hud-box label { width: 100%; text-align: center; font-size: 9px; font-weight: bold; color: #666; text-transform: uppercase; margin-bottom: 3px; letter-spacing: 0.5px;}
-        .hud-box .divider { width: 85%; height: 1px; background: #ddd; margin-bottom: 3px; }
-        .hud-box input[type="number"] { width: 100%; border: none; text-align: center; font-size: 16px; font-weight: bold; color: #000; background: transparent; outline: none; font-family: monospace; padding: 0;}
+        /* HUD Boxes - Zoned Layout */
+        .hud-box { position: absolute; background: #ffffff; border: 1px solid #333; border-radius: 6px; padding: 0; overflow: hidden; box-shadow: 0px 4px 10px rgba(0,0,0,0.4); z-index: 20; width: 66px; display: flex; flex-direction: column; align-items: center;}
+        .hud-box-header { width: 100%; background: #e6e6e6; border-bottom: 1px solid #ccc; padding: 3px 0; display: flex; justify-content: center; align-items: center;}
+        .hud-box label { font-size: 9px; font-weight: bold; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin: 0;}
+        .hud-box input[type="number"] { width: 100%; border: none; text-align: center; font-size: 16px; font-weight: bold; color: #000; background: transparent; outline: none; font-family: monospace; padding: 5px 0;}
         
-        /* Corner Positioning for HUD Boxes */
+        /* Box Positioning */
         #box-height { top: 12px; left: 12px; }
         #box-diameter { top: 12px; right: 12px; }
         #box-span { bottom: 12px; left: 12px; } 
         #box-depth { bottom: 12px; right: 12px; }
 
-        /* HUD Sliders - Decoupled from boxes */
-        .hud-slider { position: absolute; z-index: 15; appearance: none; background: transparent; outline: none; }
+        /* HUD Sliders - Hardware Look & Scroll Lock */
+        .hud-slider { position: absolute; z-index: 15; appearance: none; background: transparent; outline: none; touch-action: none; }
         .hud-slider::-webkit-slider-runnable-track { width: 100%; height: 6px; background: rgba(0,0,0,0.6); border: 1px solid #444; border-radius: 3px; }
-        .hud-slider::-webkit-slider-thumb { appearance: none; width: 20px; height: 20px; background: #58a6ff; border: 2px solid #fff; border-radius: 50%; margin-top: -8px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.5);}
+        .hud-slider::-webkit-slider-thumb { appearance: none; width: 22px; height: 22px; background: radial-gradient(circle at 50% 20%, #f4f4f4, #777); border: 1px solid #444; border-radius: 50%; margin-top: -9px; cursor: pointer; box-shadow: 0 3px 5px rgba(0,0,0,0.6);}
         
-        /* Specific Sliders Positioning */
-        #sliderHeight { width: 140px; height: 20px; top: 140px; left: 10px; transform: translate(-50%, -50%) rotate(-90deg); }
-        #sliderSpan { width: 140px; height: 20px; bottom: 25px; left: 90px; }
+        /* Slider Positioning */
+        #sliderHeight { width: 150px; height: 22px; top: 145px; left: 15px; transform: translate(-50%, -50%) rotate(-90deg); }
+        #sliderSpan { width: 140px; height: 22px; bottom: 25px; left: 90px; }
 
-        /* Minimalist Results Section */
+        /* Results */
         .results-container { padding: 10px; max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         @media (max-width: 600px) { .results-container { grid-template-columns: 1fr; } }
         
@@ -54,29 +54,29 @@
 <body>
 
     <div class="top-bar">
-        <h1>FFF Arch Maker <span class="version-badge">V10</span></h1>
+        <h1>FFF Arch Maker <span class="version-badge">V11</span></h1>
     </div>
 
     <div class="viewport-container">
         <canvas id="archCanvas"></canvas>
         
         <div class="hud-box" id="box-height">
-            <label>Height (m)</label><div class="divider"></div>
+            <div class="hud-box-header"><label>Height (m)</label></div>
             <input type="number" id="height" value="1.50" step="0.01" oninput="syncInput('height')">
         </div>
         
         <div class="hud-box" id="box-diameter">
-            <label>Tube Ø (cm)</label><div class="divider"></div>
+            <div class="hud-box-header"><label>Tube Ø (cm)</label></div>
             <input type="number" id="diameter" value="10.0" step="0.1" oninput="calculate()">
         </div>
 
         <div class="hud-box" id="box-span">
-            <label>Span (m)</label><div class="divider"></div>
+            <div class="hud-box-header"><label>Span (m)</label></div>
             <input type="number" id="span" value="2.00" step="0.01" oninput="syncInput('span')">
         </div>
 
         <div class="hud-box" id="box-depth">
-            <label>Depth (m)</label><div class="divider"></div>
+            <div class="hud-box-header"><label>Depth (m)</label></div>
             <input type="number" id="depth" value="0.30" step="0.01" oninput="calculate()">
         </div>
 
@@ -105,7 +105,7 @@
         </div>
     </div>
 
-    <p class="note">V10 Decoupled HUD. Math clamped for mobile safety. 3D Arch Shading applied.</p>
+    <p class="note">V11 Construction Dark. DPI scaling fixed. Slider scroll locked. Smooth 3D Central Shading applied.</p>
 
     <script>
         // Sync Logic
@@ -141,42 +141,63 @@
             return a;
         }
 
+        // Helper to draw catenary path
+        function drawCatenaryStroke(ctx, catenaryPoints, lineWidth, color) {
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = lineWidth;
+            for (let i = 0; i < catenaryPoints.length; i++) {
+                let p = catenaryPoints[i];
+                if (i === 0) ctx.moveTo(p.x, p.y);
+                else ctx.lineTo(p.x, p.y);
+            }
+            ctx.stroke();
+        }
+
         function drawArch(span, height, depth, diameter, a) {
             const canvas = document.getElementById('archCanvas');
             const ctx = canvas.getContext('2d');
             
-            // Bezpieczne wymiary
-            if (canvas.width === 0 || canvas.height === 0) return;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // DPI Fix: Using CSS width/height for calculations, not raw pixel count
+            const dpr = window.devicePixelRatio || 1;
+            const cssWidth = canvas.width / dpr;
+            const cssHeight = canvas.height / dpr;
+
+            if (cssWidth === 0 || cssHeight === 0) return;
+            
+            ctx.save();
+            ctx.scale(dpr, dpr); // All drawing is now scaled perfectly for Retina displays
+            ctx.clearRect(0, 0, cssWidth, cssHeight);
 
             const margin = 80; 
-            const drawWidth = Math.max(1, canvas.width - margin * 2);
-            const drawHeight = Math.max(1, canvas.height - margin * 2);
+            const drawWidth = Math.max(1, cssWidth - margin * 2);
+            const drawHeight = Math.max(1, cssHeight - margin * 2);
             
             const scaleX = drawWidth / span;
             const scaleY = drawHeight / height;
             const scale = Math.max(0.1, Math.min(scaleX, scaleY));
 
-            const offsetX = canvas.width / 2;
-            const offsetY = canvas.height - margin - (drawHeight - (height * scale)) / 2;
+            const offsetX = cssWidth / 2;
+            const offsetY = cssHeight - margin - (drawHeight - (height * scale)) / 2;
             const groundY = offsetY - (depth * scale);
 
-            // Tło - Ciemne, zgaszone, ergonomiczne
-            let skyRadius = canvas.width * 0.7;
+            // --- Tło Vignette V3 (Zieleń-Błękit i jasny brąz) ---
+            let skyRadius = cssWidth * 0.7;
             let skyGradient = ctx.createRadialGradient(offsetX, groundY, 0, offsetX, groundY, skyRadius);
-            skyGradient.addColorStop(0, '#1c314a'); 
-            skyGradient.addColorStop(1, '#070f1a'); 
+            skyGradient.addColorStop(0, '#2d5a4c'); // Jasny, turkusowy środek
+            skyGradient.addColorStop(0.5, '#1c314a'); // Granat
+            skyGradient.addColorStop(1, '#070f1a'); // Mrok
             ctx.fillStyle = skyGradient;
-            ctx.fillRect(0, 0, canvas.width, groundY);
+            ctx.fillRect(0, 0, cssWidth, groundY);
             
-            let groundRadius = canvas.width * 0.7;
+            let groundRadius = cssWidth * 0.7;
             let groundGradient = ctx.createRadialGradient(offsetX, groundY, 0, offsetX, groundY, groundRadius);
-            groundGradient.addColorStop(0, '#382b21'); 
-            groundGradient.addColorStop(1, '#14110e'); 
+            groundGradient.addColorStop(0, '#4a3826'); // Ciepły, jasny brąz w centrum
+            groundGradient.addColorStop(1, '#14110e'); // Mroczny brąz na krawędziach
             ctx.fillStyle = groundGradient; 
-            ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+            ctx.fillRect(0, groundY, cssWidth, cssHeight - groundY);
 
-            // Generowanie punktów łuku dla grid fadingu
+            // Punkty krzywej dla siatki i renderowania
             const numSteps = 150;
             const catenaryPoints = [];
             for (let i = 0; i <= numSteps; i++) {
@@ -186,7 +207,7 @@
                 catenaryPoints.push({ x: offsetX + x * scale, y: offsetY - y * scale });
             }
 
-            // Siatka - Bezpieczny Fading
+            // --- Siatka (Fading) ---
             ctx.font = '10px monospace'; 
             ctx.textAlign = 'center';
             
@@ -206,11 +227,10 @@
                 let minDst = 1000;
                 let lineCanvasX = offsetX + scaledX;
                 for(let p of catenaryPoints) minDst = Math.min(minDst, Math.abs(p.x - lineCanvasX));
-                
                 let gridAlpha = 1 - (minDst / Math.max(10, (span * scale / 2 + margin/2)));
                 ctx.globalAlpha = Math.max(0, Math.min(1, gridAlpha)); 
 
-                ctx.moveTo(offsetX + scaledX, 0); ctx.lineTo(offsetX + scaledX, canvas.height);
+                ctx.moveTo(offsetX + scaledX, 0); ctx.lineTo(offsetX + scaledX, cssHeight);
                 ctx.stroke();
                 ctx.globalAlpha = 1.0; 
             }
@@ -233,66 +253,47 @@
                 let minDst = 1000;
                 let lineCanvasY = offsetY - scaledY;
                 for(let p of catenaryPoints) minDst = Math.min(minDst, Math.abs(p.y - lineCanvasY));
-                
                 let gridAlpha = 1 - (minDst / Math.max(10, (height * scale / 2 + margin/2)));
                 ctx.globalAlpha = Math.max(0, Math.min(1, gridAlpha)); 
 
-                ctx.moveTo(0, offsetY - scaledY); ctx.lineTo(canvas.width, offsetY - scaledY);
+                ctx.moveTo(0, offsetY - scaledY); ctx.lineTo(cssWidth, offsetY - scaledY);
                 ctx.stroke();
                 ctx.globalAlpha = 1.0; 
             }
 
-            // Czerwony Krzyżyk
-            ctx.strokeStyle = '#ff3333';
-            ctx.lineWidth = 1; 
-            ctx.beginPath();
-            ctx.moveTo(offsetX - 4, groundY); ctx.lineTo(offsetX + 4, groundY); 
-            ctx.moveTo(offsetX, groundY - 4); ctx.lineTo(offsetX, groundY + 4);
-            ctx.stroke();
-
-            // Linia Gruntu
-            ctx.strokeStyle = '#2b1e16';
+            // --- Linia Gruntu (Zawsze pod krzyżykiem i łukiem) ---
+            ctx.strokeStyle = '#5c4028';
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(0, groundY);
-            ctx.lineTo(canvas.width, groundY);
+            ctx.lineTo(cssWidth, groundY);
             ctx.stroke();
 
-            // 3D Arch Shading (Cień bazowy + Jasny Rdzeń + Zewnętrzny Ostrzejszy Highlight)
+            // --- Smooth 3D Arch Shading (Wielowarstwowe światło z góry) ---
             let baseWidth = Math.max(0.1, (diameter / 100) * scale);
             ctx.lineCap = 'butt';
             ctx.lineJoin = 'round';
 
-            // 1. Ciemny cień / Baza
+            // Zewnętrzny ciemny cień
+            drawCatenaryStroke(ctx, catenaryPoints, baseWidth, '#111');
+            // Średni ciemnoszary (formuje krawędzie)
+            drawCatenaryStroke(ctx, catenaryPoints, baseWidth * 0.8, '#444');
+            // Jasny szary materiał wewnątrz
+            drawCatenaryStroke(ctx, catenaryPoints, baseWidth * 0.6, '#888');
+            // Rozbielenie bliżej środka
+            drawCatenaryStroke(ctx, catenaryPoints, baseWidth * 0.35, '#ccc');
+            // Ostry biały highlight na samym środku
+            drawCatenaryStroke(ctx, catenaryPoints, baseWidth * 0.15, '#fff');
+
+            // --- Czerwony Krzyżyk (Zawsze na samym wierzchu) ---
+            ctx.strokeStyle = '#ff2a2a';
+            ctx.lineWidth = 1.5; 
             ctx.beginPath();
-            ctx.strokeStyle = '#222'; 
-            ctx.lineWidth = baseWidth;
-            for (let i = 0; i <= numSteps; i++) {
-                let p = catenaryPoints[i];
-                if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
-            }
+            ctx.moveTo(offsetX - 5, groundY); ctx.lineTo(offsetX + 5, groundY); 
+            ctx.moveTo(offsetX, groundY - 5); ctx.lineTo(offsetX, groundY + 5);
             ctx.stroke();
 
-            // 2. Jasny szary materiał wewnątrz
-            ctx.beginPath();
-            ctx.strokeStyle = '#a0a0a0'; 
-            ctx.lineWidth = baseWidth * 0.75; 
-            for (let i = 0; i <= numSteps; i++) {
-                let p = catenaryPoints[i];
-                if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
-            }
-            ctx.stroke();
-
-            // 3. Ostre białe światło padające od góry
-            ctx.beginPath();
-            ctx.strokeStyle = '#ffffff'; 
-            ctx.lineWidth = baseWidth * 0.25; 
-            for (let i = 0; i <= numSteps; i++) {
-                let p = catenaryPoints[i];
-                if (i === 0) ctx.moveTo(p.x - baseWidth*0.2, p.y - baseWidth*0.2); 
-                else ctx.lineTo(p.x - baseWidth*0.2, p.y - baseWidth*0.2);
-            }
-            ctx.stroke();
+            ctx.restore(); // Koniec działania DPI scaling
         }
 
         function calculate() {
@@ -344,8 +345,12 @@
         
         function resizeCanvas() {
             const canvas = document.getElementById('archCanvas');
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.parentElement.getBoundingClientRect();
+            
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            
             calculate();
         }
 
