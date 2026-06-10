@@ -1,992 +1,459 @@
 <!DOCTYPE html>
-<!--
-FFF ARCH MAKER V29
-Base: V15 reset. V29 fixes initial canvas draw, embeds real Arch Maker graphic, stronger final vignette.
-Rule: this version number must match the visible badge in the app.
--->
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<meta name="theme-color" content="#242321">
-<title>Fabricable Fabric Formwork — Arch Maker V29</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#171817">
+    <title>Fabricable Fabric Formwork — Arch Maker V30</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=JetBrains+Mono:wght@400;700;800&family=Orbitron:wght@600&display=swap');
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700;800&family=Orbitron:wght@500;600;700;800&display=swap');
+        :root {
+            --ui-dark: #171817;
+            --ui-text: #f2f0ea;
+            --accent: #d54b3d;
+            --blue: #55a7ff;
+            --soil-top: #bda56a;
+            --soil-mid: #7d6137;
+            --soil-bottom: #55321f;
+            --sky-top: #b6e1fb;
+            --sky-bottom: #b2d8b7;
+        }
 
-:root{
-  --ui-dark:#171817;
-  --blue:#55a7ff;
-  --soil-top:#bda56a;
-  --soil-mid:#7d6137;
-  --soil-bottom:#55321f;
-  --sky-top:#b6e1fb;
-  --sky-bottom:#b2d8b7;
-}
+        * { box-sizing: border-box; }
 
-*{box-sizing:border-box}
+        html, body {
+            margin: 0; padding: 0;
+            width: 100%; min-height: 100%;
+            overflow-x: hidden; overflow-y: auto;
+            overscroll-behavior-y: auto;
+            background: var(--ui-dark);
+            color: var(--ui-text);
+            font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            touch-action: auto;
+        }
 
-html,body{
-  margin:0;
-  padding:0;
-  width:100%;
-  min-height:100%;
-  overflow-x:hidden;
-  overflow-y:auto;
-  background:var(--ui-dark);
-  color:#f2f0ea;
-  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  -webkit-font-smoothing:antialiased;
-  text-rendering:geometricPrecision;
-  touch-action:auto;
-}
+        button, input { font-family: inherit; }
 
-.top-bar{
-  height:29px;
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.13),rgba(0,0,0,.13)),
-    linear-gradient(90deg,#70726d 0%,#585a55 30%,#393b37 69%,#242522 100%);
-  border-bottom:1px solid rgba(0,0,0,.55);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,.10) inset,
-    0 5px 11px rgba(0,0,0,.24);
-  position:sticky;
-  top:0;
-  z-index:100;
-  overflow:hidden;
-  user-select:none;
-}
+        .top-bar {
+            height: 44px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(0,0,0,0.2)), #141411;
+            border-bottom: 1px solid rgba(0,0,0,0.8);
+            box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset, 0 4px 10px rgba(0,0,0,0.3);
+            position: sticky; top: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: center;
+            user-select: none;
+        }
 
-.title-main{
-  position:absolute;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-48%);
-  color:#f3f0ea;
-  font-family:"Baloo 2","Trebuchet MS",Inter,sans-serif;
-  font-size:18px;
-  line-height:1;
-  font-weight:400;
-  letter-spacing:-.022em;
-  white-space:nowrap;
-  text-shadow:0 2px 3.8px rgba(0,0,0,.52);
-  pointer-events:none;
-}
+        /* LOGO INTEGRATION */
+        .top-bar-logo {
+            max-height: 32px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
 
-.title-logo{
-  position:absolute;
-  right:24px;
-  top:50%;
-  transform:translateY(-50%);
-  width:145px;
-  height:auto;
-  max-height:27px;
-  object-fit:contain;
-  filter:
-    drop-shadow(0 2px 4px rgba(0,0,0,.58))
-    saturate(1.12)
-    brightness(1.08);
-  pointer-events:none;
-}
+        .version-badge {
+            position: absolute; right: 14px; top: 50%;
+            transform: translateY(-50%);
+            font-size: 9px; font-weight: 600;
+            font-family: 'Orbitron', monospace;
+            color: var(--accent);
+        }
 
-.version-badge{
-  position:absolute;
-  right:5px;
-  top:50%;
-  transform:translateY(-48%);
-  font-size:6.3px;
-  line-height:1;
-  font-family:"Orbitron","JetBrains Mono",Consolas,monospace;
-  font-weight:700;
-  letter-spacing:.13em;
-  white-space:nowrap;
-  color:transparent;
-  background:linear-gradient(90deg,#ff70d8 0%,#ff4343 48%,#ff9429 100%);
-  -webkit-background-clip:text;
-  background-clip:text;
-  -webkit-text-fill-color:transparent;
-  text-shadow:0 2px 4px rgba(0,0,0,.58);
-}
+        .viewport-container {
+            position: relative;
+            width: 100%; height: 60dvh;
+            min-height: 400px; max-height: 700px;
+            overflow: hidden;
+            background: #a8c9d1;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            isolation: isolate; touch-action: none;
+        }
 
-.viewport-container{
-  position:relative;
-  width:100%;
-  height:64dvh;
-  min-height:430px;
-  max-height:720px;
-  overflow:hidden;
-  background:#a8c9d1;
-  border-bottom:1px solid rgba(255,255,255,.07);
-  isolation:isolate;
-  touch-action:none;
-}
+        canvas { display: block; width: 100%; height: 100%; }
 
-canvas{
-  display:block;
-  width:100%;
-  height:100%;
-}
+        .hud-box {
+            position: absolute; z-index: 30;
+            width: 64px; border-radius: 6px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.92);
+            border: 1px solid rgba(255,255,255,0.6);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
 
-.hud-box{
-  position:absolute;
-  z-index:30;
-  width:62px;
-  border-radius:7px;
-  overflow:hidden;
-  background:rgba(255,255,255,.88);
-  border:1px solid rgba(255,255,255,.55);
-  box-shadow:0 7px 18px rgba(20,18,14,.16),0 1px 0 rgba(255,255,255,.52) inset;
-  backdrop-filter:blur(10px) saturate(1.05);
-  -webkit-backdrop-filter:blur(10px) saturate(1.05);
-}
+        .hud-box-header {
+            min-height: 16px; display: flex;
+            align-items: center; justify-content: center;
+            background: #e8e8e8;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
 
-.hud-box-header{
-  min-height:18px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:2px 3px 1px;
-  background:linear-gradient(180deg,rgba(255,255,255,.78),rgba(235,235,231,.72));
-  border-bottom:1px solid rgba(0,0,0,.075);
-}
+        .hud-box label {
+            margin: 0; color: #555;
+            font-size: 7.5px; font-weight: 800;
+            letter-spacing: 0.05em; text-transform: uppercase;
+        }
 
-.hud-box label{
-  margin:0;
-  color:rgba(31,31,28,.64);
-  font-size:7.8px;
-  font-weight:800;
-  line-height:1.05;
-  letter-spacing:.055em;
-  text-transform:uppercase;
-  white-space:nowrap;
-}
+        .hud-box input[type="number"] {
+            width: 100%; height: 28px;
+            border: 0; outline: 0;
+            background: transparent; color: #111;
+            text-align: center; font-size: 16px; font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            -moz-appearance: textfield;
+        }
+        .hud-box input[type="number"]::-webkit-outer-spin-button,
+        .hud-box input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
-.hud-box input{
-  width:100%;
-  height:28px;
-  border:0;
-  outline:0;
-  background:rgba(255,255,255,.92);
-  color:#141411;
-  text-align:center;
-  font-size:15.5px;
-  line-height:1;
-  font-weight:790;
-  font-family:"JetBrains Mono",Consolas,monospace;
-  letter-spacing:-.035em;
-  font-variant-numeric:tabular-nums slashed-zero;
-  font-feature-settings:"zero" 1,"tnum" 1;
-  padding:2px 3px 3px;
-}
+        #box-height { top: 12px; left: 12px; }
+        #box-diameter { top: 12px; right: 12px; }
+        #box-span { bottom: 12px; left: 12px; }
+        #box-depth { bottom: 12px; right: 12px; }
 
-#box-height{top:12px;left:12px}
-#box-diameter{top:12px;right:12px}
-#box-span{bottom:12px;left:12px}
-#box-depth{bottom:12px;right:12px}
+        .slider-shell {
+            --pct: 50; position: absolute;
+            z-index: 29; width: 150px; height: 30px;
+            touch-action: none; cursor: pointer;
+        }
 
-.slider-shell{
-  --pct:50;
-  position:absolute;
-  z-index:29;
-  width:154px;
-  height:30px;
-  touch-action:none;
-  cursor:pointer;
-  filter:drop-shadow(0 4px 6px rgba(0,0,0,.15));
-}
+        .slider-rail {
+            position: absolute; left: 0; right: 0;
+            top: 50%; height: 6px;
+            transform: translateY(-50%); pointer-events: none;
+            background: rgba(0,0,0,0.2); border-radius: 3px;
+        }
 
-.slider-rail{
-  position:absolute;
-  left:0;
-  right:0;
-  top:50%;
-  height:10px;
-  transform:translateY(-50%);
-  pointer-events:none;
-}
+        .slider-knob {
+            position: absolute;
+            left: calc(var(--pct) * 1%); top: 50%;
+            width: 16px; height: 16px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: #ddd;
+            border: 1px solid #999;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            pointer-events: none;
+        }
 
-.slider-rail::before{
-  content:"";
-  position:absolute;
-  left:0;
-  right:0;
-  top:2px;
-  height:6px;
-  border-radius:999px;
-  background:
-    linear-gradient(90deg,
-      rgba(28,32,29,.48) 0%,
-      rgba(58,64,58,.38) calc(var(--pct)*1% - 34%),
-      rgba(104,112,101,.30) calc(var(--pct)*1% - 12%),
-      rgba(142,150,136,.36) calc(var(--pct)*1%),
-      rgba(104,112,101,.30) calc(var(--pct)*1% + 12%),
-      rgba(58,64,58,.38) calc(var(--pct)*1% + 34%),
-      rgba(28,32,29,.48) 100%);
-  clip-path:polygon(
-    0 46%,
-    calc(var(--pct)*1% - 14%) 39%,
-    calc(var(--pct)*1%) 30%,
-    calc(var(--pct)*1% + 14%) 39%,
-    100% 46%,
-    100% 54%,
-    calc(var(--pct)*1% + 14%) 61%,
-    calc(var(--pct)*1%) 70%,
-    calc(var(--pct)*1% - 14%) 61%,
-    0 54%);
-  box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 -1px 0 rgba(0,0,0,.17) inset;
-}
+        #sliderHeightShell .slider-knob { transform: translate(-50%, -50%) rotate(90deg); }
+        .hud-slider { display: none; }
 
-.slider-focus{
-  position:absolute;
-  top:0;
-  left:calc(var(--pct)*1%);
-  width:58px;
-  height:10px;
-  transform:translateX(-50%);
-  border-radius:999px;
-  background:radial-gradient(ellipse at center,rgba(226,230,210,.070) 0%,rgba(226,230,210,.028) 49%,rgba(226,230,210,0) 84%);
-  pointer-events:none;
-}
+        #sliderHeightShell {
+            width: 150px; top: 190px; left: 35px;
+            transform: rotate(-90deg); transform-origin: left center;
+        }
+        #sliderSpanShell { width: 150px; bottom: 18px; left: 90px; }
 
-.slider-knob{
-  position:absolute;
-  left:calc(var(--pct)*1%);
-  top:50%;
-  width:15px;
-  height:15px;
-  transform:translate(-50%,-50%);
-  border-radius:50%;
-  border:0;
-  background:
-    radial-gradient(circle at 50% 40%,
-      rgba(214,219,224,.96) 0%,
-      rgba(190,196,202,.95) 28%,
-      rgba(154,161,169,.95) 58%,
-      rgba(121,128,136,.95) 82%,
-      rgba(101,107,115,.96) 100%);
-  box-shadow:0 1px 2px rgba(0,0,0,.14),0 0 0 1px rgba(18,24,30,.07),0 1px 0 rgba(255,255,255,.06) inset;
-  pointer-events:none;
-}
+        .results-shell {
+            background: linear-gradient(180deg, #181918 0%, #111 100%);
+            padding-bottom: 20px;
+        }
 
-#sliderHeightShell .slider-knob{transform:translate(-50%,-50%) rotate(90deg)}
+        .results-container {
+            width: min(800px, calc(100% - 24px));
+            margin: 0 auto; padding: 18px 0;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+        }
 
-#sliderHeightShell{
-  width:154px;
-  top:214px;
-  left:35px;
-  transform:rotate(-90deg);
-  transform-origin:left center;
-}
+        .result-panel {
+            background: rgba(255,255,255,0.02);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 12px;
+        }
 
-#sliderSpanShell{
-  width:154px;
-  bottom:18px;
-  left:96px;
-}
+        .section-title {
+            margin: 0 0 8px 0; padding-bottom: 4px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            color: var(--blue);
+            font-size: 9px; font-weight: 800; text-transform: uppercase;
+        }
 
-.results-shell{
-  background:#161715;
-  min-height:280px;
-  padding:12px 0 38px;
-  touch-action:pan-y;
-}
+        .result-row {
+            display: flex; align-items: baseline; justify-content: space-between;
+            gap: 10px; min-height: 20px; margin: 0;
+            color: rgba(242,240,234,0.7); font-size: 12px;
+        }
 
-.results-container{
-  width:min(820px,calc(100% - 24px));
-  margin:0 auto;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:16px;
-}
+        .value {
+            color: #fff; font-family: 'JetBrains Mono', monospace;
+            font-size: 13px; font-weight: 700;
+        }
+        .value-highlight {
+            color: var(--blue); font-family: 'JetBrains Mono', monospace;
+            font-size: 15px; font-weight: 800;
+        }
 
-.result-card{
-  background:linear-gradient(180deg,rgba(255,255,255,.026),rgba(255,255,255,.006)),#191a18;
-  border:1px solid rgba(255,255,255,.045);
-  box-shadow:0 14px 24px rgba(0,0,0,.12);
-  padding:13px 16px 14px;
-}
+        .note {
+            text-align: center; color: rgba(255,255,255,0.2); font-size: 9px;
+            margin-top: 10px;
+        }
 
-.result-section-title{
-  margin:0 0 10px;
-  color:var(--blue);
-  font-size:11px;
-  font-weight:850;
-  letter-spacing:.045em;
-  text-transform:uppercase;
-}
-
-.result-row{
-  display:grid;
-  grid-template-columns:1fr auto;
-  align-items:baseline;
-  gap:10px;
-  padding:2px 0;
-  color:rgba(242,240,234,.72);
-  font-size:13px;
-  border-bottom:1px solid rgba(255,255,255,.025);
-}
-
-.result-row strong{color:rgba(242,240,234,.85);font-weight:800}
-
-.result-value{
-  color:rgba(255,255,255,.93);
-  font-family:"JetBrains Mono",Consolas,monospace;
-  font-variant-numeric:tabular-nums slashed-zero;
-  font-feature-settings:"zero" 1,"tnum" 1;
-  font-size:13px;
-  font-weight:800;
-  text-align:right;
-  white-space:nowrap;
-}
-
-.value-highlight{color:var(--blue);font-size:14px}
-
-.note{
-  width:min(820px,calc(100% - 24px));
-  margin:0 auto;
-  padding:6px 0 calc(28px + env(safe-area-inset-bottom));
-  border-top:1px solid rgba(255,255,255,.04);
-  color:rgba(242,240,234,.24);
-  font-size:9px;
-  text-align:center;
-}
-
-@media(max-width:700px){
-  .viewport-container{height:63dvh;min-height:410px}
-  .title-main{font-size:12.7px}
-  .title-logo{right:19px;width:118px;max-height:23px}
-  .version-badge{right:4px;font-size:5.8px}
-  #sliderSpanShell{width:138px;left:94px}
-  .results-container{grid-template-columns:1fr;gap:8px;padding-top:12px}
-}
-
-@media(max-width:420px){
-  .title-main{font-size:11.8px}
-  .title-logo{right:17px;width:106px;max-height:20px}
-  .version-badge{right:4px;font-size:5.1px}
-  .hud-box{width:64px}
-  .hud-box label{font-size:7.2px}
-  .hud-box input{font-size:15.5px}
-  #sliderSpanShell{width:118px;left:92px}
-  #sliderHeightShell{width:145px;top:208px;left:33px}
-}
-</style>
+        @media (max-width: 600px) {
+            .results-container { grid-template-columns: 1fr; gap: 10px; }
+            #sliderHeightShell { top: 170px; }
+            .top-bar-logo { max-height: 24px; }
+        }
+    </style>
 </head>
-
 <body>
-<div class="top-bar">
-  <span class="title-main">Fabricable Fabric Formwork</span>
-  <img class="title-logo" alt="Arch Maker" src="data:image/webp;base64,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">
-  <span class="version-badge">V29</span>
-</div>
-
-<div class="viewport-container" id="viewport">
-  <canvas id="archCanvas"></canvas>
-
-  <div class="hud-box" id="box-height">
-    <div class="hud-box-header"><label>Height (m)</label></div>
-    <input id="height" value="1,50" inputmode="decimal" oninput="syncInput('height')">
-  </div>
-
-  <div class="hud-box" id="box-diameter">
-    <div class="hud-box-header"><label>Tube Ø (cm)</label></div>
-    <input id="diameter" value="10,0" inputmode="decimal" oninput="calculate()">
-  </div>
-
-  <div class="hud-box" id="box-span">
-    <div class="hud-box-header"><label>Span (m)</label></div>
-    <input id="span" value="1,00" inputmode="decimal" oninput="syncInput('span')">
-  </div>
-
-  <div class="hud-box" id="box-depth">
-    <div class="hud-box-header"><label>Depth (m)</label></div>
-    <input id="depth" value="0,30" inputmode="decimal" oninput="calculate()">
-  </div>
-
-  <div class="slider-shell" id="sliderHeightShell">
-    <div class="slider-rail"><div class="slider-focus"></div><div class="slider-knob"></div></div>
-  </div>
-
-  <div class="slider-shell" id="sliderSpanShell">
-    <div class="slider-rail"><div class="slider-focus"></div><div class="slider-knob"></div></div>
-  </div>
-</div>
-
-<div class="results-shell">
-  <div class="results-container">
-    <div class="result-card">
-      <h3 class="result-section-title">Above Ground Parameters</h3>
-      <div class="result-row"><span>Visual Span:</span><span class="result-value" id="spanAbove">—</span></div>
-      <div class="result-row"><span>Visual Height:</span><span class="result-value" id="heightAbove">—</span></div>
-      <div class="result-row"><span>Visible Tube Length:</span><span class="result-value" id="lengthAbove">—</span></div>
-
-      <h3 class="result-section-title" style="margin-top:14px">Underground Parameters</h3>
-      <div class="result-row"><span>Tube Length per Hole:</span><span class="result-value" id="lengthUnder">—</span></div>
-      <div class="result-row"><span>Total Tube Length (L+R):</span><span class="result-value value-highlight" id="lengthTotal">—</span></div>
+    <div class="top-bar">
+        <img src="arch_maker_logo_v27_transparent.jpg" alt="Arch Maker" class="top-bar-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <span class="title-main" style="display:none; margin-left: 10px;">FABRICABLE ARCH MAKER</span>
+        <span class="version-badge">V30</span>
     </div>
 
-    <div class="result-card">
-      <h3 class="result-section-title">Materials (Total)</h3>
-      <div class="result-row"><span>Mortar Volume:</span><span class="result-value" id="volume">—</span></div>
-      <div class="result-row"><span><strong>Mapefill PRO (Dry Mass):</strong></span><span class="result-value value-highlight" id="dryMass">—</span></div>
-      <div class="result-row"><span>Water (14% - 15%):</span><span class="result-value" id="waterRange">—</span></div>
-      <div class="result-row"><span>Total Arch Mass:</span><span class="result-value" id="totalMass">—</span></div>
+    <div class="viewport-container" id="viewport">
+        <canvas id="archCanvas"></canvas>
+
+        <div class="hud-box" id="box-height">
+            <div class="hud-box-header"><label>Height (m)</label></div>
+            <input type="number" id="height" value="1.50" step="0.01" inputmode="decimal" oninput="syncInput('height')">
+        </div>
+        <div class="hud-box" id="box-diameter">
+            <div class="hud-box-header"><label>Tube Ø (cm)</label></div>
+            <input type="number" id="diameter" value="10.0" step="0.1" inputmode="decimal" oninput="calculate()">
+        </div>
+        <div class="hud-box" id="box-span">
+            <div class="hud-box-header"><label>Span (m)</label></div>
+            <input type="number" id="span" value="2.00" step="0.01" inputmode="decimal" oninput="syncInput('span')">
+        </div>
+        <div class="hud-box" id="box-depth">
+            <div class="hud-box-header"><label>Depth (m)</label></div>
+            <input type="number" id="depth" value="0.30" step="0.01" inputmode="decimal" oninput="calculate()">
+        </div>
+
+        <div class="slider-shell" id="sliderHeightShell">
+            <div class="slider-rail" aria-hidden="true"><div class="slider-knob"></div></div>
+            <input type="range" id="sliderHeight" class="hud-slider" min="0.5" max="5.0" step="0.1" value="1.5">
+        </div>
+
+        <div class="slider-shell" id="sliderSpanShell">
+            <div class="slider-rail" aria-hidden="true"><div class="slider-knob"></div></div>
+            <input type="range" id="sliderSpan" class="hud-slider" min="1.0" max="5.0" step="0.1" value="2.0">
+        </div>
     </div>
-  </div>
-
-  <div class="note">V29 — fixed initial draw, embedded real Arch Maker graphic, stronger final vignette.</div>
-</div>
-
-<script>
-const VERSION="V29";
-
-const state={
-  height:1.5,
-  span:1.0,
-  diameter:10.0,
-  depth:0.3,
-  sliderHeightMin:0.5,
-  sliderHeightMax:5.0,
-  sliderSpanMin:1.0,
-  sliderSpanMax:5.0
-};
-
-function clamp(v,min,max){return Math.min(max,Math.max(min,v))}
-function parseNumber(id){
-  const raw=String(document.getElementById(id).value).trim().replace(",",".");
-  const value=parseFloat(raw);
-  return Number.isFinite(value)?value:0;
-}
-function formatComma(value,digits){return Number(value).toFixed(digits).replace(".",",")}
-
-function syncInput(which){
-  if(which==="height"){
-    state.height=clamp(parseNumber("height"),state.sliderHeightMin,state.sliderHeightMax);
-    setSliderPercent("sliderHeightShell",state.height,state.sliderHeightMin,state.sliderHeightMax);
-  }
-  if(which==="span"){
-    state.span=clamp(parseNumber("span"),state.sliderSpanMin,state.sliderSpanMax);
-    setSliderPercent("sliderSpanShell",state.span,state.sliderSpanMin,state.sliderSpanMax);
-  }
-  calculate();
-}
-
-function setSliderPercent(shellId,value,min,max){
-  const shell=document.getElementById(shellId);
-  if(!shell)return;
-  const pct=clamp(((value-min)/(max-min))*100,0,100);
-  shell.style.setProperty("--pct",pct);
-}
-
-function updateInputValue(id,value,digits){
-  document.getElementById(id).value=formatComma(value,digits);
-}
-
-function setValueFromPointer(shell,event){
-  const rect=shell.getBoundingClientRect();
-  let percent;
-
-  if(shell.id==="sliderHeightShell"){
-    percent=1-((event.clientY-rect.top)/Math.max(1,rect.height));
-    state.height=clamp(state.sliderHeightMin+percent*(state.sliderHeightMax-state.sliderHeightMin),state.sliderHeightMin,state.sliderHeightMax);
-    state.height=Math.round(state.height*10)/10;
-    updateInputValue("height",state.height,2);
-    setSliderPercent("sliderHeightShell",state.height,state.sliderHeightMin,state.sliderHeightMax);
-  }
-
-  if(shell.id==="sliderSpanShell"){
-    percent=(event.clientX-rect.left)/Math.max(1,rect.width);
-    state.span=clamp(state.sliderSpanMin+percent*(state.sliderSpanMax-state.sliderSpanMin),state.sliderSpanMin,state.sliderSpanMax);
-    state.span=Math.round(state.span*10)/10;
-    updateInputValue("span",state.span,2);
-    setSliderPercent("sliderSpanShell",state.span,state.sliderSpanMin,state.sliderSpanMax);
-  }
-
-  calculate();
-}
-
-document.querySelectorAll(".slider-shell").forEach(shell=>{
-  shell.addEventListener("pointerdown",event=>{
-    event.preventDefault();
-    event.stopPropagation();
-    shell.setPointerCapture?.(event.pointerId);
-    shell.dataset.dragging="1";
-    setValueFromPointer(shell,event);
-  },{passive:false});
-
-  shell.addEventListener("pointermove",event=>{
-    if(shell.dataset.dragging!=="1")return;
-    event.preventDefault();
-    event.stopPropagation();
-    setValueFromPointer(shell,event);
-  },{passive:false});
-
-  function endDrag(event){
-    shell.dataset.dragging="0";
-    try{shell.releasePointerCapture?.(event.pointerId)}catch(_){}
-  }
-
-  shell.addEventListener("pointerup",endDrag);
-  shell.addEventListener("pointercancel",endDrag);
-  shell.addEventListener("lostpointercapture",()=>shell.dataset.dragging="0");
-});
-
-function findCatenaryParameterA(span,height){
-  const halfSpan=span/2;
-  let aMin=.001,aMax=100,a=(aMin+aMax)/2;
-
-  for(let i=0;i<150;i++){
-    const calcHeight=a*(Math.cosh(halfSpan/a)-1);
-    const diff=calcHeight-height;
-
-    if(Math.abs(diff)<.00001)break;
-    if(diff>0)aMin=a;
-    else aMax=a;
-
-    a=(aMin+aMax)/2;
-  }
-
-  return a;
-}
-
-function seededRandom(seed){
-  let t=seed+0x6D2B79F5;
-  return function(){
-    t=Math.imul(t^(t>>>15),t|1);
-    t^=t+Math.imul(t^(t>>>7),t|61);
-    return ((t^(t>>>14))>>>0)/4294967296;
-  };
-}
-
-function drawStableSoilTexture(ctx,width,groundY,height){
-  const rand=seededRandom(1447);
-  const count=Math.floor(width*(height-groundY)/620);
-
-  ctx.save();
-
-  for(let i=0;i<count;i++){
-    const x=rand()*width;
-    const y=groundY+rand()*Math.max(1,height-groundY);
-    const radius=.20+rand()*1.70;
-    const alpha=.028+rand()*.068;
-    const isWarm=rand()>.56;
-
-    ctx.fillStyle=isWarm
-      ?`rgba(255,243,196,${alpha})`
-      :`rgba(39,29,18,${alpha*.86})`;
-
-    ctx.beginPath();
-    ctx.arc(x,y,radius,0,Math.PI*2);
-    ctx.fill();
-  }
-
-  const pebbles=Math.floor(width*(height-groundY)/9000);
-
-  for(let i=0;i<pebbles;i++){
-    const x=rand()*width;
-    const y=groundY+rand()*Math.max(1,height-groundY);
-    const rx=.8+rand()*2.8;
-    const ry=.45+rand()*1.25;
-    const a=.050+rand()*.070;
-
-    ctx.fillStyle=rand()>.52
-      ?`rgba(52,40,25,${a})`
-      :`rgba(220,190,119,${a*.76})`;
-
-    ctx.beginPath();
-    ctx.ellipse(x,y,rx,ry,rand()*Math.PI,0,Math.PI*2);
-    ctx.fill();
-  }
-
-  ctx.restore();
-}
-
-function drawCatenaryStrokeOffset(ctx,points,lineWidth,color,normalOffset){
-  if(!points.length||lineWidth<=0)return;
-
-  ctx.beginPath();
-  ctx.strokeStyle=color;
-  ctx.lineWidth=lineWidth;
-
-  for(let i=0;i<points.length;i++){
-    const p=points[i];
-    const pPrev=points[Math.max(0,i-1)];
-    const pNext=points[Math.min(points.length-1,i+1)];
-    const dx=pNext.x-pPrev.x;
-    const dy=pNext.y-pPrev.y;
-    const len=Math.hypot(dx,dy)||1;
-    const nx=dy/len;
-    const ny=-dx/len;
-    const x=p.x+nx*normalOffset;
-    const y=p.y+ny*normalOffset;
-
-    if(i===0)ctx.moveTo(x,y);
-    else ctx.lineTo(x,y);
-  }
-
-  ctx.stroke();
-}
-
-function drawTube(ctx,points,baseWidth){
-  if(!points.length||baseWidth<=0)return;
-
-  function stroke(width,color,normalOffset=0,blur=0){
-    ctx.save();
-    ctx.lineCap="butt";
-    ctx.lineJoin="round";
-    if(blur>0)ctx.filter=`blur(${blur}px)`;
-    drawCatenaryStrokeOffset(ctx,points,width,color,normalOffset);
-    ctx.restore();
-  }
-
-  ctx.save();
-  ctx.lineCap="butt";
-  ctx.lineJoin="round";
-  ctx.shadowColor="rgba(0,0,0,.22)";
-  ctx.shadowBlur=Math.max(5,baseWidth*.12);
-  ctx.shadowOffsetX=Math.max(1,baseWidth*.030);
-  ctx.shadowOffsetY=Math.max(2,baseWidth*.070);
-  drawCatenaryStrokeOffset(ctx,points,baseWidth*1.01,"rgba(63,66,58,.84)",0);
-  ctx.restore();
-
-  stroke(baseWidth*.998,"rgba(84,88,78,.98)",0,Math.max(.24,baseWidth*.002));
-  stroke(baseWidth*.940,"rgba(101,106,94,.96)",.015*baseWidth,Math.max(.34,baseWidth*.004));
-  stroke(baseWidth*.865,"rgba(115,120,106,.90)",.06*baseWidth,Math.max(.44,baseWidth*.006));
-  stroke(baseWidth*.785,"rgba(128,133,118,.84)",.12*baseWidth,Math.max(.58,baseWidth*.008));
-
-  stroke(baseWidth*.36,"rgba(106,111,99,.16)",-.09*baseWidth,Math.max(1.05,baseWidth*.016));
-  stroke(baseWidth*.22,"rgba(92,97,87,.12)",-.18*baseWidth,Math.max(1.10,baseWidth*.018));
-
-  const layers=26;
-
-  for(let i=0;i<layers;i++){
-    const t=i/(layers-1);
-    const offset=(-.14+t*.46)*baseWidth;
-    const width=(.28-.08*Math.abs(t-.54)*2)*baseWidth;
-    const blur=Math.max(.70,baseWidth*(.012+.008*t));
-    let color;
-
-    if(t<.44){
-      const k=t/.44;
-      const a=.020+.020*k;
-      color=`rgba(${Math.round(58+40*k)},${Math.round(63+42*k)},${Math.round(57+38*k)},${a})`;
-    }else{
-      const k=(t-.44)/.56;
-      const r=Math.round(126+56*k);
-      const g=Math.round(130+52*k);
-      const b=Math.round(116+38*k);
-      const a=.016+.030*k;
-      color=`rgba(${r},${g},${b},${a})`;
-    }
-
-    stroke(width,color,offset,blur);
-  }
-
-  stroke(baseWidth*.22,"rgba(214,208,182,.060)",.29*baseWidth,Math.max(1.06,baseWidth*.018));
-  stroke(baseWidth*.08,"rgba(234,227,198,.022)",.38*baseWidth,Math.max(1.20,baseWidth*.020));
-  stroke(baseWidth*.14,"rgba(28,31,27,.060)",-.20*baseWidth,Math.max(.96,baseWidth*.014));
-
-  const rand=seededRandom(18131+Math.round(baseWidth*100));
-  const count=Math.min(3600,Math.max(700,Math.floor(points.length*baseWidth/3.7)));
-
-  ctx.save();
-
-  for(let i=0;i<count;i++){
-    const idx=1+Math.floor(rand()*Math.max(1,points.length-2));
-    const p0=points[idx-1];
-    const p1=points[idx+1];
-    const p=points[idx];
-
-    const dx=p1.x-p0.x;
-    const dy=p1.y-p0.y;
-    const len=Math.hypot(dx,dy)||1;
-
-    const nx=dy/len;
-    const ny=-dx/len;
-
-    const across=(rand()-.5)*baseWidth*.88;
-    const x=p.x+nx*across+(rand()-.5)*.9;
-    const y=p.y+ny*across+(rand()-.5)*.9;
-    const r=.18+rand()*Math.max(.24,baseWidth*.010);
-
-    const topBias=across>0?1.05:.94;
-    const a=(.014+rand()*.038)*topBias;
-
-    ctx.fillStyle=rand()>.49
-      ?`rgba(236,230,201,${a})`
-      :`rgba(26,29,25,${a*.68})`;
-
-    ctx.beginPath();
-    ctx.arc(x,y,r,0,Math.PI*2);
-    ctx.fill();
-  }
-
-  ctx.restore();
-}
-
-function drawVignette(ctx,w,h){
-  ctx.save();
-
-  ctx.translate(w/2,h*.48);
-  ctx.scale(1,1.42);
-
-  const r=Math.max(w,h)*.56;
-  const vignette=ctx.createRadialGradient(0,0,h*.10,0,0,r);
-
-  vignette.addColorStop(0,"rgba(0,0,0,0)");
-  vignette.addColorStop(.34,"rgba(0,0,0,0)");
-  vignette.addColorStop(.62,"rgba(0,0,0,.12)");
-  vignette.addColorStop(.82,"rgba(0,0,0,.25)");
-  vignette.addColorStop(1,"rgba(0,0,0,.42)");
-
-  ctx.fillStyle=vignette;
-  ctx.fillRect(-w,-h,w*2,h*2);
-  ctx.restore();
-
-  ctx.save();
-
-  const side=ctx.createLinearGradient(0,0,w,0);
-  side.addColorStop(0,"rgba(0,0,0,.22)");
-  side.addColorStop(.18,"rgba(0,0,0,0)");
-  side.addColorStop(.82,"rgba(0,0,0,0)");
-  side.addColorStop(1,"rgba(0,0,0,.22)");
-  ctx.fillStyle=side;
-  ctx.fillRect(0,0,w,h);
-
-  const topBottom=ctx.createLinearGradient(0,0,0,h);
-  topBottom.addColorStop(0,"rgba(0,0,0,.16)");
-  topBottom.addColorStop(.18,"rgba(0,0,0,0)");
-  topBottom.addColorStop(.82,"rgba(0,0,0,0)");
-  topBottom.addColorStop(1,"rgba(0,0,0,.20)");
-  ctx.fillStyle=topBottom;
-  ctx.fillRect(0,0,w,h);
-
-  ctx.restore();
-}
-
-function drawArch(span,height,depth,diameter,a){
-  const canvas=document.getElementById("archCanvas");
-  const ctx=canvas.getContext("2d");
-  const dpr=window.devicePixelRatio||1;
-  const cssWidth=canvas.width/dpr;
-  const cssHeight=canvas.height/dpr;
-
-  if(!cssWidth||!cssHeight)return;
-
-  ctx.save();
-  ctx.scale(dpr,dpr);
-  ctx.clearRect(0,0,cssWidth,cssHeight);
-
-  const marginX=Math.min(100,Math.max(58,cssWidth*.08));
-  const marginTop=Math.min(82,Math.max(52,cssHeight*.10));
-  const marginBottom=Math.min(82,Math.max(58,cssHeight*.13));
-
-  const drawWidth=Math.max(1,cssWidth-marginX*2);
-  const drawHeight=Math.max(1,cssHeight-marginTop-marginBottom);
-
-  const scaleX=drawWidth/span;
-  const scaleY=drawHeight/height;
-  const scale=Math.max(.1,Math.min(scaleX,scaleY));
-
-  const offsetX=cssWidth/2;
-  const offsetY=cssHeight-marginBottom-(drawHeight-height*scale)*.44;
-  const groundY=offsetY-depth*scale;
-
-  const root=getComputedStyle(document.documentElement);
-
-  const skyGradient=ctx.createLinearGradient(0,0,0,Math.max(1,groundY));
-  skyGradient.addColorStop(0,root.getPropertyValue("--sky-top").trim());
-  skyGradient.addColorStop(1,root.getPropertyValue("--sky-bottom").trim());
-  ctx.fillStyle=skyGradient;
-  ctx.fillRect(0,0,cssWidth,groundY);
-
-  const soilGradient=ctx.createLinearGradient(0,groundY,0,cssHeight);
-  soilGradient.addColorStop(0,root.getPropertyValue("--soil-top").trim());
-  soilGradient.addColorStop(.52,root.getPropertyValue("--soil-mid").trim());
-  soilGradient.addColorStop(1,root.getPropertyValue("--soil-bottom").trim());
-  ctx.fillStyle=soilGradient;
-  ctx.fillRect(0,groundY,cssWidth,cssHeight-groundY);
-
-  drawStableSoilTexture(ctx,cssWidth,groundY,cssHeight);
-
-  const numSteps=340;
-  const points=[];
-
-  for(let i=0;i<=numSteps;i++){
-    const t=i/numSteps;
-    const x=-span/2+t*span;
-    const y=height-a*(Math.cosh(x/a)-1);
-
-    points.push({
-      x:offsetX+x*scale,
-      y:offsetY-y*scale
-    });
-  }
-
-  ctx.save();
-  ctx.font='9px "JetBrains Mono", Consolas, monospace';
-  ctx.lineCap="butt";
-
-  const xStart=Math.floor(-span/2-2);
-  const xEnd=Math.ceil(span/2+2);
-
-  for(let x=xStart;x<=xEnd;x+=.5){
-    const canvasX=offsetX+x*scale;
-    const isMajor=Number.isInteger(x);
-    const distance=Math.abs(canvasX-offsetX)/Math.max(1,cssWidth/2);
-    const alpha=(isMajor?.105:.045)*(1-distance*.35);
-
-    ctx.strokeStyle=`rgba(255,255,255,${Math.max(.025,alpha)})`;
-    ctx.lineWidth=isMajor?.8:.45;
-    ctx.beginPath();
-    ctx.moveTo(canvasX,0);
-    ctx.lineTo(canvasX,cssHeight);
-    ctx.stroke();
-
-    if(isMajor&&x!==0){
-      ctx.fillStyle="rgba(255,255,255,.34)";
-      ctx.textAlign="center";
-      ctx.textBaseline="middle";
-      ctx.fillText(`${x}m`,canvasX,groundY+11);
-    }
-  }
-
-  const yStart=Math.floor(-depth-2);
-  const yEnd=Math.ceil(height+2);
-
-  for(let y=yStart;y<=yEnd;y+=.5){
-    const canvasY=offsetY-y*scale;
-    const isMajor=Number.isInteger(y);
-    const alpha=isMajor?.105:.045;
-
-    ctx.strokeStyle=`rgba(255,255,255,${alpha})`;
-    ctx.lineWidth=isMajor?.8:.45;
-    ctx.beginPath();
-    ctx.moveTo(0,canvasY);
-    ctx.lineTo(cssWidth,canvasY);
-    ctx.stroke();
-
-    if(isMajor&&y!==0){
-      ctx.fillStyle="rgba(255,255,255,.34)";
-      ctx.textAlign="left";
-      ctx.textBaseline="middle";
-      ctx.fillText(`${y}m`,offsetX+9,canvasY);
-    }
-  }
-
-  ctx.restore();
-
-  ctx.strokeStyle="rgba(54,38,23,.92)";
-  ctx.lineWidth=1.15;
-  ctx.beginPath();
-  ctx.moveTo(0,groundY);
-  ctx.lineTo(cssWidth,groundY);
-  ctx.stroke();
-
-  const baseWidth=Math.max(2,(diameter/100)*scale);
-  drawTube(ctx,points,baseWidth);
-
-  ctx.save();
-  ctx.strokeStyle="rgba(255,82,28,.98)";
-  ctx.lineWidth=1.45;
-  ctx.beginPath();
-  ctx.moveTo(offsetX-4.2,groundY);
-  ctx.lineTo(offsetX+4.2,groundY);
-  ctx.moveTo(offsetX,groundY-4.2);
-  ctx.lineTo(offsetX,groundY+4.2);
-  ctx.stroke();
-  ctx.restore();
-
-  drawVignette(ctx,cssWidth,cssHeight);
-
-  ctx.restore();
-}
-
-function calculate(){
-  state.height=Math.max(.01,parseNumber("height"));
-  state.span=Math.max(.01,parseNumber("span"));
-  state.diameter=Math.max(.1,parseNumber("diameter"));
-  state.depth=Math.max(0,parseNumber("depth"));
-
-  if(state.depth>=state.height)state.depth=state.height-.001;
-
-  setSliderPercent("sliderHeightShell",state.height,state.sliderHeightMin,state.sliderHeightMax);
-  setSliderPercent("sliderSpanShell",state.span,state.sliderSpanMin,state.sliderSpanMax);
-
-  const a=findCatenaryParameterA(state.span,state.height);
-  const totalLength=2*a*Math.sinh((state.span/2)/a);
-
-  const visibleHeight=Math.max(0,state.height-state.depth);
-  const spanAbove=2*a*Math.acosh(visibleHeight/a+1);
-  const lengthAbove=2*a*Math.sinh((spanAbove/2)/a);
-
-  const lengthUnderTotal=totalLength-lengthAbove;
-  const lengthUnderPerLeg=lengthUnderTotal/2;
-
-  const radiusMeters=(state.diameter/2)/100;
-  const volumeLiters=(Math.PI*Math.pow(radiusMeters,2)*totalLength)*1000;
-
-  const dryMass=volumeLiters*1.95;
-  const waterMin=dryMass*.14;
-  const waterMax=dryMass*.15;
-  const totalArchMass=dryMass+waterMax;
-
-  document.getElementById("spanAbove").innerText=spanAbove.toFixed(2)+" m";
-  document.getElementById("heightAbove").innerText=visibleHeight.toFixed(2)+" m";
-  document.getElementById("lengthAbove").innerText=lengthAbove.toFixed(2)+" m";
-  document.getElementById("lengthUnder").innerText=lengthUnderPerLeg.toFixed(2)+" m";
-  document.getElementById("lengthTotal").innerText=totalLength.toFixed(2)+" m";
-
-  document.getElementById("volume").innerText=volumeLiters.toFixed(1)+" l";
-  document.getElementById("dryMass").innerText=dryMass.toFixed(1)+" kg";
-  document.getElementById("waterRange").innerText=waterMin.toFixed(1)+" - "+waterMax.toFixed(1)+" l";
-  document.getElementById("totalMass").innerText=totalArchMass.toFixed(1)+" kg";
-
-  drawArch(state.span,state.height,state.depth,state.diameter,a);
-}
-
-function resizeCanvas(){
-  const canvas=document.getElementById("archCanvas");
-  const viewport=document.getElementById("viewport");
-  const dpr=window.devicePixelRatio||1;
-  const rect=viewport.getBoundingClientRect();
-
-  const w=Math.max(1,Math.floor(rect.width*dpr));
-  const h=Math.max(1,Math.floor(rect.height*dpr));
-
-  if(canvas.width!==w)canvas.width=w;
-  if(canvas.height!==h)canvas.height=h;
-
-  calculate();
-}
-
-function init(){
-  updateInputValue("height",state.height,2);
-  updateInputValue("span",state.span,2);
-  updateInputValue("diameter",state.diameter,1);
-  updateInputValue("depth",state.depth,2);
-
-  setSliderPercent("sliderHeightShell",state.height,state.sliderHeightMin,state.sliderHeightMax);
-  setSliderPercent("sliderSpanShell",state.span,state.sliderSpanMin,state.sliderSpanMax);
-
-  resizeCanvas();
-  requestAnimationFrame(resizeCanvas);
-  setTimeout(resizeCanvas,50);
-  setTimeout(resizeCanvas,250);
-  setTimeout(resizeCanvas,700);
-}
-
-window.addEventListener("DOMContentLoaded",init);
-window.addEventListener("load",init);
-window.addEventListener("resize",resizeCanvas);
-window.addEventListener("orientationchange",()=>setTimeout(resizeCanvas,180));
-
-if("ResizeObserver" in window){
-  const ro=new ResizeObserver(()=>resizeCanvas());
-  ro.observe(document.getElementById("viewport"));
-}
-
-init();
-</script>
+
+    <div class="results-shell">
+        <div class="results-container">
+            <div class="result-panel">
+                <p class="section-title">Above Ground</p>
+                <div class="result-row">Visual Span:<span class="value" id="spanAbove">0.00 m</span></div>
+                <div class="result-row">Visual Height:<span class="value" id="heightAbove">0.00 m</span></div>
+                <div class="result-row">Visible Tube Length:<span class="value" id="lengthAbove">0.00 m</span></div>
+                <p class="section-title" style="margin-top:10px;">Underground</p>
+                <div class="result-row">Tube Length per Hole:<span class="value" id="lengthUnder">0.00 m</span></div>
+                <div class="result-row">Total Tube Length (L+R):<span class="value-highlight" id="lengthTotal">0.00 m</span></div>
+            </div>
+
+            <div class="result-panel">
+                <p class="section-title">Materials (Total)</p>
+                <div class="result-row">Mortar Volume:<span class="value" id="volume">0.0 l</span></div>
+                <div class="result-row"><strong>Mapefill PRO (Dry Mass):</strong><span class="value-highlight" id="dryMass">0.0 kg</span></div>
+                <div class="result-row">Water (14% - 15%):<span class="value" id="waterRange">0.0 - 0.0 l</span></div>
+                <div class="result-row">Total Arch Mass:<span class="value" id="totalMass">0.0 kg</span></div>
+            </div>
+        </div>
+        <p class="note">V30 — Phase 1: Core Haptic Feedback & Spring Physics. Logo integration.</p>
+    </div>
+
+    <script>
+        const VERSION = "V30";
+
+        // V30 HAPTIC SYSTEM
+        const vibrateTick = () => { if (navigator.vibrate) navigator.vibrate(10); };
+
+        // V30 SPRING MECHANICS CORE
+        const createSpringState = (min, max) => ({
+            isAnimating: false, startTime: null, startValue: null, endValue: null,
+            velocity: 0, tension: 400, friction: 25, min: min, max: max
+        });
+        const springs = { height: createSpringState(0.5, 5.0), span: createSpringState(1.0, 5.0) };
+
+        function animateSpring(id) {
+            const state = springs[id];
+            if (!state.isAnimating) return;
+
+            const input = document.getElementById(id);
+            const now = performance.now();
+            if (!state.startTime) { state.startTime = now; state.startValue = parseFloat(input.value); }
+
+            const dt = (now - state.startTime) / 1000;
+            const displacement = state.startValue - state.endValue;
+            const acceleration = (-state.tension * displacement) + (-state.friction * state.velocity);
+
+            state.velocity += acceleration * dt;
+            const newValue = clamp(state.startValue + state.velocity * dt, state.min, state.max);
+
+            input.value = newValue;
+            const slider = document.getElementById('slider' + id.charAt(0).toUpperCase() + id.slice(1));
+            if (slider) { slider.value = newValue; updateSliderVisual(slider); }
+
+            if (Math.abs(state.velocity) < 0.02 && Math.abs(newValue - state.endValue) < 0.005) {
+                input.value = state.endValue.toFixed(2);
+                state.isAnimating = false;
+                state.startTime = null;
+                calculate();
+            } else {
+                state.startValue = newValue;
+                state.startTime = now;
+                calculate();
+                requestAnimationFrame(() => animateSpring(id));
+            }
+        }
+
+        function clamp(val, min, max) { return Math.max(min, Math.min(max, val)); }
+
+        function updateSliderVisual(slider) {
+            if (!slider) return;
+            const min = parseFloat(slider.min) || 0, max = parseFloat(slider.max) || 100;
+            const pct = clamp(((parseFloat(slider.value) || min) - min) / (max - min) * 100, 0, 100);
+            const shell = slider.closest('.slider-shell');
+            if (shell) shell.style.setProperty('--pct', pct);
+        }
+
+        function syncInput(id) {
+            const input = document.getElementById(id);
+            const slider = document.getElementById('slider' + id.charAt(0).toUpperCase() + id.slice(1));
+            if (slider) { slider.value = input.value; updateSliderVisual(slider); }
+            calculate();
+        }
+
+        document.querySelectorAll('.hud-slider').forEach(updateSliderVisual);
+
+        // V30 SLIDER INTERACTION WITH HAPTICS
+        document.querySelectorAll('.slider-shell').forEach(shell => {
+            const slider = shell.querySelector('.hud-slider');
+            const inputId = slider.id.replace('slider', '').toLowerCase();
+
+            function setSlider(e) {
+                const rect = shell.getBoundingClientRect();
+                const min = parseFloat(slider.min), max = parseFloat(slider.max);
+                let pct = shell.id === 'sliderHeightShell' 
+                    ? 1 - ((e.clientY - rect.top) / rect.height)
+                    : (e.clientX - rect.left) / rect.width;
+                
+                let val = min + clamp(pct, 0, 1) * (max - min);
+                val = Math.round(val / 0.01) * 0.01; // smooth manual drag
+                
+                slider.value = val; updateSliderVisual(slider);
+                document.getElementById(inputId).value = val.toFixed(2);
+                calculate();
+            }
+
+            shell.addEventListener('pointerdown', e => {
+                e.preventDefault(); shell.setPointerCapture(e.pointerId);
+                shell.dataset.dragging = "1"; springs[inputId].isAnimating = false;
+                setSlider(e);
+            });
+
+            shell.addEventListener('pointermove', e => {
+                if (shell.dataset.dragging === "1") setSlider(e);
+            });
+
+            shell.addEventListener('pointerup', e => {
+                shell.dataset.dragging = "0"; shell.releasePointerCapture(e.pointerId);
+                vibrateTick(); // HAPTIC KICK ON RELEASE
+                
+                // TRIGGER SPRING SNAP TO NEAREST 0.1
+                const state = springs[inputId];
+                state.isAnimating = true; state.startTime = performance.now();
+                state.startValue = parseFloat(slider.value);
+                state.endValue = Math.round(state.startValue * 10) / 10; // Snap to 0.1
+                state.velocity = 0;
+                requestAnimationFrame(() => animateSpring(inputId));
+            });
+        });
+
+        function findCatenaryA(span, height) {
+            let aMin = 0.001, aMax = 100.0, a = 50, tol = 0.0001;
+            for (let i = 0; i < 100; i++) {
+                const h = a * (Math.cosh((span / 2) / a) - 1);
+                if (Math.abs(h - height) < tol) break;
+                if (h > height) aMin = a; else aMax = a;
+                a = (aMin + aMax) / 2;
+            }
+            return a;
+        }
+
+        function drawArch(span, height, depth, diameter, a) {
+            const canvas = document.getElementById('archCanvas');
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+            const w = canvas.width / dpr, h = canvas.height / dpr;
+            if (!w || !h) return;
+
+            ctx.save(); ctx.scale(dpr, dpr); ctx.clearRect(0, 0, w, h);
+
+            const scale = Math.min((w - 120) / span, (h - 140) / height);
+            const ox = w / 2, oy = h - 80 - (h - 140 - height * scale) * 0.5;
+            const gy = oy - depth * scale;
+
+            // Simple backgrounds
+            ctx.fillStyle = '#b6e1fb'; ctx.fillRect(0, 0, w, gy);
+            ctx.fillStyle = '#bda56a'; ctx.fillRect(0, gy, w, h - gy);
+            
+            ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke();
+
+            // Catenary Path
+            const pts = [];
+            for (let i = 0; i <= 200; i++) {
+                const x = -span/2 + (i/200)*span;
+                const cy = height - a * (Math.cosh(x/a) - 1);
+                pts.push({x: ox + x*scale, y: oy - cy*scale});
+            }
+
+            const bw = Math.max(2, (diameter/100)*scale);
+            
+            // Draw Tube
+            ctx.beginPath(); ctx.strokeStyle = '#666'; ctx.lineWidth = bw;
+            ctx.lineCap = 'butt'; ctx.lineJoin = 'round';
+            pts.forEach((p, i) => i===0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function calculate() {
+            const span = Math.max(0.01, parseFloat(document.getElementById('span').value) || 0);
+            const height = Math.max(0.01, parseFloat(document.getElementById('height').value) || 0);
+            const diameter = Math.max(0.1, parseFloat(document.getElementById('diameter').value) || 0);
+            let depth = parseFloat(document.getElementById('depth').value) || 0;
+            if (depth >= height) depth = height - 0.001; if (depth < 0) depth = 0;
+
+            const a = findCatenaryA(span, height);
+            const totalLen = 2 * a * Math.sinh((span / 2) / a);
+            const vHeight = Math.max(0, height - depth);
+            const spanAbove = 2 * a * Math.acosh(vHeight / a + 1);
+            const lenAbove = 2 * a * Math.sinh((spanAbove / 2) / a);
+            const vol = (Math.PI * Math.pow(diameter/200, 2) * totalLen) * 1000;
+            const mass = vol * 1.95;
+
+            document.getElementById('spanAbove').innerText = spanAbove.toFixed(2) + ' m';
+            document.getElementById('heightAbove').innerText = vHeight.toFixed(2) + ' m';
+            document.getElementById('lengthAbove').innerText = lenAbove.toFixed(2) + ' m';
+            document.getElementById('lengthUnder').innerText = ((totalLen - lenAbove)/2).toFixed(2) + ' m';
+            document.getElementById('lengthTotal').innerText = totalLen.toFixed(2) + ' m';
+            document.getElementById('volume').innerText = vol.toFixed(1) + ' l';
+            document.getElementById('dryMass').innerText = mass.toFixed(1) + ' kg';
+            document.getElementById('waterRange').innerText = (mass*0.14).toFixed(1) + ' - ' + (mass*0.15).toFixed(1) + ' l';
+            document.getElementById('totalMass').innerText = (mass*1.15).toFixed(1) + ' kg';
+
+            drawArch(span, height, depth, diameter, a);
+        }
+
+        function resizeCanvas() {
+            const canvas = document.getElementById('archCanvas');
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width * (window.devicePixelRatio || 1);
+            canvas.height = rect.height * (window.devicePixelRatio || 1);
+            calculate();
+        }
+
+        window.addEventListener('load', resizeCanvas);
+        window.addEventListener('resize', resizeCanvas);
+    </script>
 </body>
 </html>
