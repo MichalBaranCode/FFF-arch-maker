@@ -1,335 +1,728 @@
 <!DOCTYPE html>
+<!--
+FFF ARCH MAKER V19
+Base: V15 reset / corrected from the last known good version.
+Rule: this version number must match the visible badge in the app.
+-->
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fabricable Fabric Formwork - V15</title>
+    <meta name="theme-color" content="#242321">
+    <title>Fabricable Fabric Formwork — Arch Maker V19</title>
     <style>
-        /* Global Theme */
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #1a1a1a; color: #f4f4f2; margin: 0; padding: 0; overflow-x: hidden; touch-action: manipulation; overscroll-behavior-y: none; }
-        
-        /* Top Bar - Affinity Mockup Match */
-        .top-bar { background-color: #333; border-bottom: 2px solid #222; padding: 6px 15px; display: flex; align-items: baseline; justify-content: center; position: sticky; top: 0; z-index: 100;}
-        .title-main { color: #f0f0f0; font-size: 16px; font-weight: normal; margin-right: 8px;}
-        .title-sub { color: #f0f0f0; font-size: 14px; font-style: italic; font-weight: 300; margin-right: 15px; opacity: 0.9;}
-        .version-badge { color: #e74c3c; font-size: 15px; font-family: 'Courier New', Courier, monospace; font-weight: bold; letter-spacing: 2px; }
+        :root {
+            --ui-dark: #171817;
+            --ui-panel: #20211f;
+            --ui-line: rgba(255,255,255,0.10);
+            --ui-text: #f2f0ea;
+            --ui-muted: rgba(242,240,234,0.58);
+            --accent: #d54b3d;
+            --blue: #55a7ff;
+            --soil-top: #9e9674;
+            --soil-mid: #7d6c4f;
+            --soil-bottom: #4f3b27;
+            --sky-top: #a9cfdf;
+            --sky-bottom: #bad1ad;
+        }
 
-        /* Viewport Area */
-        .viewport-container { position: relative; width: 100%; height: calc(65vh); min-height: 450px; background: #222; overflow: hidden; border-bottom: 1px solid #333; }
-        canvas { display: block; width: 100%; height: 100%; }
+        * { box-sizing: border-box; }
 
-        /* HUD Boxes - In Corners (Restored & Elegant) */
-        .hud-box { position: absolute; background: #ffffff; border-radius: 6px; padding: 0; overflow: hidden; box-shadow: 0px 6px 15px rgba(0,0,0,0.2); z-index: 20; width: 75px; display: flex; flex-direction: column; align-items: center; border: 1px solid rgba(0,0,0,0.1);}
-        .hud-box-header { width: 100%; background: #f2f2f2; border-bottom: 1px solid #ddd; padding: 4px 0; display: flex; justify-content: center; align-items: center;}
-        .hud-box label { font-size: 9px; font-weight: bold; color: #555; text-transform: uppercase; letter-spacing: 0.2px; margin: 0;}
-        .hud-box input[type="number"] { width: 100%; border: none; text-align: center; font-size: 16px; font-weight: bold; color: #111; background: #fff; outline: none; font-family: monospace; padding: 5px 0;}
-        
-        /* Corner Positioning */
-        #box-height { top: 15px; left: 15px; }
-        #box-diameter { top: 15px; right: 15px; }
-        #box-span { bottom: 15px; left: 15px; } 
-        #box-depth { bottom: 15px; right: 15px; }
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+            overflow-x: hidden;
+            overscroll-behavior-y: none;
+            background: var(--ui-dark);
+            color: var(--ui-text);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: geometricPrecision;
+            touch-action: manipulation;
+        }
 
-        /* HUD Sliders - Modern Borderless */
-        .hud-slider { position: absolute; z-index: 15; appearance: none; background: transparent; outline: none; touch-action: none; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.2)); }
-        .hud-slider::-webkit-slider-runnable-track { width: 100%; height: 2px; background: #555; border-radius: 1px; }
-        .hud-slider::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; background: radial-gradient(circle at 50% 10%, #fff, #999 70%, #555); border-radius: 50%; margin-top: -7px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.4); border: none;}
-        
-        /* Slider Positioning Next to Boxes */
-        #sliderHeight { width: 140px; top: 135px; left: 15px; transform: translate(-50%, -50%) rotate(-90deg); transform-origin: top left;}
-        #sliderSpan { width: 130px; bottom: 26px; left: 105px; }
+        button,
+        input {
+            font-family: inherit;
+        }
 
-        /* Results Section */
-        .results-container { padding: 15px 10px; max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        @media (max-width: 500px) { .results-container { grid-template-columns: 1fr; } }
-        
-        .result-panel { padding: 10px; border-bottom: 1px solid #2a2a2a; display: flex; flex-direction: column; gap: 4px; background-color: #1a1a1a;}
-        .section-title { font-size: 10px; text-transform: uppercase; color: #58a6ff; font-weight: bold; padding-bottom: 1px; margin: 0 0 4px 0; border-bottom: 1px solid #2a2a2a;}
-        .result-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #bbb; margin: 0;}
-        .value { font-size: 15px; font-weight: bold; color: #fff; font-family: monospace;}
-        .value-highlight { color: #58a6ff; font-size: 17px; font-weight: bold; font-family: monospace;}
-        
-        .note { font-size: 10px; color: #555; text-align: center; margin: 0 10px 30px 10px;}
+        .top-bar {
+            height: 34px;
+            background: linear-gradient(180deg, #30302e 0%, #242422 100%);
+            border-bottom: 1px solid rgba(0,0,0,0.55);
+            box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 8px 22px rgba(0,0,0,0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            user-select: none;
+        }
+
+        .title-main {
+            color: #f4f1eb;
+            font-size: 13px;
+            line-height: 1;
+            font-weight: 640;
+            letter-spacing: -0.02em;
+        }
+
+        .title-sub {
+            color: rgba(244,241,235,0.68);
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 12px;
+            font-style: italic;
+            line-height: 1;
+            letter-spacing: 0.015em;
+            margin-left: 1px;
+        }
+
+        .version-badge {
+            color: var(--accent);
+            font-size: 11px;
+            line-height: 1;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-weight: 800;
+            letter-spacing: 0.13em;
+            margin-left: 8px;
+            transform: translateY(0.5px);
+        }
+
+        .viewport-container {
+            position: relative;
+            width: 100%;
+            height: 64dvh;
+            min-height: 430px;
+            max-height: 720px;
+            overflow: hidden;
+            background: #a8c9d1;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            isolation: isolate;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .hud-box {
+            position: absolute;
+            z-index: 30;
+            width: 68px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.88);
+            border: 1px solid rgba(255,255,255,0.55);
+            box-shadow: 0 10px 26px rgba(20,18,14,0.18), 0 1px 0 rgba(255,255,255,0.55) inset;
+            backdrop-filter: blur(10px) saturate(1.05);
+            -webkit-backdrop-filter: blur(10px) saturate(1.05);
+        }
+
+        .hud-box-header {
+            min-height: 21px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3px 4px 2px 4px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(235,235,231,0.72));
+            border-bottom: 1px solid rgba(0,0,0,0.075);
+        }
+
+        .hud-box label {
+            margin: 0;
+            color: rgba(31,31,28,0.64);
+            font-size: 7.4px;
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: 0.055em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .hud-box input[type="number"] {
+            width: 100%;
+            height: 31px;
+            border: 0;
+            outline: 0;
+            background: rgba(255,255,255,0.92);
+            color: #141411;
+            text-align: center;
+            font-size: 15px;
+            line-height: 1;
+            font-weight: 780;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            letter-spacing: -0.03em;
+            padding: 2px 3px 3px 3px;
+            -moz-appearance: textfield;
+        }
+
+        .hud-box input[type="number"]::-webkit-outer-spin-button,
+        .hud-box input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        #box-height { top: 14px; left: 14px; }
+        #box-diameter { top: 14px; right: 14px; }
+        #box-span { bottom: 14px; left: 14px; }
+        #box-depth { bottom: 14px; right: 14px; }
+
+        .hud-slider {
+            --pos: 50%;
+            --slider-bg: linear-gradient(90deg, rgba(28,31,30,0.52) 0%, rgba(94,97,92,0.55) 40%, rgba(238,243,235,0.90) 50%, rgba(94,97,92,0.55) 60%, rgba(28,31,30,0.52) 100%);
+            position: absolute;
+            z-index: 24;
+            width: 154px;
+            height: 25px;
+            margin: 0;
+            appearance: none;
+            -webkit-appearance: none;
+            background: transparent;
+            outline: none;
+            cursor: pointer;
+            touch-action: none;
+            filter: drop-shadow(0 5px 8px rgba(0,0,0,0.22));
+        }
+
+        .hud-slider::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            border-radius: 999px;
+            background: var(--slider-bg);
+            clip-path: polygon(0 42%, var(--pos) 24%, 100% 42%, 100% 58%, var(--pos) 76%, 0 58%);
+            box-shadow: 0 1px 0 rgba(255,255,255,0.18) inset, 0 -1px 0 rgba(0,0,0,0.20) inset;
+        }
+
+        .hud-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            margin-top: -4.5px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.55);
+            background: radial-gradient(circle at 42% 30%, #ffffff 0%, #d9d7d0 34%, #8b8981 72%, #4a4945 100%);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.36), 0 0 0 1px rgba(0,0,0,0.08);
+        }
+
+        .hud-slider::-moz-range-track {
+            width: 100%;
+            height: 6px;
+            border-radius: 999px;
+            background: var(--slider-bg);
+            clip-path: polygon(0 42%, var(--pos) 24%, 100% 42%, 100% 58%, var(--pos) 76%, 0 58%);
+        }
+
+        .hud-slider::-moz-range-thumb {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.55);
+            background: radial-gradient(circle at 42% 30%, #ffffff 0%, #d9d7d0 34%, #8b8981 72%, #4a4945 100%);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.36), 0 0 0 1px rgba(0,0,0,0.08);
+        }
+
+        #sliderHeight {
+            width: 160px;
+            top: 203px;
+            left: 38px;
+            transform: rotate(-90deg);
+            transform-origin: left center;
+        }
+
+        #sliderSpan {
+            width: 164px;
+            bottom: 24px;
+            left: 94px;
+        }
+
+        .results-shell {
+            background: linear-gradient(180deg, #181918 0%, #151615 100%);
+            border-top: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .results-container {
+            width: min(820px, calc(100% - 24px));
+            margin: 0 auto;
+            padding: 18px 0 10px 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .result-panel {
+            background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.010));
+            border-top: 1px solid rgba(255,255,255,0.055);
+            border-bottom: 1px solid rgba(0,0,0,0.55);
+            padding: 10px 10px 9px 10px;
+        }
+
+        .section-title {
+            margin: 0 0 6px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            color: var(--blue);
+            font-size: 9px;
+            line-height: 1;
+            font-weight: 850;
+            letter-spacing: 0.055em;
+            text-transform: uppercase;
+        }
+
+        .section-title.secondary { margin-top: 10px; }
+
+        .result-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 14px;
+            min-height: 21px;
+            margin: 0;
+            color: rgba(242,240,234,0.70);
+            font-size: 12px;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+
+        .value,
+        .value-highlight {
+            color: #f7f5ee;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 13px;
+            font-weight: 850;
+            letter-spacing: 0.01em;
+        }
+
+        .value-highlight {
+            color: var(--blue);
+            font-size: 14px;
+        }
+
+        .note {
+            width: min(820px, calc(100% - 24px));
+            margin: 0 auto;
+            padding: 6px 0 18px 0;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            color: rgba(242,240,234,0.24);
+            font-size: 9px;
+            text-align: center;
+        }
+
+        @media (max-width: 700px) {
+            .viewport-container {
+                height: 63dvh;
+                min-height: 410px;
+            }
+
+            .title-main { font-size: 12px; }
+            .title-sub { font-size: 11px; }
+            .version-badge { font-size: 10px; }
+
+            #sliderSpan {
+                width: 138px;
+                left: 90px;
+            }
+
+            .results-container {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding-top: 12px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .top-bar { gap: 6px; }
+            .title-main { font-size: 11px; }
+            .title-sub { font-size: 10px; }
+            .hud-box { width: 64px; }
+            .hud-box label { font-size: 6.9px; }
+            .hud-box input[type="number"] { font-size: 14px; }
+            #sliderSpan { width: 118px; left: 84px; }
+            #sliderHeight { width: 145px; top: 190px; left: 35px; }
+        }
     </style>
 </head>
 <body>
-
     <div class="top-bar">
         <span class="title-main">Fabricable Fabric Formwork</span>
         <span class="title-sub">Arch Maker</span>
-        <span class="version-badge">V15</span>
+        <span class="version-badge">V19</span>
     </div>
 
     <div class="viewport-container" id="viewport">
         <canvas id="archCanvas"></canvas>
-        
+
         <div class="hud-box" id="box-height">
             <div class="hud-box-header"><label>Height (m)</label></div>
-            <input type="number" id="height" value="1.50" step="0.01" oninput="syncInput('height')">
+            <input type="number" id="height" value="1.50" step="0.01" inputmode="decimal" oninput="syncInput('height')">
         </div>
-        
+
         <div class="hud-box" id="box-diameter">
             <div class="hud-box-header"><label>Tube Ø (cm)</label></div>
-            <input type="number" id="diameter" value="10.0" step="0.1" oninput="calculate()">
+            <input type="number" id="diameter" value="10.0" step="0.1" inputmode="decimal" oninput="calculate()">
         </div>
 
         <div class="hud-box" id="box-span">
             <div class="hud-box-header"><label>Span (m)</label></div>
-            <input type="number" id="span" value="2.00" step="0.01" oninput="syncInput('span')">
+            <input type="number" id="span" value="2.00" step="0.01" inputmode="decimal" oninput="syncInput('span')">
         </div>
 
         <div class="hud-box" id="box-depth">
             <div class="hud-box-header"><label>Depth (m)</label></div>
-            <input type="number" id="depth" value="0.30" step="0.01" oninput="calculate()">
+            <input type="number" id="depth" value="0.30" step="0.01" inputmode="decimal" oninput="calculate()">
         </div>
 
-        <input type="range" id="sliderHeight" class="hud-slider" min="0.5" max="5.0" step="0.1" value="1.5" oninput="syncSlider('height')">
-        <input type="range" id="sliderSpan" class="hud-slider" min="1.0" max="5.0" step="0.1" value="2.0" oninput="syncSlider('span')">
+        <input type="range" id="sliderHeight" class="hud-slider" min="0.5" max="5.0" step="0.1" value="1.5" aria-label="Height slider" oninput="syncSlider('height')">
+        <input type="range" id="sliderSpan" class="hud-slider" min="1.0" max="5.0" step="0.1" value="2.0" aria-label="Span slider" oninput="syncSlider('span')">
     </div>
 
-    <div class="results-container">
-        <div class="result-panel">
-            <p class="section-title">Above Ground Parameters</p>
-            <div class="result-row">Visual Span:<span class="value" id="spanAbove">0.00 m</span></div>
-            <div class="result-row">Visual Height:<span class="value" id="heightAbove">0.00 m</span></div>
-            <div class="result-row">Visible Tube Length:<span class="value" id="lengthAbove">0.00 m</span></div>
-            
-            <p class="section-title" style="margin-top: 5px;">Underground Parameters</p>
-            <div class="result-row">Tube Length per Hole:<span class="value" id="lengthUnder">0.00 m</span></div>
-            <div class="result-row">Total Tube Length (L+R):<span class="value-highlight" id="lengthTotal">0.00 m</span></div>
+    <div class="results-shell">
+        <div class="results-container">
+            <div class="result-panel">
+                <p class="section-title">Above Ground Parameters</p>
+                <div class="result-row">Visual Span:<span class="value" id="spanAbove">0.00 m</span></div>
+                <div class="result-row">Visual Height:<span class="value" id="heightAbove">0.00 m</span></div>
+                <div class="result-row">Visible Tube Length:<span class="value" id="lengthAbove">0.00 m</span></div>
+
+                <p class="section-title secondary">Underground Parameters</p>
+                <div class="result-row">Tube Length per Hole:<span class="value" id="lengthUnder">0.00 m</span></div>
+                <div class="result-row">Total Tube Length (L+R):<span class="value-highlight" id="lengthTotal">0.00 m</span></div>
+            </div>
+
+            <div class="result-panel">
+                <p class="section-title">Materials (Total)</p>
+                <div class="result-row">Mortar Volume:<span class="value" id="volume">0.0 l</span></div>
+                <div class="result-row"><strong>Mapefill PRO (Dry Mass):</strong><span class="value-highlight" id="dryMass">0.0 kg</span></div>
+                <div class="result-row">Water (14% - 15%):<span class="value" id="waterRange">0.0 - 0.0 l</span></div>
+                <div class="result-row">Total Arch Mass:<span class="value" id="totalMass">0.0 kg</span></div>
+            </div>
         </div>
 
-        <div class="result-panel">
-            <p class="section-title">Materials (Total)</p>
-            <div class="result-row">Mortar Volume:<span class="value" id="volume">0.0 l</span></div>
-            <div class="result-row" style="color:#fff; font-weight:bold;">Mapefill PRO (Dry Mass):<span class="value-highlight" id="dryMass">0.0 kg</span></div>
-            <div class="result-row">Water (14% - 15%):<span class="value" id="waterRange">0.0 - 0.0 l</span></div>
-            <div class="result-row">Total Arch Mass:<span class="value" id="totalMass">0.0 - 0.0 kg</span></div>
-        </div>
+        <p class="note">V19 — reset from V15. Two sliders. Split sky/soil gradient. Refined HUD. Fixed visual height output.</p>
     </div>
-
-    <p class="note">V15 Update. Exact UI layout restored. Buttery smooth 3D arch shading with flat butt-caps.</p>
 
     <script>
-        // Sync Logic
+        const VERSION = "V19";
+
+        function clamp(value, min, max) {
+            return Math.max(min, Math.min(max, value));
+        }
+
+        function getSliderId(id) {
+            return 'slider' + id.charAt(0).toUpperCase() + id.slice(1);
+        }
+
+        function formatNumberForInput(value) {
+            return Number(value).toFixed(2);
+        }
+
+        function updateSliderVisual(slider) {
+            if (!slider) return;
+            const min = parseFloat(slider.min) || 0;
+            const max = parseFloat(slider.max) || 100;
+            const val = parseFloat(slider.value) || min;
+            const percent = clamp(((val - min) / (max - min)) * 100, 0, 100);
+            const p1 = clamp(percent - 13, 0, 100);
+            const p2 = clamp(percent + 13, 0, 100);
+
+            slider.style.setProperty('--pos', percent + '%');
+            slider.style.setProperty(
+                '--slider-bg',
+                `linear-gradient(90deg,
+                    rgba(23,28,27,0.54) 0%,
+                    rgba(75,80,75,0.56) ${p1}%,
+                    rgba(235,243,232,0.94) ${percent}%,
+                    rgba(75,80,75,0.56) ${p2}%,
+                    rgba(23,28,27,0.54) 100%)`
+            );
+        }
+
         function syncSlider(id) {
-            const slider = document.getElementById('slider' + id.charAt(0).toUpperCase() + id.slice(1));
+            const slider = document.getElementById(getSliderId(id));
             const input = document.getElementById(id);
-            input.value = parseFloat(slider.value).toFixed(2);
+            if (!slider || !input) return;
+
+            input.value = formatNumberForInput(slider.value);
+            updateSliderVisual(slider);
             calculate();
         }
 
         function syncInput(id) {
             const input = document.getElementById(id);
-            const slider = document.getElementById('slider' + id.charAt(0).toUpperCase() + id.slice(1));
-            const val = parseFloat(input.value) || 0;
-            if(slider) slider.value = Math.max(slider.min, Math.min(slider.max, val));
+            const slider = document.getElementById(getSliderId(id));
+            const val = parseFloat(String(input.value).replace(',', '.')) || 0;
+
+            if (slider) {
+                slider.value = clamp(val, parseFloat(slider.min), parseFloat(slider.max));
+                updateSliderVisual(slider);
+            }
             calculate();
         }
 
-        // Anti-Bounce for mobile sliders
-        const sliders = document.querySelectorAll('.hud-slider');
-        sliders.forEach(s => {
-            s.addEventListener('touchmove', function(e) {
-                e.stopPropagation(); 
+        document.querySelectorAll('.hud-slider').forEach(slider => {
+            updateSliderVisual(slider);
+
+            slider.addEventListener('touchstart', function(e) {
+                e.stopPropagation();
+            }, { passive: false });
+
+            slider.addEventListener('touchmove', function(e) {
+                e.stopPropagation();
             }, { passive: false });
         });
 
         function findCatenaryParameterA(span, height) {
-            let L_half = span / 2;
-            let a_min = 0.001;
-            let a_max = 100.0;
-            let a = (a_min + a_max) / 2;
-            let tolerance = 0.00001;
+            const halfSpan = span / 2;
+            let aMin = 0.001;
+            let aMax = 100.0;
+            let a = (aMin + aMax) / 2;
+            const tolerance = 0.00001;
+
             for (let i = 0; i < 150; i++) {
-                let calc_h = a * (Math.cosh(L_half / a) - 1);
-                let diff = calc_h - height;
+                const calcHeight = a * (Math.cosh(halfSpan / a) - 1);
+                const diff = calcHeight - height;
+
                 if (Math.abs(diff) < tolerance) break;
-                if (diff > 0) a_min = a;
-                else a_max = a;
-                a = (a_min + a_max) / 2;
+                if (diff > 0) aMin = a;
+                else aMax = a;
+
+                a = (aMin + aMax) / 2;
             }
+
             return a;
         }
 
-        // Helper: Draw single smooth stroke
-        function drawCatenaryStrokeOffset(ctx, catenaryPoints, lineWidth, color, offsetY) {
+        function seededRandom(seed) {
+            let t = seed + 0x6D2B79F5;
+            return function() {
+                t = Math.imul(t ^ (t >>> 15), t | 1);
+                t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+                return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+            };
+        }
+
+        function drawStableSoilTexture(ctx, width, groundY, height) {
+            const rand = seededRandom(1447);
+            const count = Math.floor(width * (height - groundY) / 2200);
+            ctx.save();
+            for (let i = 0; i < count; i++) {
+                const x = rand() * width;
+                const y = groundY + rand() * Math.max(1, height - groundY);
+                const r = 0.45 + rand() * 1.6;
+                const alpha = 0.025 + rand() * 0.045;
+                ctx.fillStyle = rand() > 0.5 ? `rgba(255,255,255,${alpha})` : `rgba(0,0,0,${alpha})`;
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        function drawCatenaryStrokeOffset(ctx, points, lineWidth, color, offsetY) {
+            if (!points.length || lineWidth <= 0) return;
             ctx.beginPath();
             ctx.strokeStyle = color;
             ctx.lineWidth = lineWidth;
-            for (let i = 0; i < catenaryPoints.length; i++) {
-                let p = catenaryPoints[i];
+            for (let i = 0; i < points.length; i++) {
+                const p = points[i];
                 if (i === 0) ctx.moveTo(p.x, p.y + offsetY);
                 else ctx.lineTo(p.x, p.y + offsetY);
             }
             ctx.stroke();
         }
 
+        function drawTube(ctx, points, baseWidth) {
+            ctx.save();
+            ctx.lineCap = 'butt';
+            ctx.lineJoin = 'round';
+
+            ctx.shadowColor = 'rgba(0,0,0,0.32)';
+            ctx.shadowBlur = Math.max(2, baseWidth * 0.22);
+            ctx.shadowOffsetX = Math.max(1, baseWidth * 0.06);
+            ctx.shadowOffsetY = Math.max(2, baseWidth * 0.10);
+            drawCatenaryStrokeOffset(ctx, points, baseWidth * 1.05, 'rgba(30,30,29,0.98)', 0);
+
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+
+            const layers = [
+                [1.00, '#383936', 0.00],
+                [0.92, '#4b4c48', -0.03],
+                [0.82, '#62635e', -0.08],
+                [0.70, '#777973', -0.14],
+                [0.58, '#8d8f88', -0.20],
+                [0.45, '#a5a79f', -0.27],
+                [0.32, '#bfc1b7', -0.34],
+                [0.20, '#dadbd2', -0.41],
+                [0.10, '#f1f0e7', -0.48]
+            ];
+
+            for (const [widthScale, color, offsetScale] of layers) {
+                drawCatenaryStrokeOffset(ctx, points, baseWidth * widthScale, color, baseWidth * offsetScale);
+            }
+
+            drawCatenaryStrokeOffset(ctx, points, Math.max(0.8, baseWidth * 0.018), 'rgba(255,255,255,0.62)', baseWidth * -0.515);
+            drawCatenaryStrokeOffset(ctx, points, Math.max(0.7, baseWidth * 0.020), 'rgba(0,0,0,0.22)', baseWidth * 0.50);
+
+            ctx.restore();
+        }
+
         function drawArch(span, height, depth, diameter, a) {
             const canvas = document.getElementById('archCanvas');
             const ctx = canvas.getContext('2d');
-            
             const dpr = window.devicePixelRatio || 1;
             const cssWidth = canvas.width / dpr;
             const cssHeight = canvas.height / dpr;
 
-            if (cssWidth === 0 || cssHeight === 0) return;
-            
+            if (!cssWidth || !cssHeight) return;
+
             ctx.save();
-            ctx.scale(dpr, dpr); 
+            ctx.scale(dpr, dpr);
             ctx.clearRect(0, 0, cssWidth, cssHeight);
 
-            const margin = 80; 
-            const drawWidth = Math.max(1, cssWidth - margin * 2);
-            const drawHeight = Math.max(1, cssHeight - margin * 2.5);
-            
+            const marginX = Math.min(100, Math.max(58, cssWidth * 0.08));
+            const marginTop = Math.min(82, Math.max(52, cssHeight * 0.10));
+            const marginBottom = Math.min(82, Math.max(58, cssHeight * 0.13));
+
+            const drawWidth = Math.max(1, cssWidth - marginX * 2);
+            const drawHeight = Math.max(1, cssHeight - marginTop - marginBottom);
+
             const scaleX = drawWidth / span;
             const scaleY = drawHeight / height;
             const scale = Math.max(0.1, Math.min(scaleX, scaleY));
 
             const offsetX = cssWidth / 2;
-            const offsetY = cssHeight - margin - (drawHeight - (height * scale)) / 2;
-            const groundY = offsetY - (depth * scale);
+            const offsetY = cssHeight - marginBottom - (drawHeight - height * scale) * 0.44;
+            const groundY = offsetY - depth * scale;
 
-            // --- 1. Affinity Mockup Background (Natural Gradient) ---
-            let bgGradient = ctx.createLinearGradient(0, 0, 0, cssHeight);
-            bgGradient.addColorStop(0, '#9dc1d3'); // Jasny błękit (jak na obrazku)
-            bgGradient.addColorStop(Math.min(1, groundY / cssHeight), '#a3c2a1'); // Zgaszona, jasna zieleń nad gruntem
-            bgGradient.addColorStop(1, '#816646'); // Głęboki brąz fundamentu
-            ctx.fillStyle = bgGradient;
+            // Separate background gradients: sky/green above ground, soil below ground.
+            const skyGradient = ctx.createLinearGradient(0, 0, 0, Math.max(1, groundY));
+            skyGradient.addColorStop(0, getComputedStyle(document.documentElement).getPropertyValue('--sky-top').trim());
+            skyGradient.addColorStop(1, getComputedStyle(document.documentElement).getPropertyValue('--sky-bottom').trim());
+            ctx.fillStyle = skyGradient;
+            ctx.fillRect(0, 0, cssWidth, groundY);
+
+            const soilGradient = ctx.createLinearGradient(0, groundY, 0, cssHeight);
+            soilGradient.addColorStop(0, getComputedStyle(document.documentElement).getPropertyValue('--soil-top').trim());
+            soilGradient.addColorStop(0.52, getComputedStyle(document.documentElement).getPropertyValue('--soil-mid').trim());
+            soilGradient.addColorStop(1, getComputedStyle(document.documentElement).getPropertyValue('--soil-bottom').trim());
+            ctx.fillStyle = soilGradient;
+            ctx.fillRect(0, groundY, cssWidth, cssHeight - groundY);
+            drawStableSoilTexture(ctx, cssWidth, groundY, cssHeight);
+
+            const vignette = ctx.createRadialGradient(cssWidth / 2, groundY * 0.50, cssHeight * 0.05, cssWidth / 2, cssHeight * 0.45, cssWidth * 0.78);
+            vignette.addColorStop(0, 'rgba(255,255,255,0.035)');
+            vignette.addColorStop(0.55, 'rgba(0,0,0,0.00)');
+            vignette.addColorStop(1, 'rgba(0,0,0,0.26)');
+            ctx.fillStyle = vignette;
             ctx.fillRect(0, 0, cssWidth, cssHeight);
 
-            // --- 2. Delicate Vignette (Anti-Glare, Center remains bright) ---
-            let vigGradient = ctx.createRadialGradient(cssWidth/2, cssHeight/2, cssHeight*0.1, cssWidth/2, cssHeight/2, cssWidth*0.9);
-            vigGradient.addColorStop(0, 'rgba(0,0,0,0)'); 
-            vigGradient.addColorStop(1, 'rgba(0,0,0,0.4)'); 
-            ctx.fillStyle = vigGradient;
-            ctx.fillRect(0, 0, cssWidth, cssHeight);
-
-            // Generate Arch Points
-            const numSteps = 150;
+            const numSteps = 220;
             const catenaryPoints = [];
             for (let i = 0; i <= numSteps; i++) {
-                let t = i / numSteps;
-                let x = -span / 2 + (t * span); 
-                let y = height - (a * (Math.cosh(x / a) - 1));
+                const t = i / numSteps;
+                const x = -span / 2 + t * span;
+                const y = height - a * (Math.cosh(x / a) - 1);
                 catenaryPoints.push({ x: offsetX + x * scale, y: offsetY - y * scale });
             }
 
-            // --- 3. Grid (Fading) ---
-            ctx.font = '10px monospace'; 
-            ctx.textAlign = 'center';
-            for(let x = - (Math.ceil(span/2)+2); x <= (Math.ceil(span/2)+2); x += 0.5) { 
+            // Clean engineering grid. Less Paint, more instrument.
+            ctx.save();
+            ctx.font = '9px "SFMono-Regular", Consolas, monospace';
+            ctx.lineCap = 'butt';
+
+            const xStart = Math.floor(-span / 2 - 2);
+            const xEnd = Math.ceil(span / 2 + 2);
+            for (let x = xStart; x <= xEnd; x += 0.5) {
+                const canvasX = offsetX + x * scale;
+                const isMajor = Number.isInteger(x);
+                const distanceToCenter = Math.abs(canvasX - offsetX) / Math.max(1, cssWidth / 2);
+                const alpha = (isMajor ? 0.15 : 0.07) * (1 - distanceToCenter * 0.35);
+                ctx.strokeStyle = `rgba(255,255,255,${Math.max(0.025, alpha)})`;
+                ctx.lineWidth = isMajor ? 0.8 : 0.45;
                 ctx.beginPath();
-                let scaledX = x * scale;
-                if (Number.isInteger(x)) {
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-                    ctx.lineWidth = 1;
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-                    if (x !== 0) ctx.fillText(x + 'm', offsetX + scaledX, groundY + 12);
-                } else {
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-                    ctx.lineWidth = 0.5;
-                }
-                let minDst = 1000;
-                let lineCanvasX = offsetX + scaledX;
-                for(let p of catenaryPoints) minDst = Math.min(minDst, Math.abs(p.x - lineCanvasX));
-                ctx.globalAlpha = Math.max(0, Math.min(1, 1 - (minDst / (span * scale / 2 + margin/2)))); 
-                ctx.moveTo(offsetX + scaledX, 0); ctx.lineTo(offsetX + scaledX, cssHeight);
+                ctx.moveTo(canvasX, 0);
+                ctx.lineTo(canvasX, cssHeight);
                 ctx.stroke();
-                ctx.globalAlpha = 1.0; 
+
+                if (isMajor && x !== 0) {
+                    ctx.fillStyle = 'rgba(255,255,255,0.42)';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(`${x}m`, canvasX, groundY + 11);
+                }
             }
 
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'middle';
-            for(let y = - (Math.floor(depth)+2); y <= (Math.ceil(height)+2); y += 0.5) { 
+            const yStart = Math.floor(-depth - 2);
+            const yEnd = Math.ceil(height + 2);
+            for (let y = yStart; y <= yEnd; y += 0.5) {
+                const canvasY = offsetY - y * scale;
+                const isMajor = Number.isInteger(y);
+                const alpha = isMajor ? 0.15 : 0.07;
+                ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
+                ctx.lineWidth = isMajor ? 0.8 : 0.45;
                 ctx.beginPath();
-                let scaledY = y * scale;
-                if (Number.isInteger(y)) {
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-                    ctx.lineWidth = 1;
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-                    if (y !== 0) ctx.fillText(y + 'm', offsetX + 8, offsetY - scaledY);
-                } else {
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-                    ctx.lineWidth = 0.5;
-                }
-                let minDst = 1000;
-                let lineCanvasY = offsetY - scaledY;
-                for(let p of catenaryPoints) minDst = Math.min(minDst, Math.abs(p.y - lineCanvasY));
-                ctx.globalAlpha = Math.max(0, Math.min(1, 1 - (minDst / (height * scale / 2 + margin/2)))); 
-                ctx.moveTo(0, offsetY - scaledY); ctx.lineTo(cssWidth, offsetY - scaledY);
+                ctx.moveTo(0, canvasY);
+                ctx.lineTo(cssWidth, canvasY);
                 ctx.stroke();
-                ctx.globalAlpha = 1.0; 
-            }
 
-            // --- 4. Linia Gruntu ---
-            ctx.strokeStyle = '#3a2717';
-            ctx.lineWidth = 2;
+                if (isMajor && y !== 0) {
+                    ctx.fillStyle = 'rgba(255,255,255,0.42)';
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(`${y}m`, offsetX + 9, canvasY);
+                }
+            }
+            ctx.restore();
+
+            // Ground plane.
+            ctx.strokeStyle = 'rgba(54,38,23,0.92)';
+            ctx.lineWidth = 1.35;
             ctx.beginPath();
             ctx.moveTo(0, groundY);
             ctx.lineTo(cssWidth, groundY);
             ctx.stroke();
 
-            // --- 5. Smooth 3D Tube Shading (Wielowarstwowy, płynny blend, PŁASKIE końce) ---
-            let baseWidth = Math.max(0.1, (diameter / 100) * scale);
-            
-            // BEZWZGLĘDNIE płaskie krawędzie (żadnych zaokrągleń)
-            ctx.lineCap = 'butt';
-            ctx.lineJoin = 'miter';
+            const baseWidth = Math.max(2.0, (diameter / 100) * scale);
+            drawTube(ctx, catenaryPoints, baseWidth);
 
-            // Konstrukcja płynnego światłocienia poprzez gęste nałożenie na siebie 8 warstw
-            // Każda kolejna warstwa jest jaśniejsza, cieńsza i minimalnie przesunięta do góry.
-            
-            // L1: Najszersza, najciemniejsza baza (dolna krawędź rury w cieniu)
-            drawCatenaryStrokeOffset(ctx, catenaryPoints, baseWidth, '#333333', 0);
-            
-            // L2: Płynne przejście w szarość
-            drawCatenaryStrokeOffset(ctx, catenaryPoints, baseWidth * 0.9, '#4d4d4d', -baseWidth * 0.05);
-            
-            // L3: Rdzeń rury
-            drawCatenaryStrokeOffset(ctx, catenaryPoints, baseWidth * 0.75, '#666666', -baseWidth * 0.125);
-            
-            // L4: Łapanie światła
-            drawCatenaryStrokeOffset(ctx, catenaryPoints, baseWidth * 0.6, '#888888', -baseWidth * 0.2);
-            
-            // L5: Strefa bardzo jasna
-            drawCatenaryStrokeOffset(ctx, catenaryPoints, baseWidth * 0.45, '#aaaaaa', -baseWidth * 0.275);
-            
-            // L6: Miękki odblask
-            drawCatenaryStrokeOffset(ctx, catenaryPoints, baseWidth * 0.3, '#cccccc', -baseWidth * 0.35);
-            
-            // L7: Ostre światło słońca blisko górnej krawędzi
-            drawCatenaryStrokeOffset(ctx, catenaryPoints, baseWidth * 0.15, '#eaeaea', -baseWidth * 0.425);
-            
-            // L8: Czysta biel na samym szczycie krawędzi
-            drawCatenaryStrokeOffset(ctx, catenaryPoints, baseWidth * 0.05, '#ffffff', -baseWidth * 0.475);
-
-
-            // --- 6. Ciemnożółty Krzyżyk (Zawsze NA WIERZCHU) ---
-            ctx.strokeStyle = '#ccaa00'; // Ciemny, inżynieryjny żółty
-            ctx.lineWidth = 1.5; 
+            // Survey cross, always on top.
+            ctx.save();
+            ctx.strokeStyle = 'rgba(183,142,0,0.98)';
+            ctx.lineWidth = 1.35;
             ctx.beginPath();
-            ctx.moveTo(offsetX - 4, groundY); ctx.lineTo(offsetX + 4, groundY); 
-            ctx.moveTo(offsetX, groundY - 4); ctx.lineTo(offsetX, groundY + 4);
+            ctx.moveTo(offsetX - 4.2, groundY);
+            ctx.lineTo(offsetX + 4.2, groundY);
+            ctx.moveTo(offsetX, groundY - 4.2);
+            ctx.lineTo(offsetX, groundY + 4.2);
             ctx.stroke();
+            ctx.restore();
 
-            ctx.restore(); 
+            ctx.restore();
         }
 
         function calculate() {
-            const span = Math.max(0.01, parseFloat(document.getElementById('span').value) || 0);
-            const height = Math.max(0.01, parseFloat(document.getElementById('height').value) || 0);
-            const diameter = Math.max(0.1, parseFloat(document.getElementById('diameter').value) || 0);
-            let depth = parseFloat(document.getElementById('depth').value) || 0;
+            const span = Math.max(0.01, parseFloat(String(document.getElementById('span').value).replace(',', '.')) || 0);
+            const height = Math.max(0.01, parseFloat(String(document.getElementById('height').value).replace(',', '.')) || 0);
+            const diameter = Math.max(0.1, parseFloat(String(document.getElementById('diameter').value).replace(',', '.')) || 0);
+            let depth = parseFloat(String(document.getElementById('depth').value).replace(',', '.')) || 0;
 
             if (depth >= height) depth = height - 0.001;
             if (depth < 0) depth = 0;
 
             const a = findCatenaryParameterA(span, height);
             const totalLength = 2 * a * Math.sinh((span / 2) / a);
-            
-            const spanAbove = 2 * a * Math.acosh((height - depth) / a + 1);
+
+            const visibleHeight = Math.max(0, height - depth);
+            const spanAbove = 2 * a * Math.acosh(visibleHeight / a + 1);
             const lengthAbove = 2 * a * Math.sinh((spanAbove / 2) / a);
 
             const lengthUnderTotal = totalLength - lengthAbove;
@@ -337,37 +730,40 @@
 
             const radiusMeters = (diameter / 2) / 100;
             const volumeLiters = (Math.PI * Math.pow(radiusMeters, 2) * totalLength) * 1000;
-            
+
             const dryMass = volumeLiters * 1.95;
             const waterMin = dryMass * 0.14;
             const waterMax = dryMass * 0.15;
+            const totalArchMass = dryMass + waterMax;
 
-            document.getElementById('spanAbove').innerText = spanAbove.toFixed(2) + " m";
-            document.getElementById('lengthAbove').innerText = lengthAbove.toFixed(2) + " m";
-            document.getElementById('lengthUnder').innerText = lengthUnderPerLeg.toFixed(2) + " m";
-            document.getElementById('lengthTotal').innerText = totalLength.toFixed(2) + " m";
+            document.getElementById('spanAbove').innerText = spanAbove.toFixed(2) + ' m';
+            document.getElementById('heightAbove').innerText = visibleHeight.toFixed(2) + ' m';
+            document.getElementById('lengthAbove').innerText = lengthAbove.toFixed(2) + ' m';
+            document.getElementById('lengthUnder').innerText = lengthUnderPerLeg.toFixed(2) + ' m';
+            document.getElementById('lengthTotal').innerText = totalLength.toFixed(2) + ' m';
 
-            document.getElementById('volume').innerText = volumeLiters.toFixed(1) + " l";
-            document.getElementById('dryMass').innerText = dryMass.toFixed(1) + " kg";
-            document.getElementById('waterRange').innerText = waterMin.toFixed(1) + " - " + waterMax.toFixed(1) + " l";
-            document.getElementById('totalMass').innerText = (dryMass + waterMax).toFixed(1) + " kg";
+            document.getElementById('volume').innerText = volumeLiters.toFixed(1) + ' l';
+            document.getElementById('dryMass').innerText = dryMass.toFixed(1) + ' kg';
+            document.getElementById('waterRange').innerText = waterMin.toFixed(1) + ' - ' + waterMax.toFixed(1) + ' l';
+            document.getElementById('totalMass').innerText = totalArchMass.toFixed(1) + ' kg';
 
             drawArch(span, height, depth, diameter, a);
         }
-        
+
         function resizeCanvas() {
             const canvas = document.getElementById('archCanvas');
             const dpr = window.devicePixelRatio || 1;
             const rect = canvas.parentElement.getBoundingClientRect();
-            
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            
+
+            canvas.width = Math.floor(rect.width * dpr);
+            canvas.height = Math.floor(rect.height * dpr);
+
             calculate();
         }
 
-        window.onload = resizeCanvas;
+        window.addEventListener('load', resizeCanvas);
         window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 180));
     </script>
 </body>
 </html>
