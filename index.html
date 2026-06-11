@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <!--
-FFF ARCH MAKER V34
-Logo path fixed for current GitHub repo structure:
+FFF ARCH MAKER V35
+Current repo structure:
 index.html and arch-maker-logo.png are in the same root folder.
-Visible app badge must match this version: V34.
+Visible app badge must match this version: V35.
 -->
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <meta name="theme-color" content="#242321">
-<title>Fabricable Fabric Formwork — Arch Maker V34</title>
+<title>Fabricable Fabric Formwork — Arch Maker V35</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700;800&family=Orbitron:wght@500;600;700;800&display=swap');
@@ -18,11 +18,16 @@ Visible app badge must match this version: V34.
 :root{
   --ui-dark:#171817;
   --blue:#55a7ff;
-  --soil-top:#bda56a;
-  --soil-mid:#7d6137;
-  --soil-bottom:#55321f;
-  --sky-top:#b6e1fb;
-  --sky-bottom:#b2d8b7;
+  --blue-soft:#5e91b0;
+  --blue-muted:#5d7382;
+  --soil-top:#c1aa6d;
+  --soil-mid:#816239;
+  --soil-bottom:#56311f;
+  --sky-top:#b5def8;
+  --sky-bottom:#afd5b8;
+  --card-bg:rgba(244,244,241,.90);
+  --card-line:rgba(255,255,255,.68);
+  --card-shadow:rgba(14,12,10,.16);
 }
 
 *{box-sizing:border-box}
@@ -42,7 +47,7 @@ html,body{
 }
 
 .top-bar{
-  height:29px;
+  height:31px;
   background:
     linear-gradient(180deg,rgba(255,255,255,.13),rgba(0,0,0,.13)),
     linear-gradient(90deg,#70726d 0%,#585a55 30%,#393b37 69%,#242522 100%);
@@ -62,14 +67,14 @@ html,body{
   left:50%;
   top:50%;
   transform:translate(-50%,-48%);
-  color:#f3f0ea;
+  color:#ffffff;
   font-family:"Baloo 2","Trebuchet MS",Inter,sans-serif;
-  font-size:17.9px;
+  font-size:19.1px;
   line-height:1;
   font-weight:400;
   letter-spacing:-.022em;
   white-space:nowrap;
-  text-shadow:0 2px 3.8px rgba(0,0,0,.52);
+  text-shadow:0 2px 4px rgba(0,0,0,.56);
   pointer-events:none;
 }
 
@@ -131,11 +136,13 @@ canvas{
   position:absolute;
   z-index:30;
   width:62px;
-  border-radius:7px;
+  border-radius:12px;
   overflow:hidden;
   background:rgba(255,255,255,.88);
-  border:1px solid rgba(255,255,255,.55);
-  box-shadow:0 7px 18px rgba(20,18,14,.16),0 1px 0 rgba(255,255,255,.52) inset;
+  border:1px solid rgba(255,255,255,.58);
+  box-shadow:
+    0 10px 20px rgba(20,18,14,.15),
+    0 1px 0 rgba(255,255,255,.58) inset;
   backdrop-filter:blur(10px) saturate(1.05);
   -webkit-backdrop-filter:blur(10px) saturate(1.05);
 }
@@ -146,7 +153,7 @@ canvas{
   align-items:center;
   justify-content:center;
   padding:2px 3px 1px;
-  background:linear-gradient(180deg,rgba(255,255,255,.78),rgba(235,235,231,.72));
+  background:linear-gradient(180deg,rgba(255,255,255,.80),rgba(236,236,232,.74));
   border-bottom:1px solid rgba(0,0,0,.075);
 }
 
@@ -192,7 +199,7 @@ canvas{
   height:30px;
   touch-action:none;
   cursor:pointer;
-  filter:drop-shadow(0 4px 6px rgba(0,0,0,.15));
+  filter:drop-shadow(0 4px 6px rgba(0,0,0,.14));
 }
 
 .slider-rail{
@@ -218,7 +225,7 @@ canvas{
       rgba(28,32,29,.48) 0%,
       rgba(58,64,58,.38) calc(var(--pct)*1% - 34%),
       rgba(104,112,101,.30) calc(var(--pct)*1% - 12%),
-      rgba(142,150,136,.36) calc(var(--pct)*1%),
+      rgba(142,150,136,.34) calc(var(--pct)*1%),
       rgba(104,112,101,.30) calc(var(--pct)*1% + 12%),
       rgba(58,64,58,.38) calc(var(--pct)*1% + 34%),
       rgba(28,32,29,.48) 100%);
@@ -246,7 +253,7 @@ canvas{
   height:10px;
   transform:translateX(-50%);
   border-radius:999px;
-  background:radial-gradient(ellipse at center,rgba(226,230,210,.070) 0%,rgba(226,230,210,.028) 49%,rgba(226,230,210,0) 84%);
+  background:radial-gradient(ellipse at center,rgba(226,230,210,.065) 0%,rgba(226,230,210,.024) 49%,rgba(226,230,210,0) 84%);
   pointer-events:none;
 }
 
@@ -260,16 +267,16 @@ canvas{
   border-radius:50%;
   border:0;
   background:
-    radial-gradient(circle at 50% 40%,
-      rgba(214,219,224,.96) 0%,
-      rgba(190,196,202,.95) 28%,
-      rgba(154,161,169,.95) 58%,
-      rgba(121,128,136,.95) 82%,
-      rgba(101,107,115,.96) 100%);
+    radial-gradient(circle at 50% 48%,
+      rgba(219,224,229,.96) 0%,
+      rgba(196,202,209,.95) 30%,
+      rgba(164,171,179,.95) 60%,
+      rgba(132,139,147,.95) 84%,
+      rgba(110,116,124,.96) 100%);
   box-shadow:
-    0 1px 2px rgba(0,0,0,.14),
-    0 0 0 1px rgba(18,24,30,.07),
-    0 1px 0 rgba(255,255,255,.06) inset;
+    0 1px 2px rgba(0,0,0,.13),
+    0 0 0 1px rgba(18,24,30,.06),
+    0 1px 0 rgba(255,255,255,.04) inset;
   pointer-events:none;
 }
 
@@ -292,10 +299,13 @@ canvas{
 }
 
 .results-shell{
-  background:#161715;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.06),rgba(0,0,0,.10)),
+    linear-gradient(90deg,#70726d 0%,#585a55 30%,#393b37 69%,#242522 100%);
   min-height:280px;
-  padding:12px 0 38px;
+  padding:16px 0 40px;
   touch-action:pan-y;
+  box-shadow:0 -1px 0 rgba(255,255,255,.06) inset;
 }
 
 .results-container{
@@ -307,15 +317,20 @@ canvas{
 }
 
 .result-card{
-  background:linear-gradient(180deg,rgba(255,255,255,.026),rgba(255,255,255,.006)),#191a18;
-  border:1px solid rgba(255,255,255,.045);
-  box-shadow:0 14px 24px rgba(0,0,0,.12);
-  padding:13px 16px 14px;
+  background:var(--card-bg);
+  border:1px solid var(--card-line);
+  border-radius:14px;
+  box-shadow:
+    0 10px 24px var(--card-shadow),
+    0 1px 0 rgba(255,255,255,.55) inset;
+  padding:14px 16px 15px;
+  backdrop-filter:blur(8px) saturate(1.04);
+  -webkit-backdrop-filter:blur(8px) saturate(1.04);
 }
 
 .result-section-title{
   margin:0 0 10px;
-  color:var(--blue);
+  color:var(--blue-muted);
   font-size:11px;
   font-weight:850;
   letter-spacing:.045em;
@@ -327,19 +342,19 @@ canvas{
   grid-template-columns:1fr auto;
   align-items:baseline;
   gap:10px;
-  padding:2px 0;
-  color:rgba(242,240,234,.72);
+  padding:3px 0;
+  color:rgba(36,36,34,.78);
   font-size:13px;
-  border-bottom:1px solid rgba(255,255,255,.025);
+  border-bottom:1px solid rgba(0,0,0,.045);
 }
 
 .result-row strong{
-  color:rgba(242,240,234,.85);
+  color:rgba(28,28,27,.88);
   font-weight:800;
 }
 
 .result-value{
-  color:rgba(255,255,255,.93);
+  color:rgba(32,32,30,.94);
   font-family:"JetBrains Mono",Consolas,monospace;
   font-variant-numeric:tabular-nums slashed-zero;
   font-feature-settings:"zero" 1,"tnum" 1;
@@ -356,25 +371,25 @@ canvas{
 
 .note{
   width:min(820px,calc(100% - 24px));
-  margin:0 auto;
+  margin:8px auto 0;
   padding:6px 0 calc(28px + env(safe-area-inset-bottom));
-  border-top:1px solid rgba(255,255,255,.04);
-  color:rgba(242,240,234,.24);
+  border-top:1px solid rgba(255,255,255,.05);
+  color:rgba(240,240,236,.24);
   font-size:9px;
   text-align:center;
 }
 
 @media(max-width:700px){
   .viewport-container{height:63dvh;min-height:410px}
-  .title-main{font-size:12.7px}
+  .title-main{font-size:13.3px}
   .title-logo{right:19px;width:116px;max-height:22px}
   .version-badge{right:4px;font-size:5.6px}
   #sliderSpanShell{width:138px;left:94px}
-  .results-container{grid-template-columns:1fr;gap:8px;padding-top:12px}
+  .results-container{grid-template-columns:1fr;gap:10px;padding-top:12px}
 }
 
 @media(max-width:420px){
-  .title-main{font-size:11.7px}
+  .title-main{font-size:12.2px}
   .title-logo{right:16px;width:98px;max-height:20px}
   .version-badge{right:4px;font-size:5.0px}
   .hud-box{width:64px}
@@ -390,7 +405,7 @@ canvas{
 <div class="top-bar">
   <span class="title-main">Fabricable Fabric Formwork</span>
   <img class="title-logo" alt="Arch Maker" src="arch-maker-logo.png">
-  <span class="version-badge">V34</span>
+  <span class="version-badge">V35</span>
 </div>
 
 <div class="viewport-container" id="viewport">
@@ -449,15 +464,15 @@ canvas{
       <div class="result-row"><span>Mortar Volume:</span><span class="result-value" id="volume">—</span></div>
       <div class="result-row"><span><strong>Mapefill PRO (Dry Mass):</strong></span><span class="result-value value-highlight" id="dryMass">—</span></div>
       <div class="result-row"><span>Water (14% - 15%):</span><span class="result-value" id="waterRange">—</span></div>
-      <div class="result-row"><span>Total Arch Mass:</span><span class="result-value" id="totalMass">—</span></div>
+      <div class="result-row"><span><strong>Total Arch Mass:</strong></span><span class="result-value value-highlight" id="totalMass">—</span></div>
     </div>
   </div>
 
-  <div class="note">V34 — logo path fixed: arch-maker-logo.png in root repo folder. True oval vignette.</div>
+  <div class="note">V35 — vignette restored and strengthened, calmer matte tube shading, unified lower cards.</div>
 </div>
 
 <script>
-const VERSION="V34";
+const VERSION="V35";
 
 const state={
   height:1.5,
@@ -598,15 +613,15 @@ function seededRandom(seed){
 
 function drawStableSoilTexture(ctx,width,groundY,height){
   const rand=seededRandom(1447);
-  const count=Math.floor(width*(height-groundY)/620);
+  const count=Math.floor(width*(height-groundY)/540);
 
   ctx.save();
 
   for(let i=0;i<count;i++){
     const x=rand()*width;
     const y=groundY+rand()*Math.max(1,height-groundY);
-    const radius=.20+rand()*1.70;
-    const alpha=.028+rand()*.068;
+    const radius=.20+rand()*1.75;
+    const alpha=.028+rand()*.072;
     const isWarm=rand()>.56;
 
     ctx.fillStyle=isWarm
@@ -618,18 +633,18 @@ function drawStableSoilTexture(ctx,width,groundY,height){
     ctx.fill();
   }
 
-  const pebbles=Math.floor(width*(height-groundY)/9000);
+  const pebbles=Math.floor(width*(height-groundY)/7400);
 
   for(let i=0;i<pebbles;i++){
     const x=rand()*width;
     const y=groundY+rand()*Math.max(1,height-groundY);
-    const rx=.8+rand()*2.8;
-    const ry=.45+rand()*1.25;
-    const a=.050+rand()*.070;
+    const rx=.8+rand()*3.1;
+    const ry=.45+rand()*1.3;
+    const a=.055+rand()*.075;
 
     ctx.fillStyle=rand()>.52
       ?`rgba(52,40,25,${a})`
-      :`rgba(220,190,119,${a*.76})`;
+      :`rgba(220,190,119,${a*.80})`;
 
     ctx.beginPath();
     ctx.ellipse(x,y,rx,ry,rand()*Math.PI,0,Math.PI*2);
@@ -687,49 +702,22 @@ function drawTube(ctx,points,baseWidth){
   ctx.shadowBlur=Math.max(5,baseWidth*.12);
   ctx.shadowOffsetX=Math.max(1,baseWidth*.030);
   ctx.shadowOffsetY=Math.max(2,baseWidth*.070);
-  drawCatenaryStrokeOffset(ctx,points,baseWidth*1.01,"rgba(63,66,58,.84)",0);
+  drawCatenaryStrokeOffset(ctx,points,baseWidth*1.01,"rgba(63,66,58,.82)",0);
   ctx.restore();
 
-  stroke(baseWidth*.998,"rgba(84,88,78,.98)",0,Math.max(.24,baseWidth*.002));
-  stroke(baseWidth*.940,"rgba(101,106,94,.96)",.015*baseWidth,Math.max(.34,baseWidth*.004));
-  stroke(baseWidth*.865,"rgba(115,120,106,.90)",.06*baseWidth,Math.max(.44,baseWidth*.006));
-  stroke(baseWidth*.785,"rgba(128,133,118,.84)",.12*baseWidth,Math.max(.58,baseWidth*.008));
+  stroke(baseWidth*.995,"rgba(92,96,86,.98)",0,Math.max(.28,baseWidth*.003));
+  stroke(baseWidth*.935,"rgba(104,109,97,.96)",.03*baseWidth,Math.max(.40,baseWidth*.005));
+  stroke(baseWidth*.855,"rgba(116,121,108,.90)",.10*baseWidth,Math.max(.55,baseWidth*.007));
+  stroke(baseWidth*.765,"rgba(126,131,117,.76)",.18*baseWidth,Math.max(.70,baseWidth*.009));
 
-  stroke(baseWidth*.36,"rgba(106,111,99,.16)",-.09*baseWidth,Math.max(1.05,baseWidth*.016));
-  stroke(baseWidth*.22,"rgba(92,97,87,.12)",-.18*baseWidth,Math.max(1.10,baseWidth*.018));
+  stroke(baseWidth*.52,"rgba(72,76,68,.22)",-.04*baseWidth,Math.max(.80,baseWidth*.010));
+  stroke(baseWidth*.42,"rgba(60,64,57,.22)",-.12*baseWidth,Math.max(.90,baseWidth*.012));
+  stroke(baseWidth*.30,"rgba(48,52,47,.16)",-.20*baseWidth,Math.max(1.00,baseWidth*.014));
 
-  const layers=22;
-
-  for(let i=0;i<layers;i++){
-    const t=i/(layers-1);
-    const offset=(-.14+t*.46)*baseWidth;
-    const width=(.28-.08*Math.abs(t-.54)*2)*baseWidth;
-    const blur=Math.max(.70,baseWidth*(.012+.008*t));
-
-    let color;
-
-    if(t<.44){
-      const k=t/.44;
-      const a=.020+.020*k;
-      color=`rgba(${Math.round(58+40*k)},${Math.round(63+42*k)},${Math.round(57+38*k)},${a})`;
-    }else{
-      const k=(t-.44)/.56;
-      const r=Math.round(126+56*k);
-      const g=Math.round(130+52*k);
-      const b=Math.round(116+38*k);
-      const a=.016+.030*k;
-      color=`rgba(${r},${g},${b},${a})`;
-    }
-
-    stroke(width,color,offset,blur);
-  }
-
-  stroke(baseWidth*.22,"rgba(214,208,182,.060)",.29*baseWidth,Math.max(1.06,baseWidth*.018));
-  stroke(baseWidth*.08,"rgba(234,227,198,.022)",.38*baseWidth,Math.max(1.20,baseWidth*.020));
-  stroke(baseWidth*.14,"rgba(28,31,27,.060)",-.20*baseWidth,Math.max(.96,baseWidth*.014));
+  stroke(baseWidth*.16,"rgba(215,208,184,.030)",.26*baseWidth,Math.max(1.00,baseWidth*.017));
 
   const rand=seededRandom(18131+Math.round(baseWidth*100));
-  const count=Math.min(3200,Math.max(600,Math.floor(points.length*baseWidth/3.8)));
+  const count=Math.min(4500,Math.max(1000,Math.floor(points.length*baseWidth/2.6)));
 
   ctx.save();
 
@@ -746,18 +734,25 @@ function drawTube(ctx,points,baseWidth){
     const nx=dy/len;
     const ny=-dx/len;
 
-    const across=(rand()-.5)*baseWidth*.88;
-    const x=p.x+nx*across+(rand()-.5)*.9;
-    const y=p.y+ny*across+(rand()-.5)*.9;
-    const r=.18+rand()*Math.max(.24,baseWidth*.010);
+    const across=(rand()-.5)*baseWidth*.86;
+    const x=p.x+nx*across+(rand()-.5)*.95;
+    const y=p.y+ny*across+(rand()-.5)*.95;
+    const r=.16+rand()*Math.max(.22,baseWidth*.010);
 
-    const topBias=across>0?1.05:.94;
-    const a=(.014+rand()*.038)*topBias;
+    let a=.014+rand()*.042;
+    let fill;
 
-    ctx.fillStyle=rand()>.49
-      ?`rgba(236,230,201,${a})`
-      :`rgba(26,29,25,${a*.68})`;
+    if(across>0){
+      fill=rand()>.54
+        ?`rgba(230,224,198,${a*.92})`
+        :`rgba(91,96,84,${a*.66})`;
+    }else{
+      fill=rand()>.50
+        ?`rgba(38,42,37,${a*.80})`
+        :`rgba(205,199,173,${a*.35})`;
+    }
 
+    ctx.fillStyle=fill;
     ctx.beginPath();
     ctx.arc(x,y,r,0,Math.PI*2);
     ctx.fill();
@@ -768,15 +763,15 @@ function drawTube(ctx,points,baseWidth){
 
 function drawOvalVignette(ctx,w,h){
   ctx.save();
-  ctx.translate(w/2,h*.49);
-  ctx.scale(1,1.36);
+  ctx.translate(w/2,h*.50);
+  ctx.scale(1,1.42);
 
-  const vignette=ctx.createRadialGradient(0,0,h*.10,0,0,Math.max(w,h)*.58);
+  const vignette=ctx.createRadialGradient(0,0,h*.08,0,0,Math.max(w,h)*.62);
   vignette.addColorStop(0,"rgba(0,0,0,0)");
-  vignette.addColorStop(.40,"rgba(0,0,0,0)");
-  vignette.addColorStop(.62,"rgba(0,0,0,.10)");
-  vignette.addColorStop(.80,"rgba(0,0,0,.22)");
-  vignette.addColorStop(1,"rgba(0,0,0,.42)");
+  vignette.addColorStop(.42,"rgba(0,0,0,0)");
+  vignette.addColorStop(.67,"rgba(0,0,0,.08)");
+  vignette.addColorStop(.84,"rgba(0,0,0,.17)");
+  vignette.addColorStop(1,"rgba(0,0,0,.30)");
 
   ctx.fillStyle=vignette;
   ctx.fillRect(-w,-h,w*2,h*2);
