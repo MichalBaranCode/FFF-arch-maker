@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <meta name="theme-color" content="#171816">
-<title>Fabricable Fabric Formwork — Arch Maker V48G</title>
+<title>Fabricable Fabric Formwork — Arch Maker V50G</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700;800&family=Orbitron:wght@500;600;700;800&display=swap');
@@ -141,7 +141,6 @@ html,body{
   touch-action:none;
 }
 
-/* V48G: Integrated organic Gaudí whisper background */
 .viewport-container::before {
   content: "";
   position: absolute;
@@ -424,14 +423,13 @@ canvas{
   white-space:nowrap;
 }
 
-/* V48G: Status Colors fixed and refined */
 .status-ok { color: #72f3b7; text-shadow: 0 0 8px rgba(114,243,183,0.4); }
 .status-warn { color: #ffb84d; text-shadow: 0 0 8px rgba(255,184,77,0.5); }
-.status-danger { color: #ff4a52; text-shadow: 0 0 10px rgba(255,74,82,0.8); animation: pulseDanger 1.0s infinite alternate; }
+.status-danger { color: #ff4a52; text-shadow: 0 0 12px rgba(255,74,82,0.9); animation: pulseDanger 0.8s infinite alternate; font-weight: 900;}
 
 @keyframes pulseDanger {
-  from { opacity: 1; filter: brightness(1.2); }
-  to { opacity: 0.6; filter: brightness(1.0); }
+  from { opacity: 1; filter: brightness(1.3); }
+  to { opacity: 0.7; filter: brightness(1.0); }
 }
 
 @keyframes sciFiNumberGlow03{
@@ -495,7 +493,7 @@ canvas{
 <div class="top-bar">
   <span class="title-main">Fabricable Fabric Formwork</span>
   <img class="title-logo" alt="Arch Maker" src="arch-maker-logo.png">
-  <span class="version-badge">V48G</span>
+  <span class="version-badge">V50G</span>
 </div>
 
 <div class="viewport-container" id="viewport">
@@ -539,7 +537,7 @@ canvas{
 <div class="results-shell">
   <div class="results-container">
     <div class="result-card">
-      <h3 class="result-section-title">Structural Feasibility (FEA Heuristics)</h3>
+      <h3 class="result-section-title">Structural Feasibility (Visual FEA)</h3>
       <div class="result-row"><span>Overall Status:</span><span class="result-value" id="stressStatus">...</span></div>
       <div class="result-row"><span>Slenderness Ratio (L/Ø):</span><span class="result-value" id="slendernessRatio">—</span></div>
       <div class="result-row"><span>Thrust Ratio (Span/Height):</span><span class="result-value" id="flatnessRatio">—</span></div>
@@ -560,11 +558,11 @@ canvas{
     </div>
   </div>
 
-  <div class="note">V48G — Critical Canvas bug fixed: Hardcoded base gradients to prevent getComputedStyle crashes in mobile webviews. Bulletproofed floating-point grid loops and shadow Alpha channels.</div>
+  <div class="note">V50G — "Ironclad Edition". Zablokowano pętlę ResizeObserver z Chrome DevTools. Wprowadzono bezpieczne mapowanie kolorów z NaN-proofing. Łuk i tło zawsze widoczne.</div>
 </div>
 
 <script>
-const VERSION="V48G";
+const VERSION="V50G";
 
 const state={
   height:1.5,
@@ -576,6 +574,15 @@ const state={
   sliderSpanMin:1.0,
   sliderSpanMax:5.0
 };
+
+// PWA Service Worker Registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(err => {
+      console.log('SW registration failed (non-critical):', err);
+    });
+  });
+}
 
 function clamp(v,min,max){
   return Math.min(max,Math.max(min,v));
@@ -690,7 +697,6 @@ function findCatenaryParameterA(span,height){
 
     a=(aMin+aMax)/2;
   }
-
   return a;
 }
 
@@ -701,6 +707,12 @@ function seededRandom(seed){
     t^=t+Math.imul(t^(t>>>7),t|61);
     return ((t^(t>>>14))>>>0)/4294967296;
   };
+}
+
+// V50G: Bulletproof RGBA formatting to prevent canvas crash on NaN values
+function toRGBA(r, g, b, a) {
+  if (isNaN(r) || isNaN(g) || isNaN(b) || isNaN(a)) return "rgba(0,0,0,0)";
+  return `rgba(${Math.floor(r)}, ${Math.floor(g)}, ${Math.floor(b)}, ${Math.max(0, Math.min(1, a)).toFixed(3)})`;
 }
 
 function drawStableSoilTexture(ctx,width,groundY,height){
@@ -716,10 +728,7 @@ function drawStableSoilTexture(ctx,width,groundY,height){
     const alpha=.028+rand()*.078;
     const isWarm=rand()>.56;
 
-    ctx.fillStyle=isWarm
-      ?`rgba(235,211,151,${alpha.toFixed(3)})`
-      :`rgba(34,26,18,${(alpha*.88).toFixed(3)})`;
-
+    ctx.fillStyle=isWarm ? toRGBA(235,211,151,alpha) : toRGBA(34,26,18,alpha*.88);
     ctx.beginPath();
     ctx.arc(x,y,radius,0,Math.PI*2);
     ctx.fill();
@@ -734,10 +743,7 @@ function drawStableSoilTexture(ctx,width,groundY,height){
     const ry=.45+rand()*1.4;
     const a=.060+rand()*.090;
 
-    ctx.fillStyle=rand()>.52
-      ?`rgba(50,38,25,${a.toFixed(3)})`
-      :`rgba(205,180,118,${(a*.82).toFixed(3)})`;
-
+    ctx.fillStyle=rand()>.52 ? toRGBA(50,38,25,a) : toRGBA(205,180,118,a*.82);
     ctx.beginPath();
     ctx.ellipse(x,y,rx,ry,rand()*Math.PI,0,Math.PI*2);
     ctx.fill();
@@ -776,6 +782,7 @@ function drawCatenaryStrokeOffset(ctx,points,lineWidth,color,normalOffset){
 }
 
 function blendColor(c1, c2, t) {
+  if (isNaN(t)) return c1;
   const r = Math.round(c1[0] * (1 - t) + c2[0] * t);
   const g = Math.round(c1[1] * (1 - t) + c2[1] * t);
   const b = Math.round(c1[2] * (1 - t) + c2[2] * t);
@@ -793,7 +800,8 @@ function drawTube(ctx,points,baseWidth, stressLevel){
   const dangerMid = [255, 40, 10];
   const dangerInner = [255, 0, 0];
 
-  const easeT = Math.pow(stressLevel || 0, 2); 
+  const safeStress = isNaN(stressLevel) ? 0 : stressLevel;
+  const easeT = Math.pow(safeStress, 2); 
 
   const cOuter = blendColor(baseOuter, dangerOuter, easeT);
   const cMid = blendColor(baseMid, dangerMid, easeT);
@@ -803,13 +811,9 @@ function drawTube(ctx,points,baseWidth, stressLevel){
     ctx.save();
     ctx.lineCap="butt";
     ctx.lineJoin="round";
-    if(blur>0)ctx.filter=`blur(${blur.toFixed(1)}px)`;
+    if(blur>0 && !isNaN(blur)) ctx.filter=`blur(${Math.floor(blur)}px)`;
     
-    const r = Math.floor(colorRGB[0]);
-    const g = Math.floor(colorRGB[1]);
-    const b = Math.floor(colorRGB[2]);
-    
-    drawCatenaryStrokeOffset(ctx,points,width,`rgba(${r},${g},${b},${alpha.toFixed(3)})`,normalOffset);
+    drawCatenaryStrokeOffset(ctx,points,width,toRGBA(colorRGB[0], colorRGB[1], colorRGB[2], alpha),normalOffset);
     ctx.restore();
   }
 
@@ -817,18 +821,18 @@ function drawTube(ctx,points,baseWidth, stressLevel){
   ctx.lineCap="butt";
   ctx.lineJoin="round";
   
-  if (stressLevel > 0.1) {
-    const glowAlpha = Math.min(1.0, Math.max(0, stressLevel * 1.4)); 
-    ctx.shadowColor = `rgba(255, 40, 0, ${glowAlpha.toFixed(3)})`;
-    ctx.shadowBlur = Math.max(10, baseWidth * stressLevel);
+  if (safeStress > 0.15) {
+    const glowAlpha = Math.min(1.0, safeStress * 1.5); 
+    ctx.shadowColor = toRGBA(255, 40, 0, glowAlpha);
+    ctx.shadowBlur = Math.max(10, baseWidth * safeStress * 1.5);
   } else {
-    ctx.shadowColor="rgba(0,0,0,.15)";
+    ctx.shadowColor = toRGBA(0,0,0,0.15);
     ctx.shadowBlur=Math.max(5,baseWidth*.10);
   }
   
   ctx.shadowOffsetX=Math.max(1,baseWidth*.018);
   ctx.shadowOffsetY=Math.max(2,baseWidth*.048);
-  drawCatenaryStrokeOffset(ctx,points,baseWidth*1.01,"rgba(75,79,71,.70)",0);
+  drawCatenaryStrokeOffset(ctx,points,baseWidth*1.01,toRGBA(75,79,71,.70),0);
   ctx.restore();
 
   stroke(baseWidth*.998, cOuter, .98, 0, Math.max(.34,baseWidth*.004));
@@ -869,20 +873,17 @@ function drawTube(ctx,points,baseWidth, stressLevel){
     let fill;
     if(across>0){
       const highTex = blendColor([224,219,200], [255,160,80], easeT);
-      const rH = Math.floor(highTex[0]);
-      const gH = Math.floor(highTex[1]);
-      const bH = Math.floor(highTex[2]);
       fill=rand()>.60
-        ?`rgba(${rH},${gH},${bH},${(alpha*.58).toFixed(3)})`
-        :`rgba(114,119,109,${(alpha*.54).toFixed(3)})`;
+        ? toRGBA(highTex[0], highTex[1], highTex[2], alpha*.58)
+        : toRGBA(114, 119, 109, alpha*.54);
     }else{
-      const heatR = Math.floor(200*(rand()*0.3));
-      const heatG = Math.floor(60*(rand()*0.2));
+      const heatR = 200*(rand()*0.3);
+      const heatG = 60*(rand()*0.2);
       fill=rand()>.44
-        ?`rgba(61,66,61,${(alpha*.64).toFixed(3)})`
-        :rand()>.3 
-          ?`rgba(${heatR},${heatG},0,${(alpha*0.15).toFixed(3)})`
-          :`rgba(174,170,154,${(alpha*.23).toFixed(3)})`;
+        ? toRGBA(61, 66, 61, alpha*.64)
+        : rand()>.3 
+          ? toRGBA(heatR, heatG, 0, alpha*0.15)
+          : toRGBA(174, 170, 154, alpha*.23);
     }
 
     ctx.fillStyle=fill;
@@ -894,86 +895,93 @@ function drawTube(ctx,points,baseWidth, stressLevel){
 }
 
 function calculate(){
-  state.height=Math.max(.01,parseNumber("height"));
-  state.span=Math.max(.01,parseNumber("span"));
-  state.diameter=Math.max(.1,parseNumber("diameter"));
-  state.depth=Math.max(0,parseNumber("depth"));
+  try {
+    state.height=Math.max(.01,parseNumber("height"));
+    state.span=Math.max(.01,parseNumber("span"));
+    state.diameter=Math.max(.1,parseNumber("diameter"));
+    state.depth=Math.max(0,parseNumber("depth"));
 
-  if(state.depth>=state.height){
-    state.depth=state.height-.001;
+    if(state.depth>=state.height){
+      state.depth=state.height-.001;
+    }
+
+    setSliderPercent("sliderHeightShell",state.height,state.sliderHeightMin,state.sliderHeightMax);
+    setSliderPercent("sliderSpanShell",state.span,state.sliderSpanMin,state.sliderSpanMax);
+
+    const a=findCatenaryParameterA(state.span,state.height);
+    const totalLength=2*a*Math.sinh((state.span/2)/a);
+
+    const visibleHeight=Math.max(0.01, state.height-state.depth); 
+    const spanAbove=2*a*Math.acosh(visibleHeight/a+1);
+    const lengthAbove=2*a*Math.sinh((spanAbove/2)/a);
+
+    const lengthUnderTotal=totalLength-lengthAbove;
+    const lengthUnderPerLeg=lengthUnderTotal/2;
+
+    const diaM = state.diameter / 100;
+    const radiusMeters=diaM / 2;
+    const volumeLiters=(Math.PI*Math.pow(radiusMeters,2)*totalLength)*1000;
+
+    const dryMass=volumeLiters*1.95;
+    const waterMin=dryMass*.14;
+    const waterMax=dryMass*.15;
+    const totalArchMass=dryMass+waterMax;
+
+    const slendernessVal = totalLength / diaM;
+    const flatnessVal = spanAbove / visibleHeight;
+    const anchorageRatio = state.depth / visibleHeight;
+
+    let stress = 0;
+    if (slendernessVal > 35) stress += (slendernessVal - 35) / 35;
+    if (flatnessVal > 1.8) stress += (flatnessVal - 1.8) / 1.5; 
+    if (anchorageRatio < 0.25) stress += (0.25 - anchorageRatio) * 4; 
+
+    const stressLevel = Math.min(1.0, Math.max(0.0, stress));
+
+    document.getElementById("slendernessRatio").innerText = isNaN(slendernessVal) ? "ERR" : slendernessVal.toFixed(1);
+    document.getElementById("flatnessRatio").innerText = isNaN(flatnessVal) ? "ERR" : flatnessVal.toFixed(1);
+    document.getElementById("anchorageRatio").innerText = isNaN(anchorageRatio) ? "ERR" : anchorageRatio.toFixed(2);
+
+    const statusEl = document.getElementById("stressStatus");
+    statusEl.classList.remove("status-ok", "status-warn", "status-danger");
+    
+    if (stressLevel < 0.25) {
+      statusEl.innerText = "OPTIMAL";
+      statusEl.classList.add("status-ok");
+    } else if (stressLevel < 0.65) {
+      statusEl.innerText = "WARNING (High Stress)";
+      statusEl.classList.add("status-warn");
+    } else {
+      statusEl.innerText = "CRITICAL RISK";
+      statusEl.classList.add("status-danger");
+    }
+
+    document.getElementById("spanAbove").innerText=isNaN(spanAbove) ? "—" : spanAbove.toFixed(2)+" m";
+    document.getElementById("heightAbove").innerText=isNaN(visibleHeight) ? "—" : visibleHeight.toFixed(2)+" m";
+    document.getElementById("lengthAbove").innerText=isNaN(lengthAbove) ? "—" : lengthAbove.toFixed(2)+" m";
+    document.getElementById("lengthUnder").innerText=isNaN(lengthUnderPerLeg) ? "—" : lengthUnderPerLeg.toFixed(2)+" m";
+    document.getElementById("lengthTotal").innerText=isNaN(totalLength) ? "—" : totalLength.toFixed(2)+" m";
+
+    document.getElementById("volume").innerText=isNaN(volumeLiters) ? "—" : volumeLiters.toFixed(1)+" l";
+    document.getElementById("dryMass").innerText=isNaN(dryMass) ? "—" : dryMass.toFixed(1)+" kg";
+    document.getElementById("waterRange").innerText=isNaN(waterMin) ? "—" : waterMin.toFixed(1)+" - "+waterMax.toFixed(1)+" l";
+    document.getElementById("totalMass").innerText=isNaN(totalArchMass) ? "—" : totalArchMass.toFixed(1)+" kg";
+
+    drawArch(state.span,state.height,state.depth,state.diameter,a, stressLevel);
+  } catch (err) {
+    console.error("V50G Render Error:", err);
+    const canvas=document.getElementById("archCanvas");
+    if(canvas) {
+      const ctx=canvas.getContext("2d");
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#ff4a52";
+      ctx.font = "14px monospace";
+      ctx.fillText("DEVTOOLS RENDER CRASH DETECTED", 20, 40);
+      ctx.font = "10px monospace";
+      ctx.fillText(err.message, 20, 60);
+    }
   }
-
-  setSliderPercent("sliderHeightShell",state.height,state.sliderHeightMin,state.sliderHeightMax);
-  setSliderPercent("sliderSpanShell",state.span,state.sliderSpanMin,state.sliderSpanMax);
-
-  const a=findCatenaryParameterA(state.span,state.height);
-  const totalLength=2*a*Math.sinh((state.span/2)/a);
-
-  const visibleHeight=Math.max(0.1, state.height-state.depth); 
-  const spanAbove=2*a*Math.acosh(visibleHeight/a+1);
-  const lengthAbove=2*a*Math.sinh((spanAbove/2)/a);
-
-  const lengthUnderTotal=totalLength-lengthAbove;
-  const lengthUnderPerLeg=lengthUnderTotal/2;
-
-  const diaM = state.diameter / 100;
-  const radiusMeters=diaM / 2;
-  const volumeLiters=(Math.PI*Math.pow(radiusMeters,2)*totalLength)*1000;
-
-  const dryMass=volumeLiters*1.95;
-  const waterMin=dryMass*.14;
-  const waterMax=dryMass*.15;
-  const totalArchMass=dryMass+waterMax;
-
-  // V48G: Robust FEA Heuristics
-  const slendernessVal = totalLength / diaM;
-  const flatnessVal = spanAbove / visibleHeight;
-  const anchorageRatio = state.depth / visibleHeight;
-
-  let stress = 0;
-  
-  if (slendernessVal > 40) {
-    stress += (slendernessVal - 40) / 40; 
-  }
-  if (flatnessVal > 2.0) {
-    stress += (flatnessVal - 2.0) / 2.0; 
-  }
-  if (anchorageRatio < 0.2) {
-    stress += (0.2 - anchorageRatio) * 3; 
-  }
-
-  const stressLevel = Math.min(1.0, Math.max(0.0, stress));
-
-  document.getElementById("slendernessRatio").innerText = slendernessVal.toFixed(1);
-  document.getElementById("flatnessRatio").innerText = flatnessVal.toFixed(1);
-  document.getElementById("anchorageRatio").innerText = anchorageRatio.toFixed(2);
-
-  const statusEl = document.getElementById("stressStatus");
-  statusEl.classList.remove("status-ok", "status-warn", "status-danger");
-  
-  if (stressLevel < 0.3) {
-    statusEl.innerText = "OPTIMAL";
-    statusEl.classList.add("status-ok");
-  } else if (stressLevel < 0.7) {
-    statusEl.innerText = "WARNING (High Stress)";
-    statusEl.classList.add("status-warn");
-  } else {
-    statusEl.innerText = "CRITICAL (Buckling/Thrust Risk)";
-    statusEl.classList.add("status-danger");
-  }
-
-  document.getElementById("spanAbove").innerText=spanAbove.toFixed(2)+" m";
-  document.getElementById("heightAbove").innerText=visibleHeight.toFixed(2)+" m";
-  document.getElementById("lengthAbove").innerText=lengthAbove.toFixed(2)+" m";
-  document.getElementById("lengthUnder").innerText=lengthUnderPerLeg.toFixed(2)+" m";
-  document.getElementById("lengthTotal").innerText=totalLength.toFixed(2)+" m";
-
-  document.getElementById("volume").innerText=volumeLiters.toFixed(1)+" l";
-  document.getElementById("dryMass").innerText=dryMass.toFixed(1)+" kg";
-  document.getElementById("waterRange").innerText=waterMin.toFixed(1)+" - "+waterMax.toFixed(1)+" l";
-  document.getElementById("totalMass").innerText=totalArchMass.toFixed(1)+" kg";
-
-  drawArch(state.span,state.height,state.depth,state.diameter,a, stressLevel);
 }
 
 function drawArch(span,height,depth,diameter,a, stressLevel){
@@ -1004,7 +1012,6 @@ function drawArch(span,height,depth,diameter,a, stressLevel){
   const offsetY=cssHeight-marginBottom-(drawHeight-height*scale)*.44;
   const groundY=offsetY-depth*scale;
 
-  // V48G FIX: Hardcoded hex colors to prevent getComputedStyle parsing crashes on mobile Canvas
   const skyGradient=ctx.createLinearGradient(0,0,0,Math.max(1,groundY));
   skyGradient.addColorStop(0, "#9ec7df");
   skyGradient.addColorStop(1, "#98c2a7");
@@ -1027,11 +1034,7 @@ function drawArch(span,height,depth,diameter,a, stressLevel){
     const t=i/numSteps;
     const x=-span/2+t*span;
     const y=height-a*(Math.cosh(x/a)-1);
-
-    points.push({
-      x:offsetX+x*scale,
-      y:offsetY-y*scale
-    });
+    points.push({ x:offsetX+x*scale, y:offsetY-y*scale });
   }
 
   ctx.save();
@@ -1041,7 +1044,6 @@ function drawArch(span,height,depth,diameter,a, stressLevel){
   const xStart=Math.floor(-span/2-2);
   const xEnd=Math.ceil(span/2+2);
 
-  // V48G FIX: Math.round inside the grid loop prevents disappearing floating-point lines
   for(let x=xStart;x<=xEnd;x+=.5){
     const cleanX = Math.round(x*10)/10;
     const canvasX=offsetX+cleanX*scale;
@@ -1049,7 +1051,7 @@ function drawArch(span,height,depth,diameter,a, stressLevel){
     const distance=Math.abs(canvasX-offsetX)/Math.max(1,cssWidth/2);
     const alpha=(isMajor?.090:.038)*(1-distance*.35);
 
-    ctx.strokeStyle=`rgba(255,255,255,${Math.max(.022,alpha).toFixed(3)})`;
+    ctx.strokeStyle=toRGBA(255,255,255,Math.max(.022,alpha));
     ctx.lineWidth=isMajor?.8:.45;
     ctx.beginPath();
     ctx.moveTo(canvasX,0);
@@ -1057,7 +1059,7 @@ function drawArch(span,height,depth,diameter,a, stressLevel){
     ctx.stroke();
 
     if(isMajor&&cleanX!==0){
-      ctx.fillStyle="rgba(255,255,255,.28)";
+      ctx.fillStyle=toRGBA(255,255,255,.28);
       ctx.textAlign="center";
       ctx.textBaseline="middle";
       ctx.fillText(`${cleanX}m`,canvasX,groundY+11);
@@ -1073,7 +1075,7 @@ function drawArch(span,height,depth,diameter,a, stressLevel){
     const isMajor=Number.isInteger(cleanY);
     const alpha=isMajor?.090:.038;
 
-    ctx.strokeStyle=`rgba(255,255,255,${alpha.toFixed(3)})`;
+    ctx.strokeStyle=toRGBA(255,255,255,alpha);
     ctx.lineWidth=isMajor?.8:.45;
     ctx.beginPath();
     ctx.moveTo(0,canvasY);
@@ -1081,7 +1083,7 @@ function drawArch(span,height,depth,diameter,a, stressLevel){
     ctx.stroke();
 
     if(isMajor&&cleanY!==0){
-      ctx.fillStyle="rgba(255,255,255,.28)";
+      ctx.fillStyle=toRGBA(255,255,255,.28);
       ctx.textAlign="left";
       ctx.textBaseline="middle";
       ctx.fillText(`${cleanY}m`,offsetX+9,canvasY);
@@ -1090,7 +1092,7 @@ function drawArch(span,height,depth,diameter,a, stressLevel){
 
   ctx.restore();
 
-  ctx.strokeStyle="rgba(46,32,20,.92)";
+  ctx.strokeStyle=toRGBA(46,32,20,.92);
   ctx.lineWidth=1.15;
   ctx.beginPath();
   ctx.moveTo(0,groundY);
@@ -1101,7 +1103,7 @@ function drawArch(span,height,depth,diameter,a, stressLevel){
   drawTube(ctx,points,baseWidth, stressLevel);
 
   ctx.save();
-  ctx.strokeStyle="rgba(255,82,28,.98)";
+  ctx.strokeStyle=toRGBA(255,82,28,.98);
   ctx.lineWidth=1.45;
   ctx.beginPath();
   ctx.moveTo(offsetX-4.2,groundY);
@@ -1114,6 +1116,7 @@ function drawArch(span,height,depth,diameter,a, stressLevel){
   ctx.restore();
 }
 
+let resizeTimer;
 function resizeCanvas(){
   const canvas=document.getElementById("archCanvas");
   const viewport=document.getElementById("viewport");
@@ -1139,21 +1142,22 @@ function init(){
   setSliderPercent("sliderSpanShell",state.span,state.sliderSpanMin,state.sliderSpanMax);
 
   resizeCanvas();
-  requestAnimationFrame(resizeCanvas);
+  // Safe initial renders without triggering layout loops
   setTimeout(resizeCanvas,50);
   setTimeout(resizeCanvas,250);
-  setTimeout(resizeCanvas,700);
 }
 
 window.addEventListener("DOMContentLoaded",init);
 window.addEventListener("load",init);
-window.addEventListener("resize",resizeCanvas);
+
+// V50G: Replaced destructive ResizeObserver with a debounce system
+window.addEventListener("resize", () => {
+  cancelAnimationFrame(resizeTimer);
+  resizeTimer = requestAnimationFrame(resizeCanvas);
+});
 window.addEventListener("orientationchange",()=>setTimeout(resizeCanvas,180));
 
-if("ResizeObserver" in window){
-  const ro=new ResizeObserver(()=>resizeCanvas());
-  ro.observe(document.getElementById("viewport"));
-}
+// RESIZEOBSERVER REMOVED ENTIRELY TO PREVENT DEVTOOLS LOOP CRASHES
 
 init();
 </script>
