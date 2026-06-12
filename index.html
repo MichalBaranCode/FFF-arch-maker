@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <meta name="theme-color" content="#171816">
-<title>Fabricable Fabric Formwork — Arch Maker V47G</title>
+<title>Fabricable Fabric Formwork — Arch Maker V48G</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700;800&family=Orbitron:wght@500;600;700;800&display=swap');
@@ -139,6 +139,19 @@ html,body{
   border-bottom:0;
   isolation:isolate;
   touch-action:none;
+}
+
+/* V48G: Integrated organic Gaudí whisper background */
+.viewport-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url('whisper_pattern_v44.png');
+  background-repeat: repeat;
+  background-size: 256px;
+  opacity: 0.15;
+  mix-blend-mode: multiply;
 }
 
 canvas{
@@ -411,7 +424,7 @@ canvas{
   white-space:nowrap;
 }
 
-/* V47G: Status Colors fixed and refined */
+/* V48G: Status Colors fixed and refined */
 .status-ok { color: #72f3b7; text-shadow: 0 0 8px rgba(114,243,183,0.4); }
 .status-warn { color: #ffb84d; text-shadow: 0 0 8px rgba(255,184,77,0.5); }
 .status-danger { color: #ff4a52; text-shadow: 0 0 10px rgba(255,74,82,0.8); animation: pulseDanger 1.0s infinite alternate; }
@@ -482,7 +495,7 @@ canvas{
 <div class="top-bar">
   <span class="title-main">Fabricable Fabric Formwork</span>
   <img class="title-logo" alt="Arch Maker" src="arch-maker-logo.png">
-  <span class="version-badge">V47G</span>
+  <span class="version-badge">V48G</span>
 </div>
 
 <div class="viewport-container" id="viewport">
@@ -547,11 +560,11 @@ canvas{
     </div>
   </div>
 
-  <div class="note">V47G — Fixed invisible arch rendering bug (strict RGB integer formatting). Tightened physical heuristics for Buckling (Slenderness) and Dilation (Thrust). Labels professionalized.</div>
+  <div class="note">V48G — Critical Canvas bug fixed: Hardcoded base gradients to prevent getComputedStyle crashes in mobile webviews. Bulletproofed floating-point grid loops and shadow Alpha channels.</div>
 </div>
 
 <script>
-const VERSION="V47G";
+const VERSION="V48G";
 
 const state={
   height:1.5,
@@ -704,8 +717,8 @@ function drawStableSoilTexture(ctx,width,groundY,height){
     const isWarm=rand()>.56;
 
     ctx.fillStyle=isWarm
-      ?`rgba(235,211,151,${alpha})`
-      :`rgba(34,26,18,${alpha*.88})`;
+      ?`rgba(235,211,151,${alpha.toFixed(3)})`
+      :`rgba(34,26,18,${(alpha*.88).toFixed(3)})`;
 
     ctx.beginPath();
     ctx.arc(x,y,radius,0,Math.PI*2);
@@ -722,8 +735,8 @@ function drawStableSoilTexture(ctx,width,groundY,height){
     const a=.060+rand()*.090;
 
     ctx.fillStyle=rand()>.52
-      ?`rgba(50,38,25,${a})`
-      :`rgba(205,180,118,${a*.82})`;
+      ?`rgba(50,38,25,${a.toFixed(3)})`
+      :`rgba(205,180,118,${(a*.82).toFixed(3)})`;
 
     ctx.beginPath();
     ctx.ellipse(x,y,rx,ry,rand()*Math.PI,0,Math.PI*2);
@@ -790,14 +803,13 @@ function drawTube(ctx,points,baseWidth, stressLevel){
     ctx.save();
     ctx.lineCap="butt";
     ctx.lineJoin="round";
-    if(blur>0)ctx.filter=`blur(${blur}px)`;
+    if(blur>0)ctx.filter=`blur(${blur.toFixed(1)}px)`;
     
-    // V47G FIX: Enforce integers to prevent canvas crash on strict platforms
     const r = Math.floor(colorRGB[0]);
     const g = Math.floor(colorRGB[1]);
     const b = Math.floor(colorRGB[2]);
     
-    drawCatenaryStrokeOffset(ctx,points,width,`rgba(${r},${g},${b},${alpha})`,normalOffset);
+    drawCatenaryStrokeOffset(ctx,points,width,`rgba(${r},${g},${b},${alpha.toFixed(3)})`,normalOffset);
     ctx.restore();
   }
 
@@ -806,8 +818,8 @@ function drawTube(ctx,points,baseWidth, stressLevel){
   ctx.lineJoin="round";
   
   if (stressLevel > 0.1) {
-    const glowAlpha = Math.min(1.0, stressLevel * 1.4); 
-    ctx.shadowColor = `rgba(255, 40, 0, ${glowAlpha})`;
+    const glowAlpha = Math.min(1.0, Math.max(0, stressLevel * 1.4)); 
+    ctx.shadowColor = `rgba(255, 40, 0, ${glowAlpha.toFixed(3)})`;
     ctx.shadowBlur = Math.max(10, baseWidth * stressLevel);
   } else {
     ctx.shadowColor="rgba(0,0,0,.15)";
@@ -857,21 +869,20 @@ function drawTube(ctx,points,baseWidth, stressLevel){
     let fill;
     if(across>0){
       const highTex = blendColor([224,219,200], [255,160,80], easeT);
-      // V47G FIX: Enforce integers in dots as well
       const rH = Math.floor(highTex[0]);
       const gH = Math.floor(highTex[1]);
       const bH = Math.floor(highTex[2]);
       fill=rand()>.60
-        ?`rgba(${rH},${gH},${bH},${alpha*.58})`
-        :`rgba(114,119,109,${alpha*.54})`;
+        ?`rgba(${rH},${gH},${bH},${(alpha*.58).toFixed(3)})`
+        :`rgba(114,119,109,${(alpha*.54).toFixed(3)})`;
     }else{
       const heatR = Math.floor(200*(rand()*0.3));
       const heatG = Math.floor(60*(rand()*0.2));
       fill=rand()>.44
-        ?`rgba(61,66,61,${alpha*.64})`
+        ?`rgba(61,66,61,${(alpha*.64).toFixed(3)})`
         :rand()>.3 
-          ?`rgba(${heatR},${heatG},0,${alpha*0.15})`
-          :`rgba(174,170,154,${alpha*.23})`;
+          ?`rgba(${heatR},${heatG},0,${(alpha*0.15).toFixed(3)})`
+          :`rgba(174,170,154,${(alpha*.23).toFixed(3)})`;
     }
 
     ctx.fillStyle=fill;
@@ -914,24 +925,19 @@ function calculate(){
   const waterMax=dryMass*.15;
   const totalArchMass=dryMass+waterMax;
 
-  // V47G: Revised, Strict FEA Heuristics
+  // V48G: Robust FEA Heuristics
   const slendernessVal = totalLength / diaM;
   const flatnessVal = spanAbove / visibleHeight;
   const anchorageRatio = state.depth / visibleHeight;
 
   let stress = 0;
   
-  // Slenderness penalty: Starts warning at 40, critical if pushed much further.
   if (slendernessVal > 40) {
     stress += (slendernessVal - 40) / 40; 
   }
-  
-  // Thrust penalty: Starts penalizing when span > 2x height
   if (flatnessVal > 2.0) {
     stress += (flatnessVal - 2.0) / 2.0; 
   }
-  
-  // Embedment penalty: Massive penalty if depth is less than 20% of visual height
   if (anchorageRatio < 0.2) {
     stress += (0.2 - anchorageRatio) * 3; 
   }
@@ -968,6 +974,144 @@ function calculate(){
   document.getElementById("totalMass").innerText=totalArchMass.toFixed(1)+" kg";
 
   drawArch(state.span,state.height,state.depth,state.diameter,a, stressLevel);
+}
+
+function drawArch(span,height,depth,diameter,a, stressLevel){
+  const canvas=document.getElementById("archCanvas");
+  const ctx=canvas.getContext("2d");
+  const dpr=window.devicePixelRatio||1;
+  const cssWidth=canvas.width/dpr;
+  const cssHeight=canvas.height/dpr;
+
+  if(!cssWidth||!cssHeight)return;
+
+  ctx.save();
+  ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,cssWidth,cssHeight);
+
+  const marginX=Math.min(100,Math.max(58,cssWidth*.08));
+  const marginTop=Math.min(82,Math.max(52,cssHeight*.10));
+  const marginBottom=Math.min(82,Math.max(58,cssHeight*.13));
+
+  const drawWidth=Math.max(1,cssWidth-marginX*2);
+  const drawHeight=Math.max(1,cssHeight-marginTop-marginBottom);
+
+  const scaleX=drawWidth/span;
+  const scaleY=drawHeight/height;
+  const scale=Math.max(.1,Math.min(scaleX,scaleY));
+
+  const offsetX=cssWidth/2;
+  const offsetY=cssHeight-marginBottom-(drawHeight-height*scale)*.44;
+  const groundY=offsetY-depth*scale;
+
+  // V48G FIX: Hardcoded hex colors to prevent getComputedStyle parsing crashes on mobile Canvas
+  const skyGradient=ctx.createLinearGradient(0,0,0,Math.max(1,groundY));
+  skyGradient.addColorStop(0, "#9ec7df");
+  skyGradient.addColorStop(1, "#98c2a7");
+  ctx.fillStyle=skyGradient;
+  ctx.fillRect(0,0,cssWidth,groundY);
+
+  const soilGradient=ctx.createLinearGradient(0,groundY,0,cssHeight);
+  soilGradient.addColorStop(0, "#ac955f");
+  soilGradient.addColorStop(.52, "#6b5130");
+  soilGradient.addColorStop(1, "#432718");
+  ctx.fillStyle=soilGradient;
+  ctx.fillRect(0,groundY,cssWidth,cssHeight-groundY);
+
+  drawStableSoilTexture(ctx,cssWidth,groundY,cssHeight);
+
+  const numSteps=340;
+  const points=[];
+
+  for(let i=0;i<=numSteps;i++){
+    const t=i/numSteps;
+    const x=-span/2+t*span;
+    const y=height-a*(Math.cosh(x/a)-1);
+
+    points.push({
+      x:offsetX+x*scale,
+      y:offsetY-y*scale
+    });
+  }
+
+  ctx.save();
+  ctx.font='9px "JetBrains Mono", Consolas, monospace';
+  ctx.lineCap="butt";
+
+  const xStart=Math.floor(-span/2-2);
+  const xEnd=Math.ceil(span/2+2);
+
+  // V48G FIX: Math.round inside the grid loop prevents disappearing floating-point lines
+  for(let x=xStart;x<=xEnd;x+=.5){
+    const cleanX = Math.round(x*10)/10;
+    const canvasX=offsetX+cleanX*scale;
+    const isMajor=Number.isInteger(cleanX);
+    const distance=Math.abs(canvasX-offsetX)/Math.max(1,cssWidth/2);
+    const alpha=(isMajor?.090:.038)*(1-distance*.35);
+
+    ctx.strokeStyle=`rgba(255,255,255,${Math.max(.022,alpha).toFixed(3)})`;
+    ctx.lineWidth=isMajor?.8:.45;
+    ctx.beginPath();
+    ctx.moveTo(canvasX,0);
+    ctx.lineTo(canvasX,cssHeight);
+    ctx.stroke();
+
+    if(isMajor&&cleanX!==0){
+      ctx.fillStyle="rgba(255,255,255,.28)";
+      ctx.textAlign="center";
+      ctx.textBaseline="middle";
+      ctx.fillText(`${cleanX}m`,canvasX,groundY+11);
+    }
+  }
+
+  const yStart=Math.floor(-depth-2);
+  const yEnd=Math.ceil(height+2);
+
+  for(let y=yStart;y<=yEnd;y+=.5){
+    const cleanY = Math.round(y*10)/10;
+    const canvasY=offsetY-cleanY*scale;
+    const isMajor=Number.isInteger(cleanY);
+    const alpha=isMajor?.090:.038;
+
+    ctx.strokeStyle=`rgba(255,255,255,${alpha.toFixed(3)})`;
+    ctx.lineWidth=isMajor?.8:.45;
+    ctx.beginPath();
+    ctx.moveTo(0,canvasY);
+    ctx.lineTo(cssWidth,canvasY);
+    ctx.stroke();
+
+    if(isMajor&&cleanY!==0){
+      ctx.fillStyle="rgba(255,255,255,.28)";
+      ctx.textAlign="left";
+      ctx.textBaseline="middle";
+      ctx.fillText(`${cleanY}m`,offsetX+9,canvasY);
+    }
+  }
+
+  ctx.restore();
+
+  ctx.strokeStyle="rgba(46,32,20,.92)";
+  ctx.lineWidth=1.15;
+  ctx.beginPath();
+  ctx.moveTo(0,groundY);
+  ctx.lineTo(cssWidth,groundY);
+  ctx.stroke();
+
+  const baseWidth=Math.max(2,(diameter/100)*scale);
+  drawTube(ctx,points,baseWidth, stressLevel);
+
+  ctx.save();
+  ctx.strokeStyle="rgba(255,82,28,.98)";
+  ctx.lineWidth=1.45;
+  ctx.beginPath();
+  ctx.moveTo(offsetX-4.2,groundY);
+  ctx.lineTo(offsetX+4.2,groundY);
+  ctx.moveTo(offsetX,groundY-4.2);
+  ctx.lineTo(offsetX,groundY+4.2);
+  ctx.stroke();
+  ctx.restore();
+
+  ctx.restore();
 }
 
 function resizeCanvas(){
