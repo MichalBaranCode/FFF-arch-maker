@@ -4,10 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <meta name="theme-color" content="#171816">
-<title>Fabricable Fabric Formwork — Arch Maker V44G</title>
-
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="arch-maker-logo.png">
+<title>Fabricable Fabric Formwork — Arch Maker V46G</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700;800&family=Orbitron:wght@500;600;700;800&display=swap');
@@ -144,32 +141,19 @@ html,body{
   touch-action:none;
 }
 
-/* V44G: Integrated organic Gaudí whisper background */
-.viewport-container::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0; /* Placed below the soil/sky drawing canvas */
-  background-image: url('whisper_pattern_v44.png'); /* Pattern created by user */
-  background-repeat: repeat;
-  background-size: 256px; /* Scaled down for subtle integration */
-  opacity: 0.15; /* Extremely faint */
-  mix-blend-mode: multiply; /* Blend organic lines with the sky base */
-}
-
 canvas{
   display:block;
   width:100%;
   height:100%;
   position:relative;
-  z-index:1; /* Above the pattern */
+  z-index:1;
 }
 
 .viewport-container::after{
   content:"";
   position:absolute;
   inset:0;
-  z-index:9; /* Above drawing */
+  z-index:9;
   pointer-events:none;
   background:
     radial-gradient(
@@ -386,7 +370,7 @@ canvas{
   box-shadow:
     0 10px 24px var(--card-shadow),
     0 1px 0 rgba(255,255,255,.035) inset;
-  padding:14px 16px 15px;
+  padding:14px 166 15px;
   backdrop-filter:blur(22px) saturate(1.18);
   -webkit-backdrop-filter:blur(22px) saturate(1.18);
 }
@@ -425,6 +409,16 @@ canvas{
   font-weight:800;
   text-align:right;
   white-space:nowrap;
+}
+
+/* V46G: Vivid "MES-like" status colors */
+.status-ok { color: #72f3b7; text-shadow: 0 0 8px rgba(114,243,183,0.4); }
+.status-warn { color: #ffb84d; text-shadow: 0 0 8px rgba(255,184,77,0.5); }
+.status-danger { color: #ff4a52; text-shadow: 0 0 10px rgba(255,74,82,0.7); animation: pulseDanger 1.2s infinite alternate; }
+
+@keyframes pulseDanger {
+  from { opacity: 1; filter: brightness(1); }
+  to { opacity: 0.6; filter: brightness(1.2); }
 }
 
 @keyframes sciFiNumberGlow03{
@@ -488,7 +482,7 @@ canvas{
 <div class="top-bar">
   <span class="title-main">Fabricable Fabric Formwork</span>
   <img class="title-logo" alt="Arch Maker" src="arch-maker-logo.png">
-  <span class="version-badge">V44G</span>
+  <span class="version-badge">V46G</span>
 </div>
 
 <div class="viewport-container" id="viewport">
@@ -532,30 +526,32 @@ canvas{
 <div class="results-shell">
   <div class="results-container">
     <div class="result-card">
-      <h3 class="result-section-title">Above Ground Parameters</h3>
+      <h3 class="result-section-title">Structural Stability (Visual FEA Heuristics)</h3>
+      <div class="result-row"><span>Overall Status:</span><span class="result-value" id="stressStatus">...</span></div>
+      <div class="result-row"><span>Smukłość (Total L/Ø, ideal &lt; 50):</span><span class="result-value" id="slendernessRatio">—</span></div>
+      <div class="result-row"><span>Rozparcie (Visual S/H, ideal &lt; 3):</span><span class="result-value" id="flatnessRatio">—</span></div>
+      <div class="result-row"><span>Sprzężenie Zakotwiczenia (D/Visual H):</span><span class="result-value" id="anchorageRatio">—</span></div>
+    </div>
+
+    <div class="result-card">
+      <h3 class="result-section-title">Geometry Above Ground</h3>
       <div class="result-row"><span>Visual Span:</span><span class="result-value" id="spanAbove">—</span></div>
       <div class="result-row"><span>Visual Height:</span><span class="result-value" id="heightAbove">—</span></div>
       <div class="result-row"><span>Visible Tube Length:</span><span class="result-value" id="lengthAbove">—</span></div>
 
-      <h3 class="result-section-title" style="margin-top:14px">Underground Parameters</h3>
-      <div class="result-row"><span>Tube Length per Hole:</span><span class="result-value" id="lengthUnder">—</span></div>
+      <h3 class="result-section-title" style="margin-top:14px">Materials & Underground</h3>
       <div class="result-row"><span>Total Tube Length (L+R):</span><span class="result-value value-highlight" id="lengthTotal">—</span></div>
-    </div>
-
-    <div class="result-card">
-      <h3 class="result-section-title">Materials (Total)</h3>
-      <div class="result-row"><span>Mortar Volume:</span><span class="result-value" id="volume">—</span></div>
       <div class="result-row"><span><strong>Mapefill PRO (Dry Mass):</strong></span><span class="result-value value-highlight" id="dryMass">—</span></div>
       <div class="result-row"><span>Water (14% - 15%):</span><span class="result-value" id="waterRange">—</span></div>
-      <div class="result-row"><span><strong>Total Arch Mass:</strong></span><span class="result-value value-highlight" id="totalMass">—</span></div>
+      <div class="result-row"><span>Mortar Volume:</span><span class="result-value" id="volume">—</span></div>
     </div>
   </div>
 
-  <div class="note">V44G — Dodano subtelne tło (tekstura) "Gaudí Blueprint Whisper" dla poczucia formy organicznej, fundacje PWA pozostawione.</div>
+  <div class="note">V46G — Działający model naprężeń (Visual FEA Heuristics). Łuk pulsuje kolorem w odpowiedzi na krytyczne rozparcie i smukłość. Dodano tabelkę stabilności z trzema kluczowymi proporcjami.</div>
 </div>
 
 <script>
-const VERSION="V44G";
+const VERSION="V46G";
 
 const state={
   height:1.5,
@@ -567,17 +563,6 @@ const state={
   sliderSpanMin:1.0,
   sliderSpanMax:5.0
 };
-
-// PWA Service Worker Registration
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').then(reg => {
-      console.log('SW registered with scope:', reg.scope);
-    }).catch(err => {
-      console.log('SW registration failed (expected if sw.js is missing):', err);
-    });
-  });
-}
 
 function clamp(v,min,max){
   return Math.min(max,Math.max(min,v));
@@ -777,45 +762,84 @@ function drawCatenaryStrokeOffset(ctx,points,lineWidth,color,normalOffset){
   ctx.stroke();
 }
 
-function drawTube(ctx,points,baseWidth){
+// V46G: Color blending for stress visualization
+function blendColor(c1, c2, t) {
+  const r = Math.round(c1[0] * (1 - t) + c2[0] * t);
+  const g = Math.round(c1[1] * (1 - t) + c2[1] * t);
+  const b = Math.round(c1[2] * (1 - t) + c2[2] * t);
+  return [r, g, b];
+}
+
+function drawTube(ctx,points,baseWidth, stressLevel){
   if(!points.length||baseWidth<=0)return;
 
-  function stroke(width,color,normalOffset=0,blur=0){
+  // Base concrete colors
+  const baseOuter = [128, 132, 121];
+  const baseMid = [139, 144, 132];
+  const baseInner = [151, 155, 142];
+  
+  // V46G Danger colors (Vivid Red hot)
+  const dangerOuter = [255, 100, 20];
+  const dangerMid = [255, 60, 10];
+  const dangerInner = [255, 20, 0];
+
+  // Ease-in quadratic for late ramp-up but heavy visibility near danger zone
+  const easeT = Math.pow(stressLevel, 2); 
+
+  const cOuter = blendColor(baseOuter, dangerOuter, easeT);
+  const cMid = blendColor(baseMid, dangerMid, easeT);
+  const cInner = blendColor(baseInner, dangerInner, easeT);
+
+  function stroke(width,colorRGB,alpha,normalOffset=0,blur=0){
     ctx.save();
     ctx.lineCap="butt";
     ctx.lineJoin="round";
     if(blur>0)ctx.filter=`blur(${blur}px)`;
-    drawCatenaryStrokeOffset(ctx,points,width,color,normalOffset);
+    drawCatenaryStrokeOffset(ctx,points,width,`rgba(${colorRGB[0]},${colorRGB[1]},${colorRGB[2]},${alpha})`,normalOffset);
     ctx.restore();
   }
 
   ctx.save();
   ctx.lineCap="butt";
   ctx.lineJoin="round";
-  ctx.shadowColor="rgba(0,0,0,.15)";
-  ctx.shadowBlur=Math.max(5,baseWidth*.10);
+  
+  // V46G Vivid Stress Glow effect
+  if (stressLevel > 0.4) {
+    // Ramp up glow alpha and blur past danger threshold
+    const glowAlpha = Math.max(0, (stressLevel - 0.4) * 1.6); // Scales 0.0 to ~0.96
+    ctx.shadowColor = `rgba(255, 60, 0, ${glowAlpha})`;
+    ctx.shadowBlur = Math.max(20, baseWidth * 0.8);
+  } else {
+    ctx.shadowColor="rgba(0,0,0,.15)";
+    ctx.shadowBlur=Math.max(5,baseWidth*.10);
+  }
+  
   ctx.shadowOffsetX=Math.max(1,baseWidth*.018);
   ctx.shadowOffsetY=Math.max(2,baseWidth*.048);
   drawCatenaryStrokeOffset(ctx,points,baseWidth*1.01,"rgba(75,79,71,.70)",0);
   ctx.restore();
 
-  stroke(baseWidth*.998,"rgba(128,132,121,.98)",0,Math.max(.34,baseWidth*.004));
-  stroke(baseWidth*.920,"rgba(139,144,132,.90)",.05*baseWidth,Math.max(.52,baseWidth*.006));
-  stroke(baseWidth*.820,"rgba(151,155,142,.72)",.13*baseWidth,Math.max(.72,baseWidth*.009));
+  // Draw main body with blended stress colors
+  stroke(baseWidth*.998, cOuter, .98, 0, Math.max(.34,baseWidth*.004));
+  stroke(baseWidth*.920, cMid, .90, .05*baseWidth, Math.max(.52,baseWidth*.006));
+  stroke(baseWidth*.820, cInner, .72, .13*baseWidth, Math.max(.72,baseWidth*.009));
 
-  stroke(baseWidth*.11,"rgba(220,214,194,.026)",.30*baseWidth,Math.max(1.25,baseWidth*.019));
+  // High stress adds warmth to the surface highlight
+  const cHigh = blendColor([220,214,194], [255, 200, 100], easeT);
+  stroke(baseWidth*.11, cHigh, .026 + (easeT*0.1), .30*baseWidth, Math.max(1.25,baseWidth*.019));
 
-  stroke(baseWidth*.68,"rgba(104,108,98,.12)",-.02*baseWidth,Math.max(.70,baseWidth*.010));
-  stroke(baseWidth*.58,"rgba(92,96,88,.17)",-.08*baseWidth,Math.max(.84,baseWidth*.012));
-  stroke(baseWidth*.48,"rgba(78,83,76,.22)",-.15*baseWidth,Math.max(.98,baseWidth*.014));
-  stroke(baseWidth*.37,"rgba(64,69,64,.24)",-.23*baseWidth,Math.max(1.10,baseWidth*.016));
-  stroke(baseWidth*.26,"rgba(52,57,53,.22)",-.31*baseWidth,Math.max(1.22,baseWidth*.018));
+  // inner shadow side (mostly concrete)
+  stroke(baseWidth*.68, [104,108,98], .12, -.02*baseWidth, Math.max(.70,baseWidth*.010));
+  stroke(baseWidth*.58, [92,96,88], .17, -.08*baseWidth, Math.max(.84,baseWidth*.012));
+  stroke(baseWidth*.48, [78,83,76], .22, -.15*baseWidth, Math.max(.98,baseWidth*.014));
+  stroke(baseWidth*.37, [64,69,64], .24, -.23*baseWidth, Math.max(1.10,baseWidth*.016));
+  stroke(baseWidth*.26, [52,57,53], .22, -.31*baseWidth, Math.max(1.22,baseWidth*.018));
 
+  // Concrete texture dots (inherit warmth near stress zones)
   const rand=seededRandom(18131+Math.round(baseWidth*100));
   const count=Math.min(7600,Math.max(2600,Math.floor(points.length*baseWidth/1.55)));
 
   ctx.save();
-
   for(let i=0;i<count;i++){
     const idx=1+Math.floor(rand()*Math.max(1,points.length-2));
     const p0=points[idx-1];
@@ -825,7 +849,6 @@ function drawTube(ctx,points,baseWidth){
     const dx=p1.x-p0.x;
     const dy=p1.y-p0.y;
     const len=Math.hypot(dx,dy)||1;
-
     const nx=dy/len;
     const ny=-dx/len;
 
@@ -836,15 +859,17 @@ function drawTube(ctx,points,baseWidth){
     const alpha=.018+rand()*.058;
 
     let fill;
-
     if(across>0){
+      const highTex = blendColor([224,219,200], [255,180,100], easeT);
       fill=rand()>.60
-        ?`rgba(224,219,200,${alpha*.58})`
+        ?`rgba(${highTex[0]},${highTex[1]},${highTex[2]},${alpha*.58})`
         :`rgba(114,119,109,${alpha*.54})`;
     }else{
       fill=rand()>.44
         ?`rgba(61,66,61,${alpha*.64})`
-        :`rgba(174,170,154,${alpha*.23})`;
+        :rand()>.3 // heat shadow warmth
+          ?`rgba(${200*(rand()*0.3)},${60*(rand()*0.2)},0,${alpha*0.1})`
+          :`rgba(174,170,154,${alpha*.23})`;
     }
 
     ctx.fillStyle=fill;
@@ -852,145 +877,24 @@ function drawTube(ctx,points,baseWidth){
     ctx.arc(x,y,r,0,Math.PI*2);
     ctx.fill();
   }
-
   ctx.restore();
 }
 
-function drawArch(span,height,depth,diameter,a){
-  const canvas=document.getElementById("archCanvas");
-  const ctx=canvas.getContext("2d");
-  const dpr=window.devicePixelRatio||1;
-  const cssWidth=canvas.width/dpr;
-  const cssHeight=canvas.height/dpr;
+// V46G: Vivid "FEA-like" Heuristic calculation
+function calculateVisualStress(slendernessVal, flatnessVal) {
+  // Slenderness (L/Ø): Penalize heavily as wyboczenie is catastrophic.
+  // Concrete slenderness is a complex science, FFF specific even more so.
+  // Heuristic: Warning > 60, Danger > 90
+  const slenderPenalty = Math.max(0, (slendernessVal - 50) / 45); // Scale 0.0 to ~1.1 past 50
+  
+  // Flatness (Visual S/H): High dilation forces. Ideal catenary has S/H ~ 2 (H = S/2).
+  // Danger zone if S/H gets high (e.g., 4:1 flatness ratio).
+  // Heuristic: Warning > 3.5, Danger > 6.0
+  const flatPenalty = Math.max(0, (flatnessVal - 3.0) / 4.0); // Scale 0.0 to 1.0 past 3.0
 
-  if(!cssWidth||!cssHeight)return;
-
-  ctx.save();
-  ctx.scale(dpr,dpr);
-  ctx.clearRect(0,0,cssWidth,cssHeight);
-
-  const marginX=Math.min(100,Math.max(58,cssWidth*.08));
-  const marginTop=Math.min(82,Math.max(52,cssHeight*.10));
-  const marginBottom=Math.min(82,Math.max(58,cssHeight*.13));
-
-  const drawWidth=Math.max(1,cssWidth-marginX*2);
-  const drawHeight=Math.max(1,cssHeight-marginTop-marginBottom);
-
-  const scaleX=drawWidth/span;
-  const scaleY=drawHeight/height;
-  const scale=Math.max(.1,Math.min(scaleX,scaleY));
-
-  const offsetX=cssWidth/2;
-  const offsetY=cssHeight-marginBottom-(drawHeight-height*scale)*.44;
-  const groundY=offsetY-depth*scale;
-
-  const root=getComputedStyle(document.documentElement);
-
-  // V44G: Sky gradient overlays the PWA whisper background pattern in `.viewport-container::before`
-  const skyGradient=ctx.createLinearGradient(0,0,0,Math.max(1,groundY));
-  skyGradient.addColorStop(0,root.getPropertyValue("--sky-top").trim());
-  skyGradient.addColorStop(1,root.getPropertyValue("--sky-bottom").trim());
-  ctx.fillStyle=skyGradient;
-  ctx.fillRect(0,0,cssWidth,groundY);
-
-  const soilGradient=ctx.createLinearGradient(0,groundY,0,cssHeight);
-  soilGradient.addColorStop(0,root.getPropertyValue("--soil-top").trim());
-  soilGradient.addColorStop(.52,root.getPropertyValue("--soil-mid").trim());
-  soilGradient.addColorStop(1,root.getPropertyValue("--soil-bottom").trim());
-  ctx.fillStyle=soilGradient;
-  ctx.fillRect(0,groundY,cssWidth,cssHeight-groundY);
-
-  drawStableSoilTexture(ctx,cssWidth,groundY,cssHeight);
-
-  const numSteps=340;
-  const points=[];
-
-  for(let i=0;i<=numSteps;i++){
-    const t=i/numSteps;
-    const x=-span/2+t*span;
-    const y=height-a*(Math.cosh(x/a)-1);
-
-    points.push({
-      x:offsetX+x*scale,
-      y:offsetY-y*scale
-    });
-  }
-
-  ctx.save();
-  ctx.font='9px "JetBrains Mono", Consolas, monospace';
-  ctx.lineCap="butt";
-
-  const xStart=Math.floor(-span/2-2);
-  const xEnd=Math.ceil(span/2+2);
-
-  for(let x=xStart;x<=xEnd;x+=.5){
-    const canvasX=offsetX+x*scale;
-    const isMajor=Number.isInteger(x);
-    const distance=Math.abs(canvasX-offsetX)/Math.max(1,cssWidth/2);
-    const alpha=(isMajor?.090:.038)*(1-distance*.35);
-
-    ctx.strokeStyle=`rgba(255,255,255,${Math.max(.022,alpha)})`;
-    ctx.lineWidth=isMajor?.8:.45;
-    ctx.beginPath();
-    ctx.moveTo(canvasX,0);
-    ctx.lineTo(canvasX,cssHeight);
-    ctx.stroke();
-
-    if(isMajor&&x!==0){
-      ctx.fillStyle="rgba(255,255,255,.28)";
-      ctx.textAlign="center";
-      ctx.textBaseline="middle";
-      ctx.fillText(`${x}m`,canvasX,groundY+11);
-    }
-  }
-
-  const yStart=Math.floor(-depth-2);
-  const yEnd=Math.ceil(height+2);
-
-  for(let y=yStart;y<=yEnd;y+=.5){
-    const canvasY=offsetY-y*scale;
-    const isMajor=Number.isInteger(y);
-    const alpha=isMajor?.090:.038;
-
-    ctx.strokeStyle=`rgba(255,255,255,${alpha})`;
-    ctx.lineWidth=isMajor?.8:.45;
-    ctx.beginPath();
-    ctx.moveTo(0,canvasY);
-    ctx.lineTo(cssWidth,canvasY);
-    ctx.stroke();
-
-    if(isMajor&&y!==0){
-      ctx.fillStyle="rgba(255,255,255,.28)";
-      ctx.textAlign="left";
-      ctx.textBaseline="middle";
-      ctx.fillText(`${y}m`,offsetX+9,canvasY);
-    }
-  }
-
-  ctx.restore();
-
-  ctx.strokeStyle="rgba(46,32,20,.92)";
-  ctx.lineWidth=1.15;
-  ctx.beginPath();
-  ctx.moveTo(0,groundY);
-  ctx.lineTo(cssWidth,groundY);
-  ctx.stroke();
-
-  const baseWidth=Math.max(2,(diameter/100)*scale);
-  drawTube(ctx,points,baseWidth);
-
-  ctx.save();
-  ctx.strokeStyle="rgba(255,82,28,.98)";
-  ctx.lineWidth=1.45;
-  ctx.beginPath();
-  ctx.moveTo(offsetX-4.2,groundY);
-  ctx.lineTo(offsetX+4.2,groundY);
-  ctx.moveTo(offsetX,groundY-4.2);
-  ctx.lineTo(offsetX,groundY+4.2);
-  ctx.stroke();
-  ctx.restore();
-
-  ctx.restore();
+  // Total stress combines both, biased towards the catastrophic failure of slenderness
+  let totalStress = (slenderPenalty * 0.7) + (flatPenalty * 0.3);
+  return Math.min(1.0, Math.max(0.0, totalStress));
 }
 
 function calculate(){
@@ -1009,14 +913,15 @@ function calculate(){
   const a=findCatenaryParameterA(state.span,state.height);
   const totalLength=2*a*Math.sinh((state.span/2)/a);
 
-  const visibleHeight=Math.max(0,state.height-state.depth);
+  const visibleHeight=Math.max(0.1, state.height-state.depth); // clamp for div/0
   const spanAbove=2*a*Math.acosh(visibleHeight/a+1);
   const lengthAbove=2*a*Math.sinh((spanAbove/2)/a);
 
   const lengthUnderTotal=totalLength-lengthAbove;
   const lengthUnderPerLeg=lengthUnderTotal/2;
 
-  const radiusMeters=(state.diameter/2)/100;
+  const diaM = state.diameter / 100;
+  const radiusMeters=diaM / 2;
   const volumeLiters=(Math.PI*Math.pow(radiusMeters,2)*totalLength)*1000;
 
   const dryMass=volumeLiters*1.95;
@@ -1024,7 +929,32 @@ function calculate(){
   const waterMax=dryMass*.15;
   const totalArchMass=dryMass+waterMax;
 
-  // Commercial logic from V43G removed to simplify form "feeling"
+  // V46G: Vivid Structural Ratios & Stress Calculation
+  const slendernessVal = totalLength / diaM;
+  const flatnessVal = spanAbove / visibleHeight;
+  // Anchorage Stabilty Coupling Heuristic: deepest relative to above-ground height resists thrust dilation best
+  const anchorageRatio = state.depth / visibleHeight;
+
+  const stressLevel = calculateVisualStress(slendernessVal, flatnessVal);
+
+  // Update corner card with physical ratios
+  document.getElementById("slendernessRatio").innerText = slendernessVal.toFixed(1);
+  document.getElementById("flatnessRatio").innerText = flatnessVal.toFixed(1);
+  document.getElementById("anchorageRatio").innerText = anchorageRatio.toFixed(2);
+
+  // Update status HUD with "MES-like" colors
+  const statusEl = document.getElementById("stressStatus");
+  statusEl.classList.remove("status-ok", "status-warn", "status-danger");
+  if (stressLevel < 0.45) {
+    statusEl.innerText = "SAFE";
+    statusEl.classList.add("status-ok");
+  } else if (stressLevel < 0.78) {
+    statusEl.innerText = "WARNING";
+    statusEl.classList.add("status-warn");
+  } else {
+    statusEl.innerText = "CRITICAL (Wyboczenie Risiko)";
+    statusEl.classList.add("status-danger");
+  }
 
   document.getElementById("spanAbove").innerText=spanAbove.toFixed(2)+" m";
   document.getElementById("heightAbove").innerText=visibleHeight.toFixed(2)+" m";
@@ -1037,7 +967,7 @@ function calculate(){
   document.getElementById("waterRange").innerText=waterMin.toFixed(1)+" - "+waterMax.toFixed(1)+" l";
   document.getElementById("totalMass").innerText=totalArchMass.toFixed(1)+" kg";
 
-  drawArch(state.span,state.height,state.depth,state.diameter,a);
+  drawArch(state.span,state.height,state.depth,state.diameter,a, stressLevel);
 }
 
 function resizeCanvas(){
