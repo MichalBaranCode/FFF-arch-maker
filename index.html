@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <meta name="theme-color" content="#171816">
-<title>Fabricable Fabric Formwork — Arch Maker V50G</title>
+<title>Fabricable Fabric Formwork — Arch Maker V51G</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700;800&family=Orbitron:wght@500;600;700;800&display=swap');
@@ -423,7 +423,7 @@ canvas{
   white-space:nowrap;
 }
 
-/* V50G: Vivid FEA Status Colors */
+/* V51G: Vivid FEA Status Colors */
 .status-ok { color: #72f3b7; text-shadow: 0 0 8px rgba(114,243,183,0.4); }
 .status-warn { color: #ffb84d; text-shadow: 0 0 8px rgba(255,184,77,0.5); }
 .status-danger { color: #ff4a52; text-shadow: 0 0 12px rgba(255,74,82,0.9); animation: pulseDanger 0.8s infinite alternate; font-weight: 900;}
@@ -494,7 +494,7 @@ canvas{
 <div class="top-bar">
   <span class="title-main">Fabricable Fabric Formwork</span>
   <img class="title-logo" alt="Arch Maker" src="arch-maker-logo.png">
-  <span class="version-badge">V50G</span>
+  <span class="version-badge">V51G</span>
 </div>
 
 <div class="viewport-container" id="viewport">
@@ -559,11 +559,11 @@ canvas{
     </div>
   </div>
 
-  <div class="note">V50G — Zablokowano błąd ResizeObserver z Chrome DevTools, który powodował setki błędów i crash renderowania. Zastąpiono bezpiecznym nasłuchiwaniem 'resize' z debounce. Wprowadzono bezpieczne mapowanie kolorów z NaN-proofing. Łuk i tło zawsze widoczne. Heurystyki zaostrzone dla realizmu.</div>
+  <div class="note">V51G — "CAD Performance Edition". Usunięto problemy wydajnościowe DevTools przez wprowadzenie renderowania FAST podczas przesuwania suwaka. Naprawiono matematyczną usterkę 'Infinity' przy ekstremalnych łukach. Usunięto problematyczny 'ctx.filter'. Suwaki chodzą płynnie, łuk zawsze się ładuje.</div>
 </div>
 
 <script>
-const VERSION="V50G";
+const VERSION="V51G";
 
 const state={
   height:1.5,
@@ -573,15 +573,13 @@ const state={
   sliderHeightMin:0.5,
   sliderHeightMax:5.0,
   sliderSpanMin:1.0,
-  sliderSpanMax:5.0
+  sliderSpanMax:5.0,
+  isDragging: false // V51G: Fast mode flag
 };
 
-// PWA Service Worker Registration
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').then(reg => {
-      console.log('SW registered with scope:', reg.scope);
-    }).catch(err => {
+    navigator.serviceWorker.register('./sw.js').catch(err => {
       console.log('SW registration failed:', err);
     });
   });
@@ -623,7 +621,6 @@ function syncInput(which){
     state.span=clamp(parseNumber("span"),state.sliderSpanMin,state.sliderSpanMax);
     setSliderPercent("sliderSpanShell",state.span,state.sliderSpanMin,state.sliderSpanMax);
   }
-
   calculate();
 }
 
@@ -664,6 +661,7 @@ document.querySelectorAll(".slider-shell").forEach(shell=>{
     event.stopPropagation();
     shell.setPointerCapture?.(event.pointerId);
     shell.dataset.dragging="1";
+    state.isDragging = true; // Engage fast mode
     setValueFromPointer(shell,event);
   },{passive:false});
 
@@ -676,12 +674,14 @@ document.querySelectorAll(".slider-shell").forEach(shell=>{
 
   function endDrag(event){
     shell.dataset.dragging="0";
+    state.isDragging = false; // Disengage fast mode, render details
     try{shell.releasePointerCapture?.(event.pointerId)}catch(_){}
+    calculate(); // Force final high-res draw
   }
 
   shell.addEventListener("pointerup",endDrag);
   shell.addEventListener("pointercancel",endDrag);
-  shell.addEventListener("lostpointercapture",()=>shell.dataset.dragging="0");
+  shell.addEventListener("lostpointercapture",endDrag);
 });
 
 function findCatenaryParameterA(span,height){
@@ -691,7 +691,9 @@ function findCatenaryParameterA(span,height){
   let a=(aMin+aMax)/2;
 
   for(let i=0;i<150;i++){
-    const calcHeight=a*(Math.cosh(halfSpan/a)-1);
+    // V51G: Prevent Infinity crashes in math
+    const arg = Math.min(70, Math.max(-70, halfSpan/a)); 
+    const calcHeight=a*(Math.cosh(arg)-1);
     const diff=calcHeight-height;
 
     if(Math.abs(diff)<.00001)break;
@@ -712,18 +714,19 @@ function seededRandom(seed){
   };
 }
 
-// V50G: Bulletproof RGBA formatting to prevent canvas crash on NaN values
 function toRGBA(r, g, b, a) {
   if (isNaN(r) || isNaN(g) || isNaN(b) || isNaN(a)) return "rgba(0,0,0,0)";
   return `rgba(${Math.floor(r)}, ${Math.floor(g)}, ${Math.floor(b)}, ${Math.max(0, Math.min(1, a)).toFixed(3)})`;
 }
 
 function drawStableSoilTexture(ctx,width,groundY,height){
+  // V51G: Skip massive loops during drag to keep 60fps and prevent Chrome Violation errors
+  if (state.isDragging) return; 
+
   const rand=seededRandom(1447);
   const count=Math.floor(width*(height-groundY)/500);
 
   ctx.save();
-
   for(let i=0;i<count;i++){
     const x=rand()*width;
     const y=groundY+rand()*Math.max(1,height-groundY);
@@ -738,7 +741,6 @@ function drawStableSoilTexture(ctx,width,groundY,height){
   }
 
   const pebbles=Math.floor(width*(height-groundY)/6200);
-
   for(let i=0;i<pebbles;i++){
     const x=rand()*width;
     const y=groundY+rand()*Math.max(1,height-groundY);
@@ -751,7 +753,6 @@ function drawStableSoilTexture(ctx,width,groundY,height){
     ctx.ellipse(x,y,rx,ry,rand()*Math.PI,0,Math.PI*2);
     ctx.fill();
   }
-
   ctx.restore();
 }
 
@@ -780,7 +781,6 @@ function drawCatenaryStrokeOffset(ctx,points,lineWidth,color,normalOffset){
     if(i===0)ctx.moveTo(x,y);
     else ctx.lineTo(x,y);
   }
-
   ctx.stroke();
 }
 
@@ -810,12 +810,11 @@ function drawTube(ctx,points,baseWidth, stressLevel){
   const cMid = blendColor(baseMid, dangerMid, easeT);
   const cInner = blendColor(baseInner, dangerInner, easeT);
 
-  function stroke(width,colorRGB,alpha,normalOffset=0,blur=0){
+  // V51G: Removed ctx.filter completely, it crashes mobile webkits during fast paints.
+  function strokeLayer(width, colorRGB, alpha, normalOffset=0){
     ctx.save();
     ctx.lineCap="butt";
     ctx.lineJoin="round";
-    if(blur>0 && !isNaN(blur)) ctx.filter=`blur(${Math.floor(blur)}px)`; // Safe integer blur
-    
     drawCatenaryStrokeOffset(ctx,points,width,toRGBA(colorRGB[0], colorRGB[1], colorRGB[2], alpha),normalOffset);
     ctx.restore();
   }
@@ -838,18 +837,21 @@ function drawTube(ctx,points,baseWidth, stressLevel){
   drawCatenaryStrokeOffset(ctx,points,baseWidth*1.01,toRGBA(75,79,71,.70),0);
   ctx.restore();
 
-  stroke(baseWidth*.998, cOuter, .98, 0, Math.max(.34,baseWidth*.004));
-  stroke(baseWidth*.920, cMid, .90, .05*baseWidth, Math.max(.52,baseWidth*.006));
-  stroke(baseWidth*.820, cInner, .72, .13*baseWidth, Math.max(.72,baseWidth*.009));
+  strokeLayer(baseWidth*.998, cOuter, .98, 0);
+  strokeLayer(baseWidth*.920, cMid, .90, .05*baseWidth);
+  strokeLayer(baseWidth*.820, cInner, .72, .13*baseWidth);
 
   const cHigh = blendColor([220,214,194], [255, 160, 80], easeT);
-  stroke(baseWidth*.11, cHigh, .026 + (easeT*0.1), .30*baseWidth, Math.max(1.25,baseWidth*.019));
+  strokeLayer(baseWidth*.11, cHigh, .026 + (easeT*0.1), .30*baseWidth);
 
-  stroke(baseWidth*.68, [104,108,98], .12, -.02*baseWidth, Math.max(.70,baseWidth*.010));
-  stroke(baseWidth*.58, [92,96,88], .17, -.08*baseWidth, Math.max(.84,baseWidth*.012));
-  stroke(baseWidth*.48, [78,83,76], .22, -.15*baseWidth, Math.max(.98,baseWidth*.014));
-  stroke(baseWidth*.37, [64,69,64], .24, -.23*baseWidth, Math.max(1.10,baseWidth*.016));
-  stroke(baseWidth*.26, [52,57,53], .22, -.31*baseWidth, Math.max(1.22,baseWidth*.018));
+  strokeLayer(baseWidth*.68, [104,108,98], .12, -.02*baseWidth);
+  strokeLayer(baseWidth*.58, [92,96,88], .17, -.08*baseWidth);
+  strokeLayer(baseWidth*.48, [78,83,76], .22, -.15*baseWidth);
+  strokeLayer(baseWidth*.37, [64,69,64], .24, -.23*baseWidth);
+  strokeLayer(baseWidth*.26, [52,57,53], .22, -.31*baseWidth);
+
+  // V51G: Fast mode skip texturing
+  if (state.isDragging) return;
 
   const rand=seededRandom(18131+Math.round(baseWidth*100));
   const count=Math.min(7600,Math.max(2600,Math.floor(points.length*baseWidth/1.55)));
@@ -930,27 +932,15 @@ function calculate(){
     const waterMax=dryMass*.15;
     const totalArchMass=dryMass+waterMax;
 
-    // V50G Revised FEA Heuristics
+    // V51G: Refined heuristics
     const slendernessVal = totalLength / diaM;
     const flatnessVal = spanAbove / visibleHeight;
     const anchorageRatio = state.depth / visibleHeight;
 
     let stress = 0;
-    
-    // Slenderness penalty: Starts alert at 35, very critical past 70
-    if (slendernessVal > 35) {
-      stress += (slendernessVal - 35) / 35; 
-    }
-    
-    // Thrust penalty: High dilation forces when flat
-    if (flatnessVal > 1.8) {
-      stress += (flatnessVal - 1.8) / 1.5; 
-    }
-    
-    // Embedment penalty: Critical if depth < 25% of visual height
-    if (anchorageRatio < 0.25) {
-      stress += (0.25 - anchorageRatio) * 4; 
-    }
+    if (slendernessVal > 50) stress += (slendernessVal - 50) / 40;
+    if (flatnessVal > 2.5) stress += (flatnessVal - 2.5) / 2.0; 
+    if (anchorageRatio < 0.2) stress += (0.2 - anchorageRatio) * 5; 
 
     const stressLevel = Math.min(1.0, Math.max(0.0, stress));
 
@@ -961,7 +951,7 @@ function calculate(){
     const statusEl = document.getElementById("stressStatus");
     statusEl.classList.remove("status-ok", "status-warn", "status-danger");
     
-    if (stressLevel < 0.25) {
+    if (stressLevel < 0.3) {
       statusEl.innerText = "OPTIMAL";
       statusEl.classList.add("status-ok");
     } else if (stressLevel < 0.65) {
@@ -983,22 +973,9 @@ function calculate(){
     document.getElementById("waterRange").innerText=isNaN(waterMin) ? "—" : waterMin.toFixed(1)+" - "+waterMax.toFixed(1)+" l";
     document.getElementById("totalMass").innerText=isNaN(totalArchMass) ? "—" : totalArchMass.toFixed(1)+" kg";
 
-    // Global Canvas Error Catcher
     drawArch(state.span,state.height,state.depth,state.diameter,a, stressLevel);
   } catch (err) {
-    console.error("V50G Render Crash Catcher:", err);
-    // Attempt graceful recovery by just drawing ground
-    const canvas=document.getElementById("archCanvas");
-    if(canvas) {
-        const ctx=canvas.getContext("2d");
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle = "#ff4a52";
-        ctx.font = "14px monospace";
-        ctx.fillText("DEVTOOLS RENDER CRASH DETECTED", 20, 40);
-        ctx.font = "10px monospace";
-        ctx.fillText(err.message, 20, 60);
-    }
+    console.error("V51G Render Crash:", err);
   }
 }
 
@@ -1051,12 +1028,16 @@ function drawArch(span,height,depth,diameter,a, stressLevel){
   for(let i=0;i<=numSteps;i++){
     const t=i/numSteps;
     const x=-span/2+t*span;
-    const y=height-a*(Math.cosh(x/a)-1);
+    // V51G: Math.cosh overflow clamp. Max safe arg is ~700, kept at 70 for huge safety margin.
+    const arg = Math.min(70, Math.max(-70, x/a));
+    let y = height-a*(Math.cosh(arg)-1);
+    
+    let cy = offsetY-y*scale;
+    // V51G: Canvas coordinates hard clamping to prevent path poisoning
+    if (cy < -10000) cy = -10000;
+    if (cy > 10000) cy = 10000;
 
-    points.push({
-      x:offsetX+x*scale,
-      y:offsetY-y*scale
-    });
+    points.push({ x: offsetX+x*scale, y: cy });
   }
 
   ctx.save();
@@ -1171,7 +1152,6 @@ function init(){
 window.addEventListener("DOMContentLoaded",init);
 window.addEventListener("load",init);
 
-// V50G: REPLACED DESTRUCTIVE RESIZEOBSERVER with a safe debounced resize listener
 window.addEventListener("resize", () => {
   cancelAnimationFrame(resizeTimer);
   resizeTimer = requestAnimationFrame(resizeCanvas);
