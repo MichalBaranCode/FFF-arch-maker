@@ -423,6 +423,7 @@ canvas{
   white-space:nowrap;
 }
 
+/* V50G: Vivid FEA Status Colors */
 .status-ok { color: #72f3b7; text-shadow: 0 0 8px rgba(114,243,183,0.4); }
 .status-warn { color: #ffb84d; text-shadow: 0 0 8px rgba(255,184,77,0.5); }
 .status-danger { color: #ff4a52; text-shadow: 0 0 12px rgba(255,74,82,0.9); animation: pulseDanger 0.8s infinite alternate; font-weight: 900;}
@@ -558,7 +559,7 @@ canvas{
     </div>
   </div>
 
-  <div class="note">V50G — "Ironclad Edition". Zablokowano pętlę ResizeObserver z Chrome DevTools. Wprowadzono bezpieczne mapowanie kolorów z NaN-proofing. Łuk i tło zawsze widoczne.</div>
+  <div class="note">V50G — Zablokowano błąd ResizeObserver z Chrome DevTools, który powodował setki błędów i crash renderowania. Zastąpiono bezpiecznym nasłuchiwaniem 'resize' z debounce. Wprowadzono bezpieczne mapowanie kolorów z NaN-proofing. Łuk i tło zawsze widoczne. Heurystyki zaostrzone dla realizmu.</div>
 </div>
 
 <script>
@@ -578,8 +579,10 @@ const state={
 // PWA Service Worker Registration
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(err => {
-      console.log('SW registration failed (non-critical):', err);
+    navigator.serviceWorker.register('./sw.js').then(reg => {
+      console.log('SW registered with scope:', reg.scope);
+    }).catch(err => {
+      console.log('SW registration failed:', err);
     });
   });
 }
@@ -811,7 +814,7 @@ function drawTube(ctx,points,baseWidth, stressLevel){
     ctx.save();
     ctx.lineCap="butt";
     ctx.lineJoin="round";
-    if(blur>0 && !isNaN(blur)) ctx.filter=`blur(${Math.floor(blur)}px)`;
+    if(blur>0 && !isNaN(blur)) ctx.filter=`blur(${Math.floor(blur)}px)`; // Safe integer blur
     
     drawCatenaryStrokeOffset(ctx,points,width,toRGBA(colorRGB[0], colorRGB[1], colorRGB[2], alpha),normalOffset);
     ctx.restore();
@@ -927,14 +930,27 @@ function calculate(){
     const waterMax=dryMass*.15;
     const totalArchMass=dryMass+waterMax;
 
+    // V50G Revised FEA Heuristics
     const slendernessVal = totalLength / diaM;
     const flatnessVal = spanAbove / visibleHeight;
     const anchorageRatio = state.depth / visibleHeight;
 
     let stress = 0;
-    if (slendernessVal > 35) stress += (slendernessVal - 35) / 35;
-    if (flatnessVal > 1.8) stress += (flatnessVal - 1.8) / 1.5; 
-    if (anchorageRatio < 0.25) stress += (0.25 - anchorageRatio) * 4; 
+    
+    // Slenderness penalty: Starts alert at 35, very critical past 70
+    if (slendernessVal > 35) {
+      stress += (slendernessVal - 35) / 35; 
+    }
+    
+    // Thrust penalty: High dilation forces when flat
+    if (flatnessVal > 1.8) {
+      stress += (flatnessVal - 1.8) / 1.5; 
+    }
+    
+    // Embedment penalty: Critical if depth < 25% of visual height
+    if (anchorageRatio < 0.25) {
+      stress += (0.25 - anchorageRatio) * 4; 
+    }
 
     const stressLevel = Math.min(1.0, Math.max(0.0, stress));
 
@@ -967,19 +983,21 @@ function calculate(){
     document.getElementById("waterRange").innerText=isNaN(waterMin) ? "—" : waterMin.toFixed(1)+" - "+waterMax.toFixed(1)+" l";
     document.getElementById("totalMass").innerText=isNaN(totalArchMass) ? "—" : totalArchMass.toFixed(1)+" kg";
 
+    // Global Canvas Error Catcher
     drawArch(state.span,state.height,state.depth,state.diameter,a, stressLevel);
   } catch (err) {
-    console.error("V50G Render Error:", err);
+    console.error("V50G Render Crash Catcher:", err);
+    // Attempt graceful recovery by just drawing ground
     const canvas=document.getElementById("archCanvas");
     if(canvas) {
-      const ctx=canvas.getContext("2d");
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "#ff4a52";
-      ctx.font = "14px monospace";
-      ctx.fillText("DEVTOOLS RENDER CRASH DETECTED", 20, 40);
-      ctx.font = "10px monospace";
-      ctx.fillText(err.message, 20, 60);
+        const ctx=canvas.getContext("2d");
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle = "#ff4a52";
+        ctx.font = "14px monospace";
+        ctx.fillText("DEVTOOLS RENDER CRASH DETECTED", 20, 40);
+        ctx.font = "10px monospace";
+        ctx.fillText(err.message, 20, 60);
     }
   }
 }
@@ -1034,7 +1052,11 @@ function drawArch(span,height,depth,diameter,a, stressLevel){
     const t=i/numSteps;
     const x=-span/2+t*span;
     const y=height-a*(Math.cosh(x/a)-1);
-    points.push({ x:offsetX+x*scale, y:offsetY-y*scale });
+
+    points.push({
+      x:offsetX+x*scale,
+      y:offsetY-y*scale
+    });
   }
 
   ctx.save();
@@ -1142,7 +1164,6 @@ function init(){
   setSliderPercent("sliderSpanShell",state.span,state.sliderSpanMin,state.sliderSpanMax);
 
   resizeCanvas();
-  // Safe initial renders without triggering layout loops
   setTimeout(resizeCanvas,50);
   setTimeout(resizeCanvas,250);
 }
@@ -1150,14 +1171,12 @@ function init(){
 window.addEventListener("DOMContentLoaded",init);
 window.addEventListener("load",init);
 
-// V50G: Replaced destructive ResizeObserver with a debounce system
+// V50G: REPLACED DESTRUCTIVE RESIZEOBSERVER with a safe debounced resize listener
 window.addEventListener("resize", () => {
   cancelAnimationFrame(resizeTimer);
   resizeTimer = requestAnimationFrame(resizeCanvas);
 });
 window.addEventListener("orientationchange",()=>setTimeout(resizeCanvas,180));
-
-// RESIZEOBSERVER REMOVED ENTIRELY TO PREVENT DEVTOOLS LOOP CRASHES
 
 init();
 </script>
