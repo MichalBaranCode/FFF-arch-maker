@@ -1,10 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<!--
+FFF ARCH MAKER V42
+Repo structure:
+index.html and arch-maker-logo.png are in the same root folder.
+Visible app badge must match this version: V42.
+-->
+<html lang="pl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <meta name="theme-color" content="#171816">
-<title>Fabricable Fabric Formwork — Arch Maker V51G</title>
+<title>Fabricable Fabric Formwork — Arch Maker V42</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700;800&family=Orbitron:wght@500;600;700;800&display=swap');
@@ -141,18 +147,6 @@ html,body{
   touch-action:none;
 }
 
-.viewport-container::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background-image: url('whisper_pattern_v44.png');
-  background-repeat: repeat;
-  background-size: 256px;
-  opacity: 0.15;
-  mix-blend-mode: multiply;
-}
-
 canvas{
   display:block;
   width:100%;
@@ -161,6 +155,7 @@ canvas{
   z-index:1;
 }
 
+/* V42: visible again, but smooth — overlay above drawing, below controls */
 .viewport-container::after{
   content:"";
   position:absolute;
@@ -423,16 +418,7 @@ canvas{
   white-space:nowrap;
 }
 
-/* V51G: Vivid FEA Status Colors */
-.status-ok { color: #72f3b7; text-shadow: 0 0 8px rgba(114,243,183,0.4); }
-.status-warn { color: #ffb84d; text-shadow: 0 0 8px rgba(255,184,77,0.5); }
-.status-danger { color: #ff4a52; text-shadow: 0 0 12px rgba(255,74,82,0.9); animation: pulseDanger 0.8s infinite alternate; font-weight: 900;}
-
-@keyframes pulseDanger {
-  from { opacity: 1; filter: brightness(1.3); }
-  to { opacity: 0.7; filter: brightness(1.0); }
-}
-
+/* V42: animated sample 03 — cyan/green stronger contour */
 @keyframes sciFiNumberGlow03{
   0%,100%{
     color:#baf8ff;
@@ -494,7 +480,7 @@ canvas{
 <div class="top-bar">
   <span class="title-main">Fabricable Fabric Formwork</span>
   <img class="title-logo" alt="Arch Maker" src="arch-maker-logo.png">
-  <span class="version-badge">V51G</span>
+  <span class="version-badge">V42</span>
 </div>
 
 <div class="viewport-container" id="viewport">
@@ -538,32 +524,30 @@ canvas{
 <div class="results-shell">
   <div class="results-container">
     <div class="result-card">
-      <h3 class="result-section-title">Structural Feasibility (Visual FEA)</h3>
-      <div class="result-row"><span>Overall Status:</span><span class="result-value" id="stressStatus">...</span></div>
-      <div class="result-row"><span>Slenderness Ratio (L/Ø):</span><span class="result-value" id="slendernessRatio">—</span></div>
-      <div class="result-row"><span>Thrust Ratio (Span/Height):</span><span class="result-value" id="flatnessRatio">—</span></div>
-      <div class="result-row"><span>Embedment Ratio (Depth/Height):</span><span class="result-value" id="anchorageRatio">—</span></div>
-    </div>
-
-    <div class="result-card">
-      <h3 class="result-section-title">Geometry Above Ground</h3>
+      <h3 class="result-section-title">Above Ground Parameters</h3>
       <div class="result-row"><span>Visual Span:</span><span class="result-value" id="spanAbove">—</span></div>
       <div class="result-row"><span>Visual Height:</span><span class="result-value" id="heightAbove">—</span></div>
       <div class="result-row"><span>Visible Tube Length:</span><span class="result-value" id="lengthAbove">—</span></div>
 
-      <h3 class="result-section-title" style="margin-top:14px">Materials & Underground</h3>
+      <h3 class="result-section-title" style="margin-top:14px">Underground Parameters</h3>
+      <div class="result-row"><span>Tube Length per Hole:</span><span class="result-value" id="lengthUnder">—</span></div>
       <div class="result-row"><span>Total Tube Length (L+R):</span><span class="result-value value-highlight" id="lengthTotal">—</span></div>
+    </div>
+
+    <div class="result-card">
+      <h3 class="result-section-title">Materials (Total)</h3>
+      <div class="result-row"><span>Mortar Volume:</span><span class="result-value" id="volume">—</span></div>
       <div class="result-row"><span><strong>Mapefill PRO (Dry Mass):</strong></span><span class="result-value value-highlight" id="dryMass">—</span></div>
       <div class="result-row"><span>Water (14% - 15%):</span><span class="result-value" id="waterRange">—</span></div>
-      <div class="result-row"><span>Mortar Volume:</span><span class="result-value" id="volume">—</span></div>
+      <div class="result-row"><span><strong>Total Arch Mass:</strong></span><span class="result-value value-highlight" id="totalMass">—</span></div>
     </div>
   </div>
 
-  <div class="note">V51G — "CAD Performance Edition". Usunięto problemy wydajnościowe DevTools przez wprowadzenie renderowania FAST podczas przesuwania suwaka. Naprawiono matematyczną usterkę 'Infinity' przy ekstremalnych łukach. Usunięto problematyczny 'ctx.filter'. Suwaki chodzą płynnie, łuk zawsze się ładuje.</div>
+  <div class="note">V42 — repaired visible smooth vignette, softer HUD digit shadows, brighter arch, animated sci-fi numbers sample 03.</div>
 </div>
 
 <script>
-const VERSION="V51G";
+const VERSION="V42";
 
 const state={
   height:1.5,
@@ -573,17 +557,8 @@ const state={
   sliderHeightMin:0.5,
   sliderHeightMax:5.0,
   sliderSpanMin:1.0,
-  sliderSpanMax:5.0,
-  isDragging: false // V51G: Fast mode flag
+  sliderSpanMax:5.0
 };
-
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(err => {
-      console.log('SW registration failed:', err);
-    });
-  });
-}
 
 function clamp(v,min,max){
   return Math.min(max,Math.max(min,v));
@@ -621,6 +596,7 @@ function syncInput(which){
     state.span=clamp(parseNumber("span"),state.sliderSpanMin,state.sliderSpanMax);
     setSliderPercent("sliderSpanShell",state.span,state.sliderSpanMin,state.sliderSpanMax);
   }
+
   calculate();
 }
 
@@ -661,7 +637,6 @@ document.querySelectorAll(".slider-shell").forEach(shell=>{
     event.stopPropagation();
     shell.setPointerCapture?.(event.pointerId);
     shell.dataset.dragging="1";
-    state.isDragging = true; // Engage fast mode
     setValueFromPointer(shell,event);
   },{passive:false});
 
@@ -674,14 +649,12 @@ document.querySelectorAll(".slider-shell").forEach(shell=>{
 
   function endDrag(event){
     shell.dataset.dragging="0";
-    state.isDragging = false; // Disengage fast mode, render details
     try{shell.releasePointerCapture?.(event.pointerId)}catch(_){}
-    calculate(); // Force final high-res draw
   }
 
   shell.addEventListener("pointerup",endDrag);
   shell.addEventListener("pointercancel",endDrag);
-  shell.addEventListener("lostpointercapture",endDrag);
+  shell.addEventListener("lostpointercapture",()=>shell.dataset.dragging="0");
 });
 
 function findCatenaryParameterA(span,height){
@@ -691,9 +664,7 @@ function findCatenaryParameterA(span,height){
   let a=(aMin+aMax)/2;
 
   for(let i=0;i<150;i++){
-    // V51G: Prevent Infinity crashes in math
-    const arg = Math.min(70, Math.max(-70, halfSpan/a)); 
-    const calcHeight=a*(Math.cosh(arg)-1);
+    const calcHeight=a*(Math.cosh(halfSpan/a)-1);
     const diff=calcHeight-height;
 
     if(Math.abs(diff)<.00001)break;
@@ -702,6 +673,7 @@ function findCatenaryParameterA(span,height){
 
     a=(aMin+aMax)/2;
   }
+
   return a;
 }
 
@@ -714,19 +686,12 @@ function seededRandom(seed){
   };
 }
 
-function toRGBA(r, g, b, a) {
-  if (isNaN(r) || isNaN(g) || isNaN(b) || isNaN(a)) return "rgba(0,0,0,0)";
-  return `rgba(${Math.floor(r)}, ${Math.floor(g)}, ${Math.floor(b)}, ${Math.max(0, Math.min(1, a)).toFixed(3)})`;
-}
-
 function drawStableSoilTexture(ctx,width,groundY,height){
-  // V51G: Skip massive loops during drag to keep 60fps and prevent Chrome Violation errors
-  if (state.isDragging) return; 
-
   const rand=seededRandom(1447);
   const count=Math.floor(width*(height-groundY)/500);
 
   ctx.save();
+
   for(let i=0;i<count;i++){
     const x=rand()*width;
     const y=groundY+rand()*Math.max(1,height-groundY);
@@ -734,13 +699,17 @@ function drawStableSoilTexture(ctx,width,groundY,height){
     const alpha=.028+rand()*.078;
     const isWarm=rand()>.56;
 
-    ctx.fillStyle=isWarm ? toRGBA(235,211,151,alpha) : toRGBA(34,26,18,alpha*.88);
+    ctx.fillStyle=isWarm
+      ?`rgba(235,211,151,${alpha})`
+      :`rgba(34,26,18,${alpha*.88})`;
+
     ctx.beginPath();
     ctx.arc(x,y,radius,0,Math.PI*2);
     ctx.fill();
   }
 
   const pebbles=Math.floor(width*(height-groundY)/6200);
+
   for(let i=0;i<pebbles;i++){
     const x=rand()*width;
     const y=groundY+rand()*Math.max(1,height-groundY);
@@ -748,11 +717,15 @@ function drawStableSoilTexture(ctx,width,groundY,height){
     const ry=.45+rand()*1.4;
     const a=.060+rand()*.090;
 
-    ctx.fillStyle=rand()>.52 ? toRGBA(50,38,25,a) : toRGBA(205,180,118,a*.82);
+    ctx.fillStyle=rand()>.52
+      ?`rgba(50,38,25,${a})`
+      :`rgba(205,180,118,${a*.82})`;
+
     ctx.beginPath();
     ctx.ellipse(x,y,rx,ry,rand()*Math.PI,0,Math.PI*2);
     ctx.fill();
   }
+
   ctx.restore();
 }
 
@@ -781,82 +754,51 @@ function drawCatenaryStrokeOffset(ctx,points,lineWidth,color,normalOffset){
     if(i===0)ctx.moveTo(x,y);
     else ctx.lineTo(x,y);
   }
+
   ctx.stroke();
 }
 
-function blendColor(c1, c2, t) {
-  if (isNaN(t)) return c1;
-  const r = Math.round(c1[0] * (1 - t) + c2[0] * t);
-  const g = Math.round(c1[1] * (1 - t) + c2[1] * t);
-  const b = Math.round(c1[2] * (1 - t) + c2[2] * t);
-  return [r, g, b];
-}
-
-function drawTube(ctx,points,baseWidth, stressLevel){
+function drawTube(ctx,points,baseWidth){
   if(!points.length||baseWidth<=0)return;
 
-  const baseOuter = [128, 132, 121];
-  const baseMid = [139, 144, 132];
-  const baseInner = [151, 155, 142];
-  
-  const dangerOuter = [255, 80, 20];
-  const dangerMid = [255, 40, 10];
-  const dangerInner = [255, 0, 0];
-
-  const safeStress = isNaN(stressLevel) ? 0 : stressLevel;
-  const easeT = Math.pow(safeStress, 2); 
-
-  const cOuter = blendColor(baseOuter, dangerOuter, easeT);
-  const cMid = blendColor(baseMid, dangerMid, easeT);
-  const cInner = blendColor(baseInner, dangerInner, easeT);
-
-  // V51G: Removed ctx.filter completely, it crashes mobile webkits during fast paints.
-  function strokeLayer(width, colorRGB, alpha, normalOffset=0){
+  function stroke(width,color,normalOffset=0,blur=0){
     ctx.save();
     ctx.lineCap="butt";
     ctx.lineJoin="round";
-    drawCatenaryStrokeOffset(ctx,points,width,toRGBA(colorRGB[0], colorRGB[1], colorRGB[2], alpha),normalOffset);
+    if(blur>0)ctx.filter=`blur(${blur}px)`;
+    drawCatenaryStrokeOffset(ctx,points,width,color,normalOffset);
     ctx.restore();
   }
 
   ctx.save();
   ctx.lineCap="butt";
   ctx.lineJoin="round";
-  
-  if (safeStress > 0.15) {
-    const glowAlpha = Math.min(1.0, safeStress * 1.5); 
-    ctx.shadowColor = toRGBA(255, 40, 0, glowAlpha);
-    ctx.shadowBlur = Math.max(10, baseWidth * safeStress * 1.5);
-  } else {
-    ctx.shadowColor = toRGBA(0,0,0,0.15);
-    ctx.shadowBlur=Math.max(5,baseWidth*.10);
-  }
-  
+  ctx.shadowColor="rgba(0,0,0,.15)";
+  ctx.shadowBlur=Math.max(5,baseWidth*.10);
   ctx.shadowOffsetX=Math.max(1,baseWidth*.018);
   ctx.shadowOffsetY=Math.max(2,baseWidth*.048);
-  drawCatenaryStrokeOffset(ctx,points,baseWidth*1.01,toRGBA(75,79,71,.70),0);
+  drawCatenaryStrokeOffset(ctx,points,baseWidth*1.01,"rgba(75,79,71,.70)",0);
   ctx.restore();
 
-  strokeLayer(baseWidth*.998, cOuter, .98, 0);
-  strokeLayer(baseWidth*.920, cMid, .90, .05*baseWidth);
-  strokeLayer(baseWidth*.820, cInner, .72, .13*baseWidth);
+  /* V42: brighter, less sad concrete body */
+  stroke(baseWidth*.998,"rgba(128,132,121,.98)",0,Math.max(.34,baseWidth*.004));
+  stroke(baseWidth*.920,"rgba(139,144,132,.90)",.05*baseWidth,Math.max(.52,baseWidth*.006));
+  stroke(baseWidth*.820,"rgba(151,155,142,.72)",.13*baseWidth,Math.max(.72,baseWidth*.009));
 
-  const cHigh = blendColor([220,214,194], [255, 160, 80], easeT);
-  strokeLayer(baseWidth*.11, cHigh, .026 + (easeT*0.1), .30*baseWidth);
+  stroke(baseWidth*.11,"rgba(220,214,194,.026)",.30*baseWidth,Math.max(1.25,baseWidth*.019));
 
-  strokeLayer(baseWidth*.68, [104,108,98], .12, -.02*baseWidth);
-  strokeLayer(baseWidth*.58, [92,96,88], .17, -.08*baseWidth);
-  strokeLayer(baseWidth*.48, [78,83,76], .22, -.15*baseWidth);
-  strokeLayer(baseWidth*.37, [64,69,64], .24, -.23*baseWidth);
-  strokeLayer(baseWidth*.26, [52,57,53], .22, -.31*baseWidth);
-
-  // V51G: Fast mode skip texturing
-  if (state.isDragging) return;
+  /* inner side: still darker, but not black/sad */
+  stroke(baseWidth*.68,"rgba(104,108,98,.12)",-.02*baseWidth,Math.max(.70,baseWidth*.010));
+  stroke(baseWidth*.58,"rgba(92,96,88,.17)",-.08*baseWidth,Math.max(.84,baseWidth*.012));
+  stroke(baseWidth*.48,"rgba(78,83,76,.22)",-.15*baseWidth,Math.max(.98,baseWidth*.014));
+  stroke(baseWidth*.37,"rgba(64,69,64,.24)",-.23*baseWidth,Math.max(1.10,baseWidth*.016));
+  stroke(baseWidth*.26,"rgba(52,57,53,.22)",-.31*baseWidth,Math.max(1.22,baseWidth*.018));
 
   const rand=seededRandom(18131+Math.round(baseWidth*100));
   const count=Math.min(7600,Math.max(2600,Math.floor(points.length*baseWidth/1.55)));
 
   ctx.save();
+
   for(let i=0;i<count;i++){
     const idx=1+Math.floor(rand()*Math.max(1,points.length-2));
     const p0=points[idx-1];
@@ -866,6 +808,7 @@ function drawTube(ctx,points,baseWidth, stressLevel){
     const dx=p1.x-p0.x;
     const dy=p1.y-p0.y;
     const len=Math.hypot(dx,dy)||1;
+
     const nx=dy/len;
     const ny=-dx/len;
 
@@ -876,19 +819,15 @@ function drawTube(ctx,points,baseWidth, stressLevel){
     const alpha=.018+rand()*.058;
 
     let fill;
+
     if(across>0){
-      const highTex = blendColor([224,219,200], [255,160,80], easeT);
       fill=rand()>.60
-        ? toRGBA(highTex[0], highTex[1], highTex[2], alpha*.58)
-        : toRGBA(114, 119, 109, alpha*.54);
+        ?`rgba(224,219,200,${alpha*.58})`
+        :`rgba(114,119,109,${alpha*.54})`;
     }else{
-      const heatR = 200*(rand()*0.3);
-      const heatG = 60*(rand()*0.2);
       fill=rand()>.44
-        ? toRGBA(61, 66, 61, alpha*.64)
-        : rand()>.3 
-          ? toRGBA(heatR, heatG, 0, alpha*0.15)
-          : toRGBA(174, 170, 154, alpha*.23);
+        ?`rgba(61,66,61,${alpha*.64})`
+        :`rgba(174,170,154,${alpha*.23})`;
     }
 
     ctx.fillStyle=fill;
@@ -896,90 +835,11 @@ function drawTube(ctx,points,baseWidth, stressLevel){
     ctx.arc(x,y,r,0,Math.PI*2);
     ctx.fill();
   }
+
   ctx.restore();
 }
 
-function calculate(){
-  try {
-    state.height=Math.max(.01,parseNumber("height"));
-    state.span=Math.max(.01,parseNumber("span"));
-    state.diameter=Math.max(.1,parseNumber("diameter"));
-    state.depth=Math.max(0,parseNumber("depth"));
-
-    if(state.depth>=state.height){
-      state.depth=state.height-.001;
-    }
-
-    setSliderPercent("sliderHeightShell",state.height,state.sliderHeightMin,state.sliderHeightMax);
-    setSliderPercent("sliderSpanShell",state.span,state.sliderSpanMin,state.sliderSpanMax);
-
-    const a=findCatenaryParameterA(state.span,state.height);
-    const totalLength=2*a*Math.sinh((state.span/2)/a);
-
-    const visibleHeight=Math.max(0.01, state.height-state.depth); 
-    const spanAbove=2*a*Math.acosh(visibleHeight/a+1);
-    const lengthAbove=2*a*Math.sinh((spanAbove/2)/a);
-
-    const lengthUnderTotal=totalLength-lengthAbove;
-    const lengthUnderPerLeg=lengthUnderTotal/2;
-
-    const diaM = state.diameter / 100;
-    const radiusMeters=diaM / 2;
-    const volumeLiters=(Math.PI*Math.pow(radiusMeters,2)*totalLength)*1000;
-
-    const dryMass=volumeLiters*1.95;
-    const waterMin=dryMass*.14;
-    const waterMax=dryMass*.15;
-    const totalArchMass=dryMass+waterMax;
-
-    // V51G: Refined heuristics
-    const slendernessVal = totalLength / diaM;
-    const flatnessVal = spanAbove / visibleHeight;
-    const anchorageRatio = state.depth / visibleHeight;
-
-    let stress = 0;
-    if (slendernessVal > 50) stress += (slendernessVal - 50) / 40;
-    if (flatnessVal > 2.5) stress += (flatnessVal - 2.5) / 2.0; 
-    if (anchorageRatio < 0.2) stress += (0.2 - anchorageRatio) * 5; 
-
-    const stressLevel = Math.min(1.0, Math.max(0.0, stress));
-
-    document.getElementById("slendernessRatio").innerText = isNaN(slendernessVal) ? "ERR" : slendernessVal.toFixed(1);
-    document.getElementById("flatnessRatio").innerText = isNaN(flatnessVal) ? "ERR" : flatnessVal.toFixed(1);
-    document.getElementById("anchorageRatio").innerText = isNaN(anchorageRatio) ? "ERR" : anchorageRatio.toFixed(2);
-
-    const statusEl = document.getElementById("stressStatus");
-    statusEl.classList.remove("status-ok", "status-warn", "status-danger");
-    
-    if (stressLevel < 0.3) {
-      statusEl.innerText = "OPTIMAL";
-      statusEl.classList.add("status-ok");
-    } else if (stressLevel < 0.65) {
-      statusEl.innerText = "WARNING (High Stress)";
-      statusEl.classList.add("status-warn");
-    } else {
-      statusEl.innerText = "CRITICAL RISK";
-      statusEl.classList.add("status-danger");
-    }
-
-    document.getElementById("spanAbove").innerText=isNaN(spanAbove) ? "—" : spanAbove.toFixed(2)+" m";
-    document.getElementById("heightAbove").innerText=isNaN(visibleHeight) ? "—" : visibleHeight.toFixed(2)+" m";
-    document.getElementById("lengthAbove").innerText=isNaN(lengthAbove) ? "—" : lengthAbove.toFixed(2)+" m";
-    document.getElementById("lengthUnder").innerText=isNaN(lengthUnderPerLeg) ? "—" : lengthUnderPerLeg.toFixed(2)+" m";
-    document.getElementById("lengthTotal").innerText=isNaN(totalLength) ? "—" : totalLength.toFixed(2)+" m";
-
-    document.getElementById("volume").innerText=isNaN(volumeLiters) ? "—" : volumeLiters.toFixed(1)+" l";
-    document.getElementById("dryMass").innerText=isNaN(dryMass) ? "—" : dryMass.toFixed(1)+" kg";
-    document.getElementById("waterRange").innerText=isNaN(waterMin) ? "—" : waterMin.toFixed(1)+" - "+waterMax.toFixed(1)+" l";
-    document.getElementById("totalMass").innerText=isNaN(totalArchMass) ? "—" : totalArchMass.toFixed(1)+" kg";
-
-    drawArch(state.span,state.height,state.depth,state.diameter,a, stressLevel);
-  } catch (err) {
-    console.error("V51G Render Crash:", err);
-  }
-}
-
-function drawArch(span,height,depth,diameter,a, stressLevel){
+function drawArch(span,height,depth,diameter,a){
   const canvas=document.getElementById("archCanvas");
   const ctx=canvas.getContext("2d");
   const dpr=window.devicePixelRatio||1;
@@ -1007,16 +867,18 @@ function drawArch(span,height,depth,diameter,a, stressLevel){
   const offsetY=cssHeight-marginBottom-(drawHeight-height*scale)*.44;
   const groundY=offsetY-depth*scale;
 
+  const root=getComputedStyle(document.documentElement);
+
   const skyGradient=ctx.createLinearGradient(0,0,0,Math.max(1,groundY));
-  skyGradient.addColorStop(0, "#9ec7df");
-  skyGradient.addColorStop(1, "#98c2a7");
+  skyGradient.addColorStop(0,root.getPropertyValue("--sky-top").trim());
+  skyGradient.addColorStop(1,root.getPropertyValue("--sky-bottom").trim());
   ctx.fillStyle=skyGradient;
   ctx.fillRect(0,0,cssWidth,groundY);
 
   const soilGradient=ctx.createLinearGradient(0,groundY,0,cssHeight);
-  soilGradient.addColorStop(0, "#ac955f");
-  soilGradient.addColorStop(.52, "#6b5130");
-  soilGradient.addColorStop(1, "#432718");
+  soilGradient.addColorStop(0,root.getPropertyValue("--soil-top").trim());
+  soilGradient.addColorStop(.52,root.getPropertyValue("--soil-mid").trim());
+  soilGradient.addColorStop(1,root.getPropertyValue("--soil-bottom").trim());
   ctx.fillStyle=soilGradient;
   ctx.fillRect(0,groundY,cssWidth,cssHeight-groundY);
 
@@ -1028,16 +890,12 @@ function drawArch(span,height,depth,diameter,a, stressLevel){
   for(let i=0;i<=numSteps;i++){
     const t=i/numSteps;
     const x=-span/2+t*span;
-    // V51G: Math.cosh overflow clamp. Max safe arg is ~700, kept at 70 for huge safety margin.
-    const arg = Math.min(70, Math.max(-70, x/a));
-    let y = height-a*(Math.cosh(arg)-1);
-    
-    let cy = offsetY-y*scale;
-    // V51G: Canvas coordinates hard clamping to prevent path poisoning
-    if (cy < -10000) cy = -10000;
-    if (cy > 10000) cy = 10000;
+    const y=height-a*(Math.cosh(x/a)-1);
 
-    points.push({ x: offsetX+x*scale, y: cy });
+    points.push({
+      x:offsetX+x*scale,
+      y:offsetY-y*scale
+    });
   }
 
   ctx.save();
@@ -1048,24 +906,23 @@ function drawArch(span,height,depth,diameter,a, stressLevel){
   const xEnd=Math.ceil(span/2+2);
 
   for(let x=xStart;x<=xEnd;x+=.5){
-    const cleanX = Math.round(x*10)/10;
-    const canvasX=offsetX+cleanX*scale;
-    const isMajor=Number.isInteger(cleanX);
+    const canvasX=offsetX+x*scale;
+    const isMajor=Number.isInteger(x);
     const distance=Math.abs(canvasX-offsetX)/Math.max(1,cssWidth/2);
     const alpha=(isMajor?.090:.038)*(1-distance*.35);
 
-    ctx.strokeStyle=toRGBA(255,255,255,Math.max(.022,alpha));
+    ctx.strokeStyle=`rgba(255,255,255,${Math.max(.022,alpha)})`;
     ctx.lineWidth=isMajor?.8:.45;
     ctx.beginPath();
     ctx.moveTo(canvasX,0);
     ctx.lineTo(canvasX,cssHeight);
     ctx.stroke();
 
-    if(isMajor&&cleanX!==0){
-      ctx.fillStyle=toRGBA(255,255,255,.28);
+    if(isMajor&&x!==0){
+      ctx.fillStyle="rgba(255,255,255,.28)";
       ctx.textAlign="center";
       ctx.textBaseline="middle";
-      ctx.fillText(`${cleanX}m`,canvasX,groundY+11);
+      ctx.fillText(`${x}m`,canvasX,groundY+11);
     }
   }
 
@@ -1073,29 +930,28 @@ function drawArch(span,height,depth,diameter,a, stressLevel){
   const yEnd=Math.ceil(height+2);
 
   for(let y=yStart;y<=yEnd;y+=.5){
-    const cleanY = Math.round(y*10)/10;
-    const canvasY=offsetY-cleanY*scale;
-    const isMajor=Number.isInteger(cleanY);
+    const canvasY=offsetY-y*scale;
+    const isMajor=Number.isInteger(y);
     const alpha=isMajor?.090:.038;
 
-    ctx.strokeStyle=toRGBA(255,255,255,alpha);
+    ctx.strokeStyle=`rgba(255,255,255,${alpha})`;
     ctx.lineWidth=isMajor?.8:.45;
     ctx.beginPath();
     ctx.moveTo(0,canvasY);
     ctx.lineTo(cssWidth,canvasY);
     ctx.stroke();
 
-    if(isMajor&&cleanY!==0){
-      ctx.fillStyle=toRGBA(255,255,255,.28);
+    if(isMajor&&y!==0){
+      ctx.fillStyle="rgba(255,255,255,.28)";
       ctx.textAlign="left";
       ctx.textBaseline="middle";
-      ctx.fillText(`${cleanY}m`,offsetX+9,canvasY);
+      ctx.fillText(`${y}m`,offsetX+9,canvasY);
     }
   }
 
   ctx.restore();
 
-  ctx.strokeStyle=toRGBA(46,32,20,.92);
+  ctx.strokeStyle="rgba(46,32,20,.92)";
   ctx.lineWidth=1.15;
   ctx.beginPath();
   ctx.moveTo(0,groundY);
@@ -1103,10 +959,10 @@ function drawArch(span,height,depth,diameter,a, stressLevel){
   ctx.stroke();
 
   const baseWidth=Math.max(2,(diameter/100)*scale);
-  drawTube(ctx,points,baseWidth, stressLevel);
+  drawTube(ctx,points,baseWidth);
 
   ctx.save();
-  ctx.strokeStyle=toRGBA(255,82,28,.98);
+  ctx.strokeStyle="rgba(255,82,28,.98)";
   ctx.lineWidth=1.45;
   ctx.beginPath();
   ctx.moveTo(offsetX-4.2,groundY);
@@ -1119,7 +975,51 @@ function drawArch(span,height,depth,diameter,a, stressLevel){
   ctx.restore();
 }
 
-let resizeTimer;
+function calculate(){
+  state.height=Math.max(.01,parseNumber("height"));
+  state.span=Math.max(.01,parseNumber("span"));
+  state.diameter=Math.max(.1,parseNumber("diameter"));
+  state.depth=Math.max(0,parseNumber("depth"));
+
+  if(state.depth>=state.height){
+    state.depth=state.height-.001;
+  }
+
+  setSliderPercent("sliderHeightShell",state.height,state.sliderHeightMin,state.sliderHeightMax);
+  setSliderPercent("sliderSpanShell",state.span,state.sliderSpanMin,state.sliderSpanMax);
+
+  const a=findCatenaryParameterA(state.span,state.height);
+  const totalLength=2*a*Math.sinh((state.span/2)/a);
+
+  const visibleHeight=Math.max(0,state.height-state.depth);
+  const spanAbove=2*a*Math.acosh(visibleHeight/a+1);
+  const lengthAbove=2*a*Math.sinh((spanAbove/2)/a);
+
+  const lengthUnderTotal=totalLength-lengthAbove;
+  const lengthUnderPerLeg=lengthUnderTotal/2;
+
+  const radiusMeters=(state.diameter/2)/100;
+  const volumeLiters=(Math.PI*Math.pow(radiusMeters,2)*totalLength)*1000;
+
+  const dryMass=volumeLiters*1.95;
+  const waterMin=dryMass*.14;
+  const waterMax=dryMass*.15;
+  const totalArchMass=dryMass+waterMax;
+
+  document.getElementById("spanAbove").innerText=spanAbove.toFixed(2)+" m";
+  document.getElementById("heightAbove").innerText=visibleHeight.toFixed(2)+" m";
+  document.getElementById("lengthAbove").innerText=lengthAbove.toFixed(2)+" m";
+  document.getElementById("lengthUnder").innerText=lengthUnderPerLeg.toFixed(2)+" m";
+  document.getElementById("lengthTotal").innerText=totalLength.toFixed(2)+" m";
+
+  document.getElementById("volume").innerText=volumeLiters.toFixed(1)+" l";
+  document.getElementById("dryMass").innerText=dryMass.toFixed(1)+" kg";
+  document.getElementById("waterRange").innerText=waterMin.toFixed(1)+" - "+waterMax.toFixed(1)+" l";
+  document.getElementById("totalMass").innerText=totalArchMass.toFixed(1)+" kg";
+
+  drawArch(state.span,state.height,state.depth,state.diameter,a);
+}
+
 function resizeCanvas(){
   const canvas=document.getElementById("archCanvas");
   const viewport=document.getElementById("viewport");
@@ -1145,18 +1045,21 @@ function init(){
   setSliderPercent("sliderSpanShell",state.span,state.sliderSpanMin,state.sliderSpanMax);
 
   resizeCanvas();
+  requestAnimationFrame(resizeCanvas);
   setTimeout(resizeCanvas,50);
   setTimeout(resizeCanvas,250);
+  setTimeout(resizeCanvas,700);
 }
 
 window.addEventListener("DOMContentLoaded",init);
 window.addEventListener("load",init);
-
-window.addEventListener("resize", () => {
-  cancelAnimationFrame(resizeTimer);
-  resizeTimer = requestAnimationFrame(resizeCanvas);
-});
+window.addEventListener("resize",resizeCanvas);
 window.addEventListener("orientationchange",()=>setTimeout(resizeCanvas,180));
+
+if("ResizeObserver" in window){
+  const ro=new ResizeObserver(()=>resizeCanvas());
+  ro.observe(document.getElementById("viewport"));
+}
 
 init();
 </script>
